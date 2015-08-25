@@ -1,0 +1,1363 @@
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.1, 2015-06-30)
+
+HyperList is a way to describe anything - any state, item(s), pattern, action,
+process, transition, program, instruction set etc. So, you can use it as an
+outliner, a ToDo list handler, a process design tool, a data modeler, or any
+other way you want to describe something.
+
+This plugin incorporates encryption. You can encrypt any part of a HyperList or
+take advantage of the autoencryption feature by making the HyperList a dot file
+- i.e. prefixing the file name wiht a dot (such as ".password.hl"). You can use
+this plugin to make a password safe.
+
+The VIM plugin version numbers correspond to the HyperList definition version
+numbers with the VIM plugin adding another increment of versioning, e.g VIM
+plugin version 2.3.1 would be compatible with HyperList definition version 2.3.
+
+This documentation contains the full HyperList definition. For a more
+comprehensive manual that also includes plenty of examples, read the official
+definition document:
+
+	http://isene.com/hyperlist/
+
+Here you will also find HyperGraph - a Ruby script to graph both State
+HyperLists (like mindmaps) and Transitions Hyperlists (like flowcharts).
+
+HyperList was formerly known as WOIM. The ftdetect file contains the file
+suffix ".woim" for backward compatability so that these file typeas are also
+treated as HyperList files.
+
+==============================================================================
+CONTENTS                                                  *HyperList-Contents*
+
+    1 HyperList VIM Plugin....................|HyperList-Plugin|
+    2 Background and definition...............|HyperList-Background|
+		3 HyperLists..............................|HyperLists|
+		4 HyperList Items.........................|HyperList-Item|
+		4.1 Starter...............................|HyperList-Starter|
+		4.2 Type..................................|HyperList-Type|
+		4.3 Content...............................|HyperList-Content|
+		4.3.1 Elements............................|HyperList-Elements|
+		4.3.1.1 Operator..........................|HyperList-Operator|
+		4.3.1.2 Qualifier.........................|HyperList-Qualifier|
+		4.3.1.2 Property..........................|HyperList-Property|
+		4.3.1.4 Description.......................|HyperList-Description|
+		4.3.2 Additives...........................|HyperList-Additives|
+		4.3.2.1 References........................|HyperList-References|
+		4.3.2.2 Tags..............................|HyperList-Tags|
+		4.3.2.3 Comments..........................|HyperList-Comments|
+		4.3.2.4 Quotes............................|HyperList-Quotes|
+		4.3.2.5 Change Markup.....................|HyperList-ChangeMarkup|
+		4.4 Separator.............................|HyperList-Separator|
+		5 A self-defining system..................|HyperList-Self-definition|
+    6 About...................................|HyperList-About|
+    7 Changelog...............................|HyperList-Changelog|
+    8 Credits.................................|HyperList-Credits|
+    9 License.................................|HyperList-License|
+
+==============================================================================
+1 HyperList VIM Plugin                                      *HyperList-Plugin*
+
+This plugin does both highlighting and various automatic handling of
+HyperLists, like collapsing lists or parts of lists in a sophisticated way. 
+It includes encryption functionality.
+
+The HyperList plugin for VIM consists of the main file put in the "syntax"
+subdirectory.  It also includes a file in the "ftdetect" directory so that
+files with a ".hl" extension is automatically detected and treated as a
+HyperList file.
+
+When working wiht HyperLists in VIM:
+
+	Use tabs/shifts or * for indentations.
+
+	Use <SPACE> to toggle one fold.
+	Use \0 to \9, \a, \b, \c, \d, \e, \f to show up to 15 levels expanded.
+
+	Use <leader>u to toggle underlining of States (prefixed with "S: " or "| "),
+	Transitions (prefixed with "T: " or "/ ") or underline nothing.
+
+	Use <leader>v to add a checkbox at start of item or to toggle a checkbox
+	Use <leader>V to add/toggle a checkbox with a date stamp for completion
+
+	Use "gr" (without the quotation marks, signifies "Goto Ref") or simply press
+	the "Enter" ("<CR>") key while the cursor is on a HyperList reference to jump
+	to that destination in a HyperList. Use "n" after a "gr" to verify that the
+	reference destination is unique. A reference can be in the list or to a file
+	by the use of <file:/pathto/filename>, <file:~/filename> or <file:filename>.
+
+	Use "gf" to open the file under the cursor. Graphic files are opened in
+	"feh", pdf files in "zathura" and MS/OOO docs in "LibreOffice". Other
+	filetypes are opened in VIM for editing. All this can be changed by
+	editing the function OpenFile() in the file "hyperlist.vim".
+
+	Whenever you jump to a reference in this way, the mark "'" is set at the
+	point you jumped from so that you may easily jump back by hitting "''"
+	(single quoutes twice). 
+
+	Use <leader><SPACE> to go to the next open template element
+	(A template element is a HyperList item ending in an equal sign).
+
+  As a sort of "presentation mode", you can traverse a HyperList by using
+  g<DOWN> or g<UP> to view only the current line and its ancestors.
+  An alternative is <leader><DOWN> and <leader><UP> to open more levels down.
+
+	Use <leader>L to convert the entire document to LaTaX.
+
+The LaTeX conversion includes color coding of the various elements similar to
+the colors used for HyperList files within VIM.
+
+  Use <leader>z to encrypt the current line (including all sublevels if folded).
+  Use <leader>Z to encrypt the current file (all lines).
+  Use <leader>x to decrypt the current line (mark all subsequent encrypted lines).
+  Use <leader>X to decrypt the current file (all lines).
+
+If you enter the wrong password while trying to decrypt, you will end up with
+garbage characters. To fix it, press "u" (undo) and try decrypting again with
+the correct password.
+
+If you want a HyperList to be automatically encrypted upon saving and decrypted
+upon opening it, just prefix the filename with a dot (like ".password.hl"). It
+then turns off viminfo and swapfiles to ensure security.
+
+When using encryption in a HyperList or for the whole file, you will be asked
+for a password - twice when saving the file and once when opening it. You must
+have OpenSSL in your path to take advantage of these features.
+
+Syntax updated at start and every time you leave Insert mode, or you can press
+"zx" to update the syntax. 
+
+You may speed up larger HyperListS by setting the the global variable
+"disable_collapse" - add the following to your .vimrc:
+
+  let "g:disable_collapse" = 1
+
+If you want to disable or override these keymaps with your own, simply add
+to your .vimrc file:
+
+  let "g:HLDisableMapping" = 1
+
+To use HyperLists within other file types (other than ".hl"), you can use
+"nested syntax" by adding the following to those syntax files (like the syntax
+file for text files (".txt"):
+
+  syn include @HL ~/.vim/syntax/hyperlist.vim
+  syn region HLSnip matchgroup=Snip start="HLstart" end="HLend" contains=@HL
+  hi link Snip SpecialComment
+
+If you add those three lines in your .vim/syntax/txt.vim you will be able to
+include WOIM lists in files with a ".txt", and the following example would
+become a HyperList with correct syntax highlighting and folding:
+
+HLstart
+This is a HyperList test list
+	Here is a child to the above item
+		Here is "grand child"
+	Here we are one level back
+		And here's another level down
+		[5] Dance steps
+		[3] Hurray
+		Smile
+HLend
+
+The "HLstart" and "HLend" must be at the start of the line.
+
+==============================================================================
+2 Background and definition                             *HyperList-Background*
+
+Having worked extensively with flowcharts, relations diagrams, Warnier-Orr
+diagrams and other ways of representing processes, states, instructions,
+programs and data models, I knew there was something missing. It would have
+been great to have a way of representing anything -- any state or action -- in
+a way that would be more conducive to collaboration.
+
+Most people know about flowcharts. But there are other ways of representing
+data, states, actions or processes: UML, Sankey diagrams, Decision trees, Petri
+Net, Organizational charts, Mind maps, Process Flow diagrams, Feynman diagrams,
+Data Flow diagrams, Concept maps, OBASHI, Task lists (or Todo lists),
+Warnier/Orr diagrams and various other diagrams. More than we can list here.
+They have various uses, various strengths and shortcomings.
+
+Most methodologies for representing states or flows were born out of specific
+needs and were not meant to be used as generic methods for representing
+literally anything as simple as possible. What if there were a way to represent
+any state, set of things, actions, flows or transitions? What if the method
+were simple? What if it were also Turing complete?
+
+Enter HyperList -- a system for representing data. Any data. Static or dynamic.
+It can be used to describe any state: a thing or set of things, an area, a
+concept or collection of concepts, etc. It can also be used to describe any
+action or plan, transformation or transition. In fact, it can describe anything
+-- with one complete markup set. HyperList can be be used as an outliner on
+steroids or a todo-list managing system with unlimited possibilities.
+
+After searching for a complete markup methodology for both states or things and
+actions or transitions, I came across the Warnier/Orr diagrams. They seemed to
+be the best foundation for what I needed. The methodology was expanded to be
+capable of describing anything as easily as possible; I removed the graphical
+parts of Warnier/Orr and expanded the system substantially. It turned into WOIM
+(Warnier/Orr/Isene/Möller) and later got the more descriptive name of
+HyperList. Egil Möller (http://redhog.org/) helped in the early refinements.
+
+Besides being the name of the system, "HyperList" is also used when referring
+to a list or lists conforming to this system.
+
+The strengths of HyperList are many:
+
+ * can represent any state or action with any number of levels
+ * Turing complete
+ * text-based 
+   (it is wiki-able -- i.e. it is easy to collaborate when creating HyperList)
+ * not graphical 
+   (although it can easily be made graphical for ease of consumption or eye candy)
+ * an easy syntax, humanly very readable
+ * very compact
+ * can represent negatives ("NOT:" = "don't do the following actions")
+ * can represent any number of choices in a decision (hard to do in a flowchart)
+ * easy to do loop counts
+ * easy to show attributes such as time or timing, location, person responsible, etc.
+ * potentially easy to map to other representation methods (graphical or otherwise)
+
+In its simplest form, a HyperList is just a list of Items -- like your regular
+shopping list -- but it can be so much more if you need it to be. A couple of
+examples will give you the basic idea.
+
+An example of describing a state:
+
+	Car (example obviously not complete)
+		Exterior
+			Paint
+			Chrome decor
+			Windows
+				Rubber linings
+			[4] Wheels
+		Interior
+			Seats
+				[2] Front
+				[3] Back
+		Mechanics
+			Motor
+				[6] Cylinders
+				[24] Valves
+			Brakes
+
+A transition example (task list):
+
+	Walk the dog
+		Check the weather
+			[?rain] AND/OR:
+				Get rain coat
+				Get umbrella
+			Dress for the temperature
+		Get chain
+		Call the dog
+		OR:
+			Go through the woods
+			Walk the usual track
+		AND: (concurrency)
+			Ensure the dog has done its "tasks"
+			Ensure the dog is exercised
+			  [5+] throw the favorite stick
+		Walk home
+
+And this can all be done in collaboration on a wiki. States are described,
+processes are mapped, plans and todo lists are forged. It's rather easy, and
+HyperList can accommodate any level of complexity.
+
+------------------------------------------------------------------------------
+3 HyperLists                                                      *HyperLists*
+
+A HyperList consists of one or more HyperList Items.
+
+------------------------------------------------------------------------------
+4 HyperList Item                                              *HyperList-Item*
+
+A HyperList Item is a line in a HyperList. It can have "children". Children are
+HyperList Items indented to the right below the Item.
+
+A HyperList Item consists of an optional "Starter", an optional "Type",
+"Content" and a "Separator" in that sequence. All the various parts of a
+HyperList Item are described below and in the sequence they appear in an Item,
+as outlined here:
+
+	4.1 Starter   
+	4.2 Type
+	4.3 Content
+		4.3.1 Element 
+			4.3.1.1 Operator
+			4.3.1.2 Qualifier
+			4.3.1.3 Property
+			4.3.1.4 Description 
+		4.3.2 Additive
+			4.3.2.1 Reference
+			4.3.2.2 Tag 
+			4.3.2.3 Comment  
+			4.3.2.4 Quote
+			4.3.2.5 Change Markup
+	4.4 Separator
+
+Look familiar? Yes, it is part of the table of contents at the beginning of
+this documentation -- even that is a valid HyperList. 
+
+------------------------------------------------------------------------------
+4.1 Starter                                                *HyperList-Starter*
+
+A HyperList Item may begin with a "Starter". A "Starter" can be either an
+"Identifier" or a "Multi-line Indicator".
+
+An Identifier is a unique indicator that can be used in referring to that Item.
+A numbering scheme such as X.Y.Z can be used, e.g. the first Item in a
+HyperList would be 1. The second Item would be 2, etc. A child to the second
+Item would be 2.1 and the second child of 2 would be identified as 2.2, whereas
+the child of 2.2 would be 2.2.1.
+
+A shorter form consisting of mixing numbers and letters can also be used, such
+as 1A1A for the first fourth-level Item. The next fourth-level Item would be
+1A1B. When using this scheme, there is no need for any periods. The Identifier
+"21T2AD" would be equivalent to "21.20.2.30", saving 4 characters.
+
+An Item that spans more than one line must have a Starter. It does not have to
+be an Identifier. You may use a "Multi-line Indicator" instead; just prefix the
+Item with a plus sign ("+"), to show that it spans more than one line.    The
+second line of an Item will be indented to the same level/indent as the first
+with an added space in front.    If you use a Starter on one Item, then all the
+Items in that same group of Items on the same level/indent must also have a
+Starter.
+
+In the example below, the first child begins with an Identifier and the second
+a Multi-line Indicator. A Multi-line Indicator can also be used for single-line
+Items when other Items on the same level span more than one line and thus
+require a Multi-line Indicator.
+
+	Multi-line Indicator = "+"
+		1. Following lines are of the same indent with a "space" before
+		 the text
+		+ If one Item on a certain level/indent is multi-line, all Items
+		 on the same level/indent must start with a plus sign ("+") or <Identifier> 
+
+The angle brackets near the end will be discussed later in this article.
+
+------------------------------------------------------------------------------
+4.2 Type                                                      *HyperList-Type*
+
+If it is not obvious or for clarity or strictness, prefix an Item with "S:" if
+the Item is a static or a state Item (i.e. something which does not denote
+action). Use "T:" for a transition Item (an Item indicating action).
+Alternately, you may use "|" instead of "S:", and "/" instead of "T:". The Type
+indicator comes after the optional Starter.
+
+Children of a certain Type (either state or transition) inherit their parent's
+Type unless otherwise specified.
+
+------------------------------------------------------------------------------
+4.3 Content                                                *HyperList-Content*
+
+A HyperList Item must have some sort of Content. The Content can be an
+"Element" and/or an "Additive".
+
+------------------------------------------------------------------------------
+4.3.1 Elements                                            *HyperList-Elements*
+
+An Element is either an "Operator", a "Qualifier", a "Property" or a
+"Description". Let's treat each of these concepts.
+
+------------------------------------------------------------------------------
+4.3.1.1 Operator                                          *HyperList-Operator*
+
+An Operator is anything that operates on an Item or a set of Items. It can be
+any of the usual logical operators. It can also be other Operators, such as
+"EXAMPLE: ", "EXAMPLES: ", "CHOOSE: ", "ONE OF THESE: ", "IMPLIES: ",
+"CONTINUOUS: ", etc. The Operator "CONTINUOUS: " makes an Item or set of Items
+run continuously. An Operator is written in capital letters and ends in a colon
+and a space.
+
+The Operator "ENCRYPTION: " indicates that the sub-Item(s) are to be encrypted
+or that the following block is encrypted. The encrypted block can be properly
+indented in the HyperList, or if indentation is part of the encrypted block, it
+will be left justified. This is the only Item that is allowed to break the
+indentation rules. 
+
+If you need to include one or more lines inside a HyperList that include
+HyperList expressions you don't want to be interpreted as HyperList
+expressions, then use a "literal block". This is equivalent to "pre-formatted"
+text in HTML and some word processors. To include such a block of lines, simply
+mark the start and end of the literal block with a single backslash ("\") on a
+line. Example:
+
+   \
+   This is a block of literal text...
+   Where nothing counts as HyperList markup
+   Thus - neither this: [?] nor THIS: <Test> - are seen as markup
+   ...until we end this block with...
+   \
+
+Literal blocks are useful when you want to include, for instance, a block of
+programming code in the middle of a HyperList.
+
+------------------------------------------------------------------------------
+4.3.1.2 Qualifier                                        *HyperList-Qualifier*
+
+A Qualifier does as its name suggests; it qualifies an Item. A Qualifier limits
+the use of an Item. It tells you how many times, at what times and/or under
+what conditions an Item is to be executed, exists or is valid. When an Item is
+to be included only if several conditions are met, you put all the conditions
+into square brackets and separate them by commas. If an Item is to be executed
+first for one condition, then for another and then for a third, etc, you
+separate them by periods. The usage is best described by a few examples:
+
+* Do Item if "the mail has arrived" = "[The mail has arrived]"
+* Do Item 3 times = "[3]"
+* Do Item 1 or more times = "[1+]"
+* Do Item 2 to 4 times = "[2..4]" (the user may choose 2, 3 or 4 times)
+* Do Item 2 times while "foo=true" = "[2, foo=true]"
+* Do Item from 3 to 5 times while "bar=false" = "[3..5, bar=false]"
+* Do Item less than 4 times only while "zoo=0" = "[<4, zoo=0]"
+* Do Item 1 or more times while "Bob is polite" = "[1+, Bob is polite]"
+* Do Item a minimum 2 and a maximum 7 of times while it rains and temperature
+  is less than 5 degrees Celsius = "[2..7, Raining, Temperature <5°C]"
+* Do Item in the context of "apples", then "oranges", then "grapes" =
+	"[Apples. Oranges. Grapes]". With this you can reuse a procedure in many
+	contexts.
+
+You can add a question mark before the qualifier statement to make it clearer
+that it is an ``if'' statement. These are equivalent:
+
+   [? Raining] Bring unbrella
+	 
+   [Raining] Bring unbrella
+
+To indicate that an Item is optional, use "[?]". Example:
+
+   Receive calls at reception
+      Pick up the phone and greet the caller
+      [Caller does not ask for any specific person]
+         Ask who the caller wants to speak to
+      [?] Ask the reason for wanting to talk to that person
+      [Person available] Transfer call; END
+      [Person not available] Ask if you can leave a message
+         Take the message
+         Send the message to the person
+
+The special word "END" and the semicolon in the above example will be explained
+later, under "Reference" and "Separator", respectively.
+
+Use a "timestamp" to indicate that an Item is to be done at a certain time, in
+a certain time span, before or after a certain time, etc.
+
+A timestamp has the format "YYYY-MM-DD hhmmss", conforming to the standard
+ISO-8601. The time/date format can be shortened to the appropriate time
+granularity, such as "YYYY-MM-DD hhmm", "YYYY-MM-DD hh" or "YYYY". One can add
+a timestamp Qualifier such as "[Time = 2012-12-24 17]" or simply "[2012-12-24 17]".
+
+Timestamps that represent an amount of time may be relative, such as:
+
+* Length of time to wait before doing the Item = "[+YYYY-MM-DD]"
+* Less than a certain length of time after previous Item = "[<+YYYY-MM-DD]"
+* More than a certain length of time after previous Item = "[>+YYYY-MM-DD]"
+* Length of time to wait  before doing next Item = "[-YYYY-MM-DD]"
+* Less than a certain length of time before next Item = "[<-YYYY-MM-DD]"
+* More than a certain length of time before next Item = "[>-YYYY-MM-DD]"
+* Length of time to wait after doing referenced Item = "[+YYYY-MM-DD<OtherItem>]"
+
+The last example introduces a new concept, the "Reference". References will be
+discussed below.
+
+Other obvious timestamps may be used, such as:
+
+* "[+1 week]"
+* "[-2 Martian years]"
+
+Some practical examples:
+
+* Wait one month before doing the Item = "[+YYYY-01-DD]"
+* Do Item less than 4 days before next Item = "[<-YYYY-MM-04]"
+* Wait one year and two days after Item X = "[+0001-00-02<X>]"
+
+It is also possible to have recurring Items in \hyperlist. The strict format is
+"YYYY-MM-DD+X DAY hh.mm+Y - YYYY-MM-DD hh.mm". The first date marks the
+starting date and the last date marks the end of the repetition interval. The
+"+X" is the repetition (i.e. the number of days between each repetition) in
+relation to the date, while the "+Y" is the repetition of the time (the amount
+of time between each repetition). "DAY" represents the name of the day(s) in
+the week where recurring Item occurs. You use what you need, i.e. if there is
+no repetition within a day, obviously the "+Y" would be skipped.  
+Some examples:
+
+* "[2012-05-01+7 13.00]" = 2011-05-01 1pm, repeated every 7 days
+* "[2012-05-01+2,3,2]" = Every 2, then 3, then 2 days, in repetition
+* "[2012-05-01+2 - 2012-05-01]" = Every second day for one year
+* "[2012-05-01 13.00+1]" = 2011-05-01 1pm, repeated every hour
+* "[2012-05-01 Fri,Sat - 2011-10-01]" = Every Fri & Sat in the repetition interval
+
+You can also use all possible intuitive variations by leaving certain parts of
+the timestamp unspecified.
+
+* "[YYYY-MM-03]" = Every third of every month
+* "[YYYY-12-DD]" = Every day in every December
+* "[2011-MM-05]" = The fifth of every month of 2011
+* "[Tue,Fri 12.00]" = Noon every Tuesday and Friday
+
+Here is a complex Qualifier example:
+
+   [+YYYY-MM-DD 02.30, Button color = Red, 4, ?] Push button
+
+The above statement reads "2 hours and 30 minutes after previous Item, if the
+color of the button is red, then push the button 4 times, if you want to".
+
+If you use HyperList as a todo-list manager or project management tool, there
+is a nifty way of showing Items to be done and Items done; simply add "[_]" at
+the beginning of the line for an "unchecked" Item and "[x]" for a "checked"
+Item. An unchecked Item is to be done and is indicated by this "placeholder"
+Qualifier, while a checked item indicates the Item is not to be done anymore.
+
+You may add a timestamp for the completion after a checked Item ("[x]
+YYYY-MM-DD hh.mm:"). In this way, you combine the Qualifier with a timestamp
+Tag. The timestamp as a Tag does not limit when the Item is to be done. It
+supplies information about when it was done.
+
+------------------------------------------------------------------------------
+4.3.1.2 Property                                          *HyperList-Property*
+
+A Property is any attribute describing the Content. It ends in a colon and a
+space.
+
+Examples of Properties could be: "Location = Someplace:", "Color = Green:",
+"Strength = Medium:" and "In Norway:". Anything that gives additional
+information or description to the Content.
+
+------------------------------------------------------------------------------
+4.3.1.3 Description                                    *HyperList-Description*
+
+The Description is the main body, the "meat" of the Item. Although an Item may
+not have a Description, such as a line containing only the Operator "OR:", most
+Items do have a Description. Many Items have only a Description, such as those
+in a simple todo list.
+
+------------------------------------------------------------------------------
+4.3.2 Additive                                            *HyperList-Additive*
+
+Additives can be used alone or in combination with Elements. An Additive can
+either be a "Reference", a "Comment", a "Quote" or a "Change Markup".
+
+------------------------------------------------------------------------------
+4.3.2.1 Reference                                        *HyperList-Reference*
+
+A reference is enclosed in angle brackets ("<>"). A reference can be the name
+of an Item, another HyperList or anything else. An example would be a Reference
+to a website, such as <http://www.isene.com/>, a file,
+<file:/path/to/filename>, or another item <The referenced item's Description>.
+
+There are two types of References:
+
+ * A redirection or hard Reference
+ * A soft Reference
+
+An Item consisting only of a Reference is a redirection. For a transition Item
+this means one would jump to the referenced Item and continue execution from
+there. If the redirect is to jump back after executing the referenced Item (and
+its children), then add another hash at the beginning, such as <<Reference>>.
+This makes it easy to create more compact HyperList by adding a set of
+frequently used subroutines at the end of the list. For a state Item, a
+Reference means one would include the referenced Item (and its children) at the
+Reference point.
+
+There are two special redirections for transition Items:
+
+ * An Item consisting only of the key word "SKIP" ends the current HyperList level
+ * An Item consisting only of the key word "END" ends the whole HyperList
+
+If the Reference is only part of an Item, it is a "soft Reference". It
+indicates that one would look for more information at the referenced Item. An
+even softer Reference would be to put the Reference in parentheses, such as
+(<Reference>), indicating that the referenced Item is only something apropos.
+Parentheses are used for Comments and will be discussed later.
+
+A Reference can be to any place in the list, up or down, or to another list or
+to a file, a web address or any other place that can be referred to with a
+unique name used as the Reference. Although the Reference is valid as long as
+it is unique and therefore unambiguous, you should note the following best
+practice for a Reference: 
+
+If you reference an Item higher up in the HyperList, a simple reference to the
+Item is all that is needed. One would refer to the Identifier or to the
+appropriate Content, usually the Description. Examples:
+
+	The first Item
+		A child Item
+			A grandchild
+				<A child Item>
+
+It would make sense to use an Identifier for an Item if the Description is long
+and you want to refer to that Item: 
+
+	The first Item
+		1 A child Item
+			A grandchild
+				<1>
+
+If you refer to an Item further down the hierarchy, you would use a forward
+slash ("/") to separate each level (like the "path" used in a URL):
+
+	The first Item
+		A child Item (<A grandchild/A baby>)
+			A grandchild
+				A baby
+
+If you want to refer to an Item where you first need to "climb the tree" and
+then go down another "branch", you start the path with the highest common level
+and reference the path from there:
+
+	The first Item
+		A child Item
+			A grandchild
+	Another branch
+		A leaf
+			<The first Item/A child Item/A grandchild>
+
+Or, if the referenced Item has a unique identifier, simply use that:
+
+	The first Item
+		A child Item
+			1 A grandchild
+	Another branch
+		A leaf
+			<1>
+
+You may use a unique concatenation of a path to shorten it, such as 
+<Somewhere higher up/One lev.../Ref...>. The three periods indicate
+concatenation.
+
+------------------------------------------------------------------------------
+4.3.2.2 Tag                                                    *HyperList-Tag*
+
+A Tag is a "marker" for an item. It tags an item and is used just like hashtags
+in Twitter. Examples: #TODO #RememberThis #First #SandraLyng. No spaces are
+allowed in a tag.
+
+------------------------------------------------------------------------------
+4.3.2.2 Comment                                            *HyperList-Comment*
+
+Anything within parentheses is a Comment. Comments are are not executed as
+HyperList commands -- i.e. in a list of transition Items, they are not actions
+to be executed.
+
+------------------------------------------------------------------------------
+4.3.2.3 Quote                                                *HyperList-Quote*
+
+Anything in quotation marks is a Quote. Like a Comment, a Quote is not executed
+as a HyperList command.
+
+------------------------------------------------------------------------------
+4.3.2.4 Change Markup                                 *HyperList-ChangeMarkup*
+
+When working with HyperList, especially on paper, there may come a need to mark
+deletion of Items or to show where an Item should be moved to. To accommodate
+this need, Change Markup is introduced. Change markup is a special type of Tag.
+
+If "##<" is added at the end of an Item, it is slated for deletion. To show
+that an Item should be moved, add "##>" at the end followed by a Reference
+showing to which Item it should be moved below.
+
+To indent an Item to the left, add "##<-". Indenting an Item to the right is
+marked by "##->". It is possible to combine moving and indenting an Item, i.e.
+moving an Item and making it a child of another: "##>><Ref>##->".
+
+To signify that an Item has been changed from a previous version of a
+HyperList, prefix the Item with "##text##". Inside the hash signs you may
+include information about the change done, e.g. "##John 2012-03-21##" to show
+that the Item was changed by a certain person at a given time.
+
+------------------------------------------------------------------------------
+4.4 Separator                                            *HyperList-Separator*
+
+A Separator separates one Item from another. A line in a HyperList is usually
+one Item, and Items are then usually separated by a "newline" (hitting the
+"Enter" on the keyboard). But it is possible to string several Items together
+on one line by separating them with semicolons.
+
+By separating an Item by a newline and then indenting it to the right, you
+create a child Item. A child adds information to its parent.
+
+A Separator between two Items with the same or less indent is normally read as
+"then". If a parent Item contains a description, the newline Separator and
+indent to the right (a child) reads "with" or "consists of". If a parent Item
+does not contain a Description, the Separator and indent to the right (a child)
+is read as "applies to", and a Separator between the children is read as "and".
+A few examples should suffice:
+
+	A kitchen
+		Stove
+		Table
+			Plates
+			Knives
+			Forks
+
+This would read: "A kitchen with stove and table with plates, knives and
+forks".
+
+	Time = 2010:
+		Olympic Games
+		Soccer world championship
+
+This would read: "Time = 2010: applies to: Olympic Games and Soccer world
+championship".
+
+	Walk the dog
+		Check the weather
+			[?rain] AND/OR:
+				Get rain coat
+				Get umbrella
+			Dress for the temperature
+		Get chain
+
+And this would read: "Walk the dog consists of Check the weather consists of:
+If rain, AND/OR: applies to children: Get rain coat, Get umbrella; then Dress
+for the temperature, then Get chain". Or more humanly: "Walk the dog consists
+of check the weather, which consists of either/or get the rain coat and get
+umbrella. Then dress for the temperature and then get the chain."
+
+Now consider these four examples:
+
+   Production
+      Station 1
+         Assemble parts A-G
+      Station 2
+         Assemble parts H-R
+      Station 3
+         Assemble parts S-Z
+
+   Production
+      Station 1; Assemble parts A-G
+      Station 2; Assemble parts H-R
+      Station 3; Assemble parts S-Z
+
+   Production
+      [Station 1]
+         Assemble parts A-G
+      [Station 2]
+         Assemble parts H-R
+      [Station 3]
+         Assemble parts S-Z
+
+   Production
+      [Station 1] Assemble parts A-G
+      [Station 2] Assemble parts H-R
+      [Station 3] Assemble parts S-Z
+
+The first and second examples say exactly the same thing, but the second
+example is more efficient as it uses the semicolon as a Separator instead of
+using a line break and indent. The same goes for the third and the fourth
+examples -- they are equivalent. But how about the difference between the first
+two examples and the last two?
+
+When you use a Qualifier as in examples three and four, you accommodate for the
+tasks getting done in any chosen sequence. In those two examples, the
+production could go, for example, "Station 1", then "Station 3", then "Station 2".
+
+The first and second examples read: "The production consists of: Station 1
+assembles parts A-G, then Station 2 assembles parts H-R and finally Station 3
+assembles parts S-Z".
+
+The third and fourth examples read: "The production consists of: if or when at
+Station 1, assemble parts A-G, if or when at Station 2, assemble parts H-R, and
+if or when at Station 3, assemble parts S-Z".
+
+As you can see, there is a subtle but distinct difference.
+
+------------------------------------------------------------------------------
+5 A self-defining system                           *HyperList-Self-definition*
+
+Now that we have covered all the possibilities in a HyperList, it should be
+obvious that HyperList could extend into a vast array of descriptions. It is
+even possible to write a parser or compiler for HyperList and use it as a
+programming language.
+
+Is it possible to compact the descriptions above into a HyperList? Yes, indeed.
+The HyperList system is self-describing.
+
+HyperList can be done in many different ways -- from informal to strict and
+from high-level to very detailed. The power of the tool resides with the user.
+
+To illustrate the flexibility of HyperList, we will show the definition of this
+methodology in three steps -- from a very informal and high-level description,
+to a more strict but still high-level -- to the fully-detailed definition of
+HyperList.
+
+First, here is a simple list showing what HyperList is all about:
+
+	HyperList Item parts (in sequence): 
+		Starter (optional)
+			Identifier or Multi-line Indicator
+		Type (optional)
+			State or transition
+		Content (can be an Element and/or an Additive)
+			Element
+				Either an Operator, Qualifier, Property, or Description
+			Additive    
+				Either a Reference, Tag, Comment, Quote, or Change Markup
+		Separator
+			Newline or semicolon
+
+Now, that's a very simple HyperList. Let's make the same simple list more
+strict by using the system concisely:
+
+	HyperList Item parts
+		[?] Starter; OR:
+			Identifier
+			Multi-line Indicator
+		[?] Type; OR:
+			State
+			Transition
+		Content; AND/OR:
+			Element; AND/OR:
+				Operator
+				Qualifier
+				Property
+				Description
+			Additive; AND/OR:
+				Reference
+				Tag
+				Comment
+				Quote
+				Change Markup
+		Separator; OR:
+			Newline
+			Semicolon
+
+That wasn't so intricate either, and that list is more easily parsable by a
+computer program if one wanted to automatically create graphical
+representation.
+
+How about the full and complete definition, including all imaginable details of
+how any HyperList could conceivably be structured. Fasten your seat belt.
+
+The following list shows the legal structure and syntax of a HyperList. It
+covers all you have read above. 
+
+HLstart
+	HyperList
+		[1+] HyperList Item
+			[?] Starter; OR: 
+				Identifier (Numbers: Format = "1.1.1.1", Mixed: Format = "1A1A")}
+					[Multi-line Item] The Identifier serves as a plus sign ("+")}
+						<1>
+				Multi-line Indicator = "+"
+					1 Following lines are of same indent with a "space" before
+					 the text
+					+ If one Item on a certain indent is multi-line, all Items on the same indent
+					 (including single-line Items) must start with a plus sign ("+")} or <Identifier>
+			[?] Type
+				OR: 
+					State = "S:" or "|"
+					Transition = "T:" or "/"
+				Children inherit Type from parent unless marked with different Type
+				Can be skipped when the Item is obviously a state or transition
+			Content; AND/OR: 
+				Element; AND/OR:	
+					Operator
+						Anything operating on an Item or a set of Items
+							[Set of Items] Items are indented below the Operator
+						Can be any of the usual logical operators
+						Is written in capitals ending in a colon and a space
+							EXAMPLES: "AND: ", "OR: ", "AND/OR: ", "NOT: ", "IMPLIES: "
+						Can contain a Comment to specify the Operator
+							EXAMPLE: "OR(PRIORITY): "
+								Sub-Items are to be chosen in the order of priority as listed
+						To make the Item run continuously, use "CONTINUOUS: " 
+							Item is done concurrent with remaining Items
+							The Operator can be combined with a timestamp Tag
+								EXAMPLE: "CONTINUOUS: YYYY-MM-07:" = Do the Item weekly
+						To show that an Item is encrypted or is to be encrypted, use "ENCRYPTION: "
+							OR: 
+								 The encrypted block can be correctly indented
+								 The encrypted block contains indentation and is left justified
+										This would seem to break the list, but is allowed
+						A block can be included of "literal text" negating any HyperList markup
+							Use a HyperList Item containing only the Operator "\"} to mark start/end
+								EXAMPLE: 
+									\
+									This is a block of literal text...
+									Where nothing counts as HyperList markup
+									Thus - neither this: [?] nor THIS: <Test> - are seen as markup
+									...until we end this block with...
+									\
+					Qualifier
+						Any statement in square brackets that qualifies an Item
+						Specifies under what conditions an Item is to be executed, exists or is valid
+						Several Qualifiers can be strung together, separated by commas
+							All Qualifiers need to be fulfilled for the Item to be valid
+							EXAMPLE: "[+YYYY-MM-DD 02.30, Button color = Red, 4, ?] Push button"
+						Successive Qualifiers can be strung together, separated by periods\textcolor; EXAMPLE: 
+							"[Apples. Oranges. Grapes]"
+								Do Item in the context of "apples", then "oranges", then "grapes"
+						EXAMPLES: 
+							Do Item 3 times = "[3]"
+							Do Item if "the mail has arrived" = "[The mail has arrived]"
+							Do Item 2 times while "foo=true" = "[2, foo=true]"
+							Do Item from 3 to 5 times while "bar=false" = "[3..5, bar=false]"
+							Do Item 1 or more times = "[1+]"
+							Do Item 1 or more times while "Bob is polite" = "[1+, Bob is polite]"
+							Do Item up to 4 times only while "zoo=0" = "[<4, zoo=0]"
+						Optional Item = "[?]"
+						Timestamp Qualifier = "[YYYY-MM-DD hh.mm.ss]"
+							Shorten the format to the appropriate granularity
+						Time relations
+							Length of time to wait before doing the Item = "[+YYYY-MM-DD]"
+							Less than a certain length of time after previous Item = "[<+YYYY-MM-DD]"
+							More than a certain length of time after previous Item = "[>+YYYY-MM-DD]"
+							Length of time to wait  before doing next Item = "[-YYYY-MM-DD]"
+							Less than a certain length of time before next Item = "[<-YYYY-MM-DD]"
+							More than a certain length of time before next Item = "[>-YYYY-MM-DD]"
+							Length of time to wait after doing referenced Item = "[+YYYY-MM-DD<Item]>"
+							Other obvious time indicators may be used; EXAMPLES: 
+								"[+1 week]"
+								"[-2 Martian years]"
+							EXAMPLES: 
+								Wait one month before doing the Item = "[+YYYY-01-DD]"
+								Do Item less than 4 days before next Item = "[<-YYYY-MM-04]"
+								Wait one year and two days after Item X = "[+0001-00-02<X>]"
+							Time repetition
+								Obvious/intuitive repetition
+									EXAMPLES: 
+										"[YYYY-MM-03]" = The third of every month
+										"[YYYY-12-DD]" = Every day in every December
+										"[2011-MM-05]" = The fifth of every month of 2011
+										"[Tue,Fri 12.00]" = Noon every Tuesday and Friday
+								Strict convention
+									Format = YYYY-MM-DD+X Day hh.mm+Y - YYYY-MM-DD hh.mm; EXAMPLES: 
+										"[2011-05-01+7 13.00]" = 2011-05-01 1pm, repeated every 7 days
+										"[2011-05-01+2,3,2]" = Every 2, then 3, then 2 days, in repetition
+										"[2011-05-01+2 - 2012-05-01]" = Every second day for one year
+										"[2011-05-01 13.00+1]" = 2011-05-01 1pm, repeated every hour
+										"[2011-05-01 Fri,Sat - 2011-10-01]" = Every Fri & Sat in time interval
+							Checking off Items
+								Unchecked Item = "[_]"
+								Checked Item = "[x]" 
+									[?] Timestamp Tag after ("[x] YYYY-MM-DD hh.mm:ss:")
+					Property
+						Any attribute to the <Content>, ending in a colon and a space
+							Gives additional information or description to the Item
+						EXAMPLES: 
+							"Location = Someplace:", "Color = Green:", "Strength = Medium:" and "In Norway:"
+					Description
+						The main body of the HyperList Item, the "meat" of the line
+				Additive; AND/OR: 
+					Reference
+						+ An Item name or Identifier, list name or anything else
+						 enclosed in angle brackets ("<>"); EXAMPLES: 
+							Reference to a website = "<http://www.isene.com/>"
+							Reference to a file = "<file:/path/to/filename>"
+						+ There are two types of References; OR: 
+							Redirection (hard Reference)
+								An Item consisting only of a Reference is a redirection
+									For a transition Item = Jump to referenced Item and execute
+										+ If the redirect is to jump back after executing 
+										 the referenced Item (and its children), then add another 
+										 set of angle brackets (<<Referenced Item>>)
+											+ EXAMPLE: Use this when creating subroutines at 
+											 the end of the list
+									For a state Item = Include the referenced Item
+								An Item consisting only of the key word "SKIP"
+									Ends the current HyperList level
+								An Item consisting only of the key word "END" 
+									Ends the whole HyperList
+							Soft Reference
+								Reference is part of an Item
+									Look at referenced Item for info only
+								Even softer Reference = have the Reference in parentheses
+									An Item that is only something apropos
+						+ A Reference to any Item upward in the HyperList is simply a
+						 Reference to the Item's <Content>
+						+ A Reference containing several levels down a HyperList needs a "/" 
+						 to separate each level, like a "path" (as with a URL) to the Item
+						+ To make a Reference to a different branch in a HyperList, 
+						 start the Reference from the highest common level on the list
+						 and include all Items down to the referenced Item
+							EXAMPLE: Reference from here to <Hyperlist Item/Starter/Identifier>
+						+ For long Items in a Reference, concatenation can be used
+							The concatenation must be unique
+								EXAMPLE: Reference from here to <Additive/Comment/Anything...>
+					Tag
+						A hash sign followed by any letters or numbers, used as a marker (#Tagged)
+						Is not executed as a HyperList command
+					Comment
+						Anything within parentheses is a Comment
+						Is not executed as a HyperList command
+					Quote
+						Anything in quotation marks is a Quote
+						Is not executed as a HyperList command
+					Change Markup; OR: 
+						Deletion
+							Remove the Item by adding "##<" at the end of the Item
+						Motion; OPTIONS: 
+							Move the Item by adding "##><Reference>"
+								This moves the Item just below the referenced Item
+							Move the Item one level in by adding "##<-" at the end of the Item
+							Move the Item one level out by adding "##->" at the end of the Item
+								EXAMPLE: Move an Item as a child to referenced Item = "##><Reference>##->"
+						Changed Item
+							Prefix an Item with "##Text##" to signify that a change has been made
+								Add information inside the angle brackets as appropriate
+									EXAMPLE: To show who changed it and when = "##John 2012-03-21##"
+			Separator 
+				OR: 
+					Semicolon
+						A semicolon is used to separate two HyperList Items on the same line
+					Newline
+						Used to add another Item on the same level
+						Indent
+							A Tab or an asterisk ("*")}
+								Used to add a child
+									A child adds information to its parent
+									A child is another regular <HyperList Item>
+				Definition
+					A Separator and the same or less indent normally reads "then:"
+					[parent contains <Description>]} 
+						The Separator and right indent reads "with:" or "consists of:"
+					[NOT: parent contains <Description>]} 
+						The Separator and right indent reads "applies to:"
+						A Separator between the children reads "and:"
+HLend
+
+Read and re-read the HyperList above and you will be a HyperList master after a
+while. It's all there. The whole markup.
+
+==============================================================================
+6 About                                                      *HyperList-About*
+
+The author of the VIM plugin for HyperList is also the chief maintainer of the
+HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.com 
+
+==============================================================================
+7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.3.1			2015-06-30
+
+	Added the function OpenFile() to open referenced file (mapped to 'gf')
+
+VERSION 2.3			2015-02-08
+
+	Version upgraded to HyperList definition 2.3
+	Made the changes necessary to accommodate for Twitter-type (hash)Tags
+	New markup for References (and included "@" in references)
+	Fixed bold/italic/underlined
+	Changed the Change Markup
+	Updated Latex/HTML conversion
+	Updated documentation
+
+VERSION 2.1.7		2012-10-17
+
+  Changes:
+  Fixed bugs in Identifier and Multi
+	Cosmetic fixes
+
+VERSION 2.1.6		2012-10-15
+
+  Changes:
+	Improved the GotoRef function.
+
+VERSION 2.1.5		2012-10-13
+
+  Changes:
+	Speed-up. Also added a global variable that can be set if you don't want the
+	collapse functions active, set this: ("g:disable_collapse") - it will
+	considerably speed up large HyperListS.
+	Fixed syntax highlighting for the first line in a HyperList.
+
+VERSION 2.1.4		2012-09-25
+
+  Changes:
+	Added "zx" as a command to update folding (to update syntax)
+	Added <CR> as an alternative to gr (Goto Ref)
+	Added a mark (m') to gr/<CR> to facilitate easy jump back 
+
+VERSION 2.1.3		2012-09-23
+
+  Changes:
+	Included more accented characters
+  Speedup; Adjusted minimum and maximum lines of sync'ing
+  Fixed identifiers
+
+
+VERSION 2.1.2		2012-07-07
+
+	Changes:
+	Important security upgrade: Removed traces of encrypted data upon
+	en/decrypting (part of) a HyperList.
+
+
+VERSION 2.1.1		2012-04-28
+
+	Changes:
+	Upgraded plugin to reflect the new Hyperlist version (2.1)
+
+
+VERSION 2				2012-03-28
+
+	Changes:
+	Name change (from WOIM to HyperList)
+	Complete overhaul of the definition document
+	Complete overhaul of the plugin documentation (this file)
+	Underlining of States and Transitions now toggles with <leader>u
+	Included "|" as alternative for "S: " and "/" for "T: "
+	Upgraded LaTeX export
+	Lots of minor fixes
+
+
+VERSION 1.7			2012-01-01
+
+	Changes:
+  Expanded "gr" (Goto Reference):
+    Made it possible to reference external files by the use of
+    #file:/pathto/filename, #file:~/filename or #file:filename
+    As long as the reference is prefixed with "file:" after
+    the "#", the command "gr" will open the referenced file.
+  Added HTML conversion vith the use of <leader>H.
+  Improved LaTeX conversion.
+  After an HTML/LaTeX conversion, filetype is set to html/tex.
+  Changed the color of multi-indicator (+) from red to purple.
+
+
+VERSION 1.6			2011-12-08
+
+	Changes:
+	Added marking of literal regions with special marking of start/end ("\")
+	Added <leader><DOWN> and <leader><UP>
+	Fixed syntax marking for State/Transitions where indent is "*"
+	Fixed escaping "\", "{" and "}" for LaTeX conversion
+
+
+VERSION 1.5.3		2011-09-18
+
+	Changes:
+	New feature: LaTeX conversion: Turn your WOIM list into a LaTeX document.
+	             Mapped to <leader>L (feature suggested by  Shantanu Kulkarni).
+	Added "set autoindent" to plugin settings (thanks to Shantanu Kulkarni).
+	Minor fixes.
+	Updated documentation.
+
+
+VERSION 1.5.2		2011-09-08
+
+  Changes:
+	Added "presentation mode" where you can traverse a WOIM list with
+	"g<DOWN>" or "g<UP>" to view only the current line and its ancestors.
+	Changed Quotes and Comments to only cover one line (before when it
+	covered several lines, the plugin became very slow for large lists).
+	Added instructions in doc file on using WOIM list in other file types.
+
+VERSION 1.5.1		2011-08-16
+
+  Changes:
+	Minor updates to the documentation.
+
+VERSION 1.5.0		2011-08-16
+
+  Changes:
+	Added encryption via OpenSSL:
+    <leader>z encrypts the current line (including all sublevels if folded)
+    <leader>Z encrypts the current file (all lines)
+    <leader>x decrypts the current line
+    <leader>X decrypts the current file (all lines)
+
+    A dot file (file name starts with a "." such as .test.woim) is
+    automatically encrypted on save and decrypted on opening.
+
+VERSION 1.4.7		2011-06-02
+
+  Changes:
+	Modified the GotoRef function (fixed a bug and included feed back)
+	Better syntax highlighting for folding in gvim
+	Updating the README_WOIM and documentation files + other cosmetic changes
+	Added the possibility of disabling/overriding the WOIM plugin key mapping
+	Added an ftdetect file into woim.vba
+	(Thanks to Sergey Khorev for the last two improvements)
+
+VERSION 1.4.6		2011-05-31
+
+  Perfection:
+	Minor fixes due to a bout of perfectionism.
+
+VERSION 1.4.5		2011-05-30
+
+	Overhaul:
+	Created the documentation, including the whole WOIM definition to make it
+	easily accessible within VIM. Added the INSTALL and README files.
+	
+	Created a Vimball file ("woim.vba") for easy install. Simply do:
+
+	vim woim.vba
+	:so %
+	:q
+
+VERSION 1.4.2   2011-05-29
+
+	Fixed "gr" (Goto Ref) for references with single quotes ('')
+
+	Added the search pattern from "gr" to the search register so that "n" can
+	successively be used to test if the referenced destination is unique (which
+	it should be).
+
+VERSION 1.4.1   2011-05-27
+
+	New feature:
+	Goto Reference: With the cursor at a WOIM reference, press "gr" to jump to
+	that reference in the WOIM list.
+
+	Now you can navigate more easily in WOIM lists.
+
+VERSION 1.4	    2011-05-23
+
+	This could have been the long awaited version 1.0 - but instead I decided to
+	synchronize the version numbering of this VIM plugin and the WOIM description
+	itself. From now on the releases will be synchronized, with minor fixes in
+	the VIM plugin released as minor releases (i.e. a fix to 1.4 would be 1.4.1
+	and would still be on par with the WOIM definition version 1.4). The version
+	1.4 of the WOIM definition adds time repetition as well as "checking" of
+	todo-list items.
+
+	This release:
+
+	New feature: Added the option of checkboxes for items (Thanks to Christopher
+	Truett (VIM script #3584). You can now easily add a checkbox in front of any
+	item by <leader>v and subsequently toggle that checkbox via the same
+	(<leader>v) or <leader>V if you want to add a time stamp to a box that you
+	"check" (this also toggles the timestamp if you "uncheck" the item).
+
+	Fixes: Some minor cleanup.
+
+VERSION 0.9.9   2011-04-17
+
+	Fix: Fixed interference between Operators and Tags
+
+VERSION 0.9.8   2010-12-14
+
+	Feature: States (S:) is underlined by default.  <leader>s removes the
+	underlining, while <leader>S turns on underlining of States.  Transitions are
+	not underlined by default.  <leader>T turns on underlining, while <leader>t
+	removes the underlining of Transitions.
+	
+	Fix: Removed unnecessary "contained" to make lists syntax marked even within
+	stub lists.
+	
+	Fix: Small fixes in grouping and containing of elements.
+
+VERSION 0.9.6   2010-12-03
+
+	Feature: Added "*" as possible indentation
+
+	Fix:         Changed Multiline indicator from "*" to "+"
+
+	Now compatible with WOIM v. 1.2
+
+VERSION 0.9.3   2009-12-11
+
+	Christian Bryn caught an important bug/lacking setting. The syntax file
+	now sets noexpandtab.
+
+VERSION 0.9.2   2009-10-25
+
+	A few needed minor fixes.
+
+VERSION 0.9.1   2009-08-21
+
+	New_feature:
+	Added highlighting of item motions:
+	<<          means "delete this item" (put at the end of a line)
+	>>#1.1. means "move this item to after item 1.1."
+	->           means "indent item right"
+	<-<-       means "indent item two left"
+	>>#1.-> means "move item to after item 1. and indent right"
+
+VERSION 0.9	    2009-08-10
+
+	New_feature: Accommodated for the use of subroutine calls (##ref)
+	Fix: Cleaned up syntax variable names to fit modern WOIM
+	Fix: Multi-lines have consecutive lines start with a <space>
+	Fix: Quotes or Comment can now span several lines
+	Fix: Comments allowed in Operators
+	Fix: Comments and references allowed inside Qualifiers
+	Fix: Identifier must end in a period and then a space
+	Bug_fix: Allowing a period to be part of a tag
+	Bug_fix: Fixed wrong markup for astrices not used for multi-line
+
+VERSION 0.8.6   2009-07-24
+
+	Bug fix: Corrected attributes ending in capitals that was treated as a WOIMkey
+	Bug fix: Fixed references containing a hyphen
+
+VERSION 0.8.5   2009-07-23
+
+	New feature: Expanded Attributes to include relative times and
+	greater/smaller than.
+
+	New feature: References with spaces are now accommodated for by putting it in
+	quotes.
+
+	New feature: Made references in attributes possible.
+	
+	Bug fix: Fixed references that includes ampersands ("&").
+
+VERSION 0.8.1   2009-07-22
+
+	Bug fix: Fixed highlighting of attributes with a colon (like time stamps)
+
+VERSION 0.8	    2009-07-21
+
+	New feature: Expanded folding to a maximum of 15 levels with folding levels
+	set with <leader>a to <leader>f for levels 10 to 15.  Improvement: Better
+	syntax highlighting for indexes
+
+	Bug fix: Fixed syntax syncing when entering the document in the first place
+
+VERSION 0.7.2   2009-07-15
+
+	Better syntax highlighting for references.
+	Added unobtrusive highlighting of vim bottom set-lines.
+
+VERSION 0.7.1   2009-06-16
+
+	Bug fix: Fixed an error in syntax highlighting properties containing a "-"
+	(like ISO dates).
+
+VERSION 0.7	    2009-06-13
+
+	Added macro to jump to next point in a template and fill in the value. A
+	template item is an item that ends in an equal sign and where the value after
+	the equal sign is to be filled out. Example:
+
+	ExampleTask
+		 Task name =
+		 Responsible person =
+		 Deadline =
+
+VERSION 0.6	    2009-04-13
+
+	Some minor adjustments, but a needed upgrade if you are a WOIM user.
+
+VERSION 0.4	    2009-01-16
+
+	Initial upload
+
+==============================================================================
+8 Credits                                                  *HyperList-Credits*
+
+Thanks to Jean-Dominique Warnier and Kenneth Orr for the original idea of this
+type of markup.
+
+Thanks to:
+Egil Möller for helping to cultivate the first versions.
+Axel Liljencrantz for his input in outlining WOIM.
+Christian Bryn for testing of the plugin.
+Christopher Truett for his Checkbox VIM plugin.
+Noah Spurrier for his OpenSSL VIM plugin.
+
+==============================================================================
+9 License                                                  *HyperList-License*
+
+I release all copyright claims. This code is in the public domain.  Permission
+is granted to use, copy modify, distribute, and sell this software for any
+purpose. I make no guarantee about the suitability of this software for any
+purpose and I am not liable for any damages resulting from its use. Further, I
+am under no obligation to maintain or extend this software. It is provided on
+an 'as is' basis without any expressed or implied warranty.
