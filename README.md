@@ -3,7 +3,7 @@ This VIM plugin makes it easy to create and manage HyperLists using VIM
 
 ---------------------------------------------------------------------------
 
-GENERAL INFORAMTION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.3.1)
+GENERAL INFORAMTION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.3.2)
 
 HyperLists are used to describe anything - any state, item(s), pattern,
 action, process, transition, program, instruction set etc. So, you can use
@@ -99,12 +99,56 @@ automatically encrypted on save and decrypted on opening.
 Syntax updated at start and every time you leave Insert mode, or you can
 press "zx" to update the syntax. 
 
-You may speed up larger HyperListS by setting the the global variable
+You may speed up larger HyperLists by setting the the global variable
 "disable_collapse" - add the following to your .vimrc:
 
   let "g:disable_collapse" = 1
 
-For this help and more, including the full WOIM definition/description, type 
+If you want to disable or override these keymaps with your own, simply add
+to your .vimrc file:
+
+  let "g:HLDisableMapping" = 1
+
+To use HyperLists within other file types (other than ".hl"), you can use
+"nested syntax" by adding the following to those syntax files (like the syntax
+file for text files (".txt"):
+
+  syn include @HL ~/.vim/syntax/hyperlist.vim
+  syn region HLSnip matchgroup=Snip start="HLstart" end="HLend" contains=@HL
+  hi link Snip SpecialComment
+
+If you add those three lines in your .vim/syntax/txt.vim you will be able to
+include HyperLists in files with a ".txt", and the following example would
+become a HyperList with correct syntax highlighting and folding:
+
+HLstart
+This is a HyperList test list                                                                                                                                  
+  Here is a child to the above item
+    Here is "grand child"
+  Here we are one level back
+    And here's another level down
+    [5] Dance steps
+    [3] Hurray
+    Smile
+HLend
+
+The "HLstart" and "HLend" must be at the start of the line.
+
+You can show/hide words or regex patterns by using these keys and commands:
+
+  zs    Show all lines containing word under cursor
+  zh    Hide all lines containing word under cursor
+  z0    Go back to normal HyperList folding
+  :SHOW word/pattern
+        Show lines containing either word or pattern
+  :HIDE word/pattern
+        Hide lines containing either word or pattern
+        Pattern can be any regular expression
+
+This functionality is useful for easily showing e.g. a specific tag or hash.
+The functionality is taken from VIM script #1594 (thanks to Amit Sethi).
+
+For this help and more, including the full HyperList definition/description, type 
 
   :help HyperList
 

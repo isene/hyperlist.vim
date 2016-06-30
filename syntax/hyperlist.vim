@@ -12,9 +12,10 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2.3.1 - compatible with the HyperList definition v. 2.3
-" Modified:	2015-06-30
-" Changes:      Added the function OpenFile() to open referenced file (mapped to 'gf')
+" Version:	2.3.2 - compatible with the HyperList definition v. 2.3
+" Modified:	2016-06-30
+" Changes:  Added Show/Hide of words under cursor/regex pattern
+"           Taken from VIM script #1594 (thanks to Amit Sethi)
 
 " INSTRUCTIONS {{{1
 "
@@ -424,6 +425,50 @@ function! LaTeXconversion ()
     set filetype=tex
 endfunction
 
+"  Show/Hide{{{2
+"  Useful for easily showing e.g. a specific tag or hash 
+"  Taken from VIM script #1594 (thanks to Amit Sethi)
+"  zs    Show all lines containing word under cursor
+"  zh    Hide all lines containing word under cursor
+"  z0    Go back to normal HyperList folding
+"  :SHOW word/pattern
+"        Show lines containing either word or pattern
+"  :HIDE word/pattern
+"        Hide lines containing either word or pattern
+"        Pattern can be any regular expression
+
+map   <silent>    zs    :call <SID>ShowHideWord('z', 's', '')<CR>
+map   <silent>    zh    :call <SID>ShowHideWord('z', 'h', '')<CR>
+map   <silent>    z0    :set foldmethod=syntax<CR>
+command! -nargs=+  SHOW  :call <SID>ShowHideWord('c', 's', <f-args>)
+command! -nargs=+  HIDE  :call <SID>ShowHideWord('c', 'h', <f-args>)
+
+function! <SID>ShowHideWord(mode, show, ...)
+   if (a:mode == 'z')
+      let cur_word = '\\<' . expand("<cword>") . '\\>'
+   else
+      let i = 1
+      let cur_word = '\\<\\('
+      let binder = ''
+      while i <= a:0
+         let ai = substitute(a:{i}, '\\', '\\\\', 'g')
+         let cur_word = cur_word . binder . ai
+         let binder = '\\\|'
+         let i = i + 1
+      endw
+      let cur_word = cur_word . '\\)\\>'
+   endif
+
+   let myfoldexpr = "set foldexpr=getline(v:lnum)" .
+      \ (a:show == 's' ? "!" : "=") . "~\'\^.*" . cur_word . ".*\$\'"
+
+   set foldenable
+   set foldlevel=0
+   set foldminlines=0
+   set foldmethod=expr
+   exec myfoldexpr
+endfunction
+
 " Syntax definitions {{{1
 "  HyperList elements {{{2
 
@@ -507,26 +552,26 @@ endif
 syn match   HLvim "^vim:.*"
 
 " Highlighting and Linking {{{1
-hi	    Folded	gui=bold term=bold cterm=bold
-hi def link HLident	Define
-hi def link HLmulti	String
-hi def link HLtag	String
-hi def link HLop	Function
-hi def link HLqual	Type
-hi def link HLhash	Label
-hi def link HLref	Define
-hi def link HLkey	Define
-hi          HLlit       ctermfg=none ctermbg=none gui=italic term=italic cterm=italic
-hi          HLlc        ctermfg=white ctermbg=none
+hi	        Folded	  gui=bold term=bold cterm=bold
+hi def link HLident	  Define
+hi def link HLmulti	  Constant
+hi def link HLtag	    Constant
+hi def link HLop	    Function
+hi def link HLqual	  Type
+hi def link HLhash	  Label
+hi def link HLref	    Define
+hi def link HLkey	    Define
+hi          HLlit     ctermfg=none ctermbg=none gui=italic term=italic cterm=italic
+hi          HLlc      ctermfg=white ctermbg=none
 hi def link HLcomment	Comment
-hi def link HLquote	Comment
-hi def link HLsc	Type
-hi def link HLtodo	Todo
-hi def link HLmove	Error
-hi	    HLb	        ctermfg=none ctermbg=none gui=bold term=bold cterm=bold
-hi	    HLi	        ctermfg=none ctermbg=none gui=italic term=italic cterm=italic
-hi link	    HLu	        underlined
-hi def link HLvim       Function
+hi def link HLquote	  Comment
+hi def link HLsc	    Type
+hi def link HLtodo	  Todo
+hi def link HLmove	  Error
+hi	        HLb	      ctermfg=none ctermbg=none gui=bold term=bold cterm=bold
+hi	        HLi	      ctermfg=none ctermbg=none gui=italic term=italic cterm=italic
+hi link	    HLu	      underlined
+hi def link HLvim     Function
 
 " Keymap {{{1
 
