@@ -146,7 +146,7 @@ file for text files (".txt"):
   hi link Snip SpecialComment
 
 If you add those three lines in your .vim/syntax/txt.vim you will be able to
-include WOIM lists in files with a ".txt", and the following example would
+include HyperLists in files with a ".txt", and the following example would
 become a HyperList with correct syntax highlighting and folding:
 
 HLstart

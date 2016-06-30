@@ -64,8 +64,7 @@ Use "gr" (without the quotation marks, signifies "Goto Ref") or simply
 press the "Enter" ("<CR>") key while the cursor is on a HyperList
 reference to jump to that destination in a HyperList. Use "n" after a "gr"
 to verify that the reference destination is unique. A reference can be in
-the list or to a file by the use of #file:/pathto/filename,
-#file:~/filename or #file:filename.
+the list or to a file by the use of <file:/pathto/filename>,
 
 Whenever you jump to a reference in this way, the mark "'" is set at the
 point you jumped from so that you may easily jump back by hitting "''"
@@ -109,38 +108,17 @@ to your .vimrc file:
 
   let "g:HLDisableMapping" = 1
 
-To use HyperLists within other file types (other than ".hl"), you can use
-"nested syntax" by adding the following to those syntax files (like the syntax
-file for text files (".txt"):
-
-  syn include @HL ~/.vim/syntax/hyperlist.vim
-  syn region HLSnip matchgroup=Snip start="HLstart" end="HLend" contains=@HL
-  hi link Snip SpecialComment
-
-If you add those three lines in your .vim/syntax/txt.vim you will be able to
-include HyperLists in files with a ".txt", and the following example would
-become a HyperList with correct syntax highlighting and folding:
-
-HLstart
-This is a HyperList test list                                                                                                                                  
-  Here is a child to the above item
-    Here is "grand child"
-  Here we are one level back
-    And here's another level down
-    [5] Dance steps
-    [3] Hurray
-    Smile
-HLend
-
-The "HLstart" and "HLend" must be at the start of the line.
-
 You can show/hide words or regex patterns by using these keys and commands:
 
   zs    Show all lines containing word under cursor
+
   zh    Hide all lines containing word under cursor
+
   z0    Go back to normal HyperList folding
+
   :SHOW word/pattern
         Show lines containing either word or pattern
+
   :HIDE word/pattern
         Hide lines containing either word or pattern
         Pattern can be any regular expression
