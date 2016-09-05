@@ -185,7 +185,7 @@ function! OpenFile()
     elseif gofl =~ 'pdf$'
       exe '!zathura "'.gofl.'"'
     else
-      edit gofl
+      exe '!edit '.gofl
     endif
   else
     echo "No reference"
