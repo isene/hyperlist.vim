@@ -1,4 +1,4 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.3, 2017-01-16)
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.5, 2017-01-16)
 
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -12,7 +12,7 @@ this plugin to make a password safe.
 
 The VIM plugin version numbers correspond to the HyperList definition version
 numbers with the VIM plugin adding another increment of versioning, e.g VIM
-plugin version 2.3.3 would be compatible with HyperList definition version 2.3.
+plugin version 2.3.5 would be compatible with HyperList definition version 2.3.
 
 This documentation contains the full HyperList definition. For a more
 comprehensive manual that also includes plenty of examples, read the official
@@ -1051,11 +1051,13 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.com
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
 
-VERSION 2.3.3			2017-01-16
+VERSION 2.3.5			2017-01-16
 
 Added the function Complexity(). The score shown is the total of Items and 
 References in your HyperList. To get the overall complexity use:
   :call Complexity()
+
+VERSION 2.3.3/4		Minor fixes
 
 VERSION 2.3.2			2016-06-30
 

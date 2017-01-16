@@ -12,7 +12,7 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2.3.3 - compatible with the HyperList definition v. 2.3
+" Version:	2.3.5 - compatible with the HyperList definition v. 2.3
 " Modified:	2017-01-16
 " Changes:  Added the function Complexity() to give a complexity score
 "           for a HyperList
