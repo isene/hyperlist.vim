@@ -12,10 +12,10 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2.3.2 - compatible with the HyperList definition v. 2.3
-" Modified:	2016-06-30
-" Changes:  Added Show/Hide of words under cursor/regex pattern
-"           Taken from VIM script #1594 (thanks to Amit Sethi)
+" Version:	2.3.3 - compatible with the HyperList definition v. 2.3
+" Modified:	2017-01-16
+" Changes:  Added the function Complexity() to give a complexity score
+"           for a HyperList
 
 " INSTRUCTIONS {{{1
 "
@@ -467,6 +467,34 @@ function! <SID>ShowHideWord(mode, show, ...)
    set foldminlines=0
    set foldmethod=expr
    exec myfoldexpr
+endfunction
+
+"  Complexity{{{2
+"  :call Complexity() will show the complexity score for your HyperList
+"  It adds up all HyperList Items and all references to the total score
+
+function! Complexity()
+	let l = 0
+	let c = 0
+	try
+		redir => l
+			silent exe '%s/\S//n'
+		redir END
+	catch
+		let l = 0
+	endtry
+  let l = substitute(l, '\_.\{-}\(\d\+\)\_.*', '\1', "")
+	try
+		redir => c
+			silent exe '%s/<\{1,2}[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,.:/ _&@?%=+\-\*]\+>\{1,2}//gn'
+		redir END
+	catch
+		let c = 0
+	endtry
+  let c = substitute(c, '\_.\{-}\(\d\+\)\_.*', '\1', "")
+  let plex = c + l
+  echo "Complexity = ". plex
+  return plex
 endfunction
 
 " Syntax definitions {{{1
