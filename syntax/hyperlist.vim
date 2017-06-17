@@ -12,10 +12,9 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2.3.5 - compatible with the HyperList definition v. 2.3
-" Modified:	2017-01-16
-" Changes:  Added the function Complexity() to give a complexity score
-"           for a HyperList
+" Version:	2.3.6 - compatible with the HyperList definition v. 2.3
+" Modified:	2017-06-15
+" Changes:  Added basic autonumbering (with <leader># or <leader>an)
 
 " INSTRUCTIONS {{{1
 "
@@ -23,6 +22,12 @@
 "
 " Use <SPACE> to toggle one fold.
 " Use \0 to \9, \a, \b, \c, \d, \e, \f to show up to 15 levels expanded.
+"
+" <leader># or <leader>an toggles autonumbering of new items (the previous
+" item must be numbered for the next item to be autonumbered). An item is
+" indented to the right with <c-t>, adding one level of numbering. An item
+" is indented to the left with <c-d>, removing one level of numbering and
+" increasing the number by one.
 "
 " As a sort of "presentation mode", you can traverse a HyperList by using
 " g<DOWN> or g<UP> to view only the current line and its ancestors.
@@ -66,9 +71,9 @@ endif
 let b:current_syntax="HyperList"
 set autoindent
 set textwidth=0
-set shiftwidth=2
-set tabstop=2
-set softtabstop=2
+set shiftwidth=3
+set tabstop=3
+set softtabstop=3
 set noexpandtab
 set foldmethod=syntax
 set fillchars=fold:\ 
@@ -93,6 +98,28 @@ function! HLFoldText()
   endwhile
   return line
 endfunction
+
+"  Toggle AutoNumbering {{{2
+"  Mapped to <leader># and <leader>an
+"  When activated, <cr> increments the next item on the samee level
+"  <c-t> indents the item and adds one level of numbering
+"  <c-d> de-indents the item and renumbers it.
+let s:an = 0
+function! ToggleAutonum()
+  if s:an == 0
+    imap <cr> <esc>yypf D<c-a>a 
+    imap <c-t> <esc>>>f <left><c-x>a.1<esc><end>a
+    imap <c-d> <esc><<f dF.<left><c-a><end>a
+    let s:an = 1
+  else
+    iunmap <cr>
+    iunmap <c-t>
+    iunmap <c-d>
+    let s:an = 0
+  endif
+endfunction
+nmap <leader>an :call ToggleAutonum()<cr>
+nmap <leader># :call ToggleAutonum()<cr>
 
 "  Encryption {{{2
 "  Remove traces of secure info upon decrypting (part of) a HyperList

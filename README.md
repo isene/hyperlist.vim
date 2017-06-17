@@ -3,7 +3,7 @@ This VIM plugin makes it easy to create and manage HyperLists using VIM
 
 ---------------------------------------------------------------------------
 
-GENERAL INFORAMTION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.3.2)
+GENERAL INFORAMTION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.3.6)
 
 HyperLists are used to describe anything - any state, item(s), pattern,
 action, process, transition, program, instruction set etc. So, you can use
@@ -55,6 +55,12 @@ Use tabs for indentation.
 
 Use <SPACE> to toggle one fold.
 Use \0 to \9, \a, \b, \c, \d, \e, \f to show up to 15 levels expanded.
+
+<leader># or <leader>an toggles autonumbering of new items (the previous
+item must be numbered for the next item to be autonumbered). An item is
+indented to the right with <c-t>, adding one level of numbering. An item
+is indented to the left with <c-d>, removing one level of numbering and
+increasing the number by one.
 
 As a sort of "presentation mode", you can traverse a WOIM list by using
 g<DOWN> or g<UP> to view only the current line and its ancestors.
