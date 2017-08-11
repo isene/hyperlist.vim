@@ -12,9 +12,10 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2.3.6 - compatible with the HyperList definition v. 2.3
-" Modified:	2017-06-15
-" Changes:  Added basic autonumbering (with <leader># or <leader>an)
+" Version:	2.3.7 - compatible with the HyperList definition v. 2.3
+" Modified:	2017-08-11
+" Changes:  Autonumbering now works also with numbers ending in a period
+"           (both 4.2.1 and 4.2.1. now works for <cr>, <c-t> and <c-d>)
 
 " INSTRUCTIONS {{{1
 "
@@ -107,9 +108,9 @@ endfunction
 let s:an = 0
 function! ToggleAutonum()
   if s:an == 0
-    imap <cr> <esc>yypf D<c-a>a 
-    imap <c-t> <esc>>>f <left><c-x>a.1<esc><end>a
-    imap <c-d> <esc><<f dF.<left><c-a><end>a
+    imap <cr> <esc>yypf D<left><c-a>A 
+    imap <c-t> <esc>>>f <left><left><c-x>a.1<esc><end>a
+    imap <c-d> <esc><<f <left>T.diw<left>x<left><c-a><end>a
     let s:an = 1
   else
     iunmap <cr>
