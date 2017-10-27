@@ -3,7 +3,7 @@ This VIM plugin makes it easy to create and manage HyperLists using VIM
 
 ---------------------------------------------------------------------------
 
-GENERAL INFORAMTION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.3.7)
+GENERAL INFORAMTION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.3.8)
 
 HyperLists are used to describe anything - any state, item(s), pattern,
 action, process, transition, program, instruction set etc. So, you can use
@@ -131,6 +131,15 @@ You can show/hide words or regex patterns by using these keys and commands:
 
 This functionality is useful for easily showing e.g. a specific tag or hash.
 The functionality is taken from VIM script #1594 (thanks to Amit Sethi).
+
+To sort a set of items at a specific indentation, visually select (V) the
+items you want to sort (including all the children of those items) and press
+<leader>s and the items in the range will be alphabetically sorted - but only
+the items on the same level/indentation as the first item selected. The sorted
+items will keep their children. This is useful if parts of a HyperList is 
+numbered and you get the numbering out of sequence and wants to resort them.
+One caveat, the last line in the selection cannot be the very last line in
+the document (there must be an item or an empty line below it).
 
 For this help and more, including the full HyperList definition/description, type 
 

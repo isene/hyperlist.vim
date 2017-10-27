@@ -1,4 +1,4 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.7, 2017-08-11)
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.8, 2017-10-27)
 
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -12,7 +12,7 @@ this plugin to make a password safe.
 
 The VIM plugin version numbers correspond to the HyperList definition version
 numbers with the VIM plugin adding another increment of versioning, e.g VIM
-plugin version 2.3.7 would be compatible with HyperList definition version 2.3.
+plugin version 2.3.8 would be compatible with HyperList definition version 2.3.
 
 This documentation contains the full HyperList definition. For a more
 comprehensive manual that also includes plenty of examples, read the official
@@ -181,6 +181,15 @@ You can show/hide words or regex patterns by using these keys and commands:
 
 This functionality is useful for easily showing e.g. a specific tag or hash. 
 The functionality is taken from VIM script #1594 (thanks to Amit Sethi).
+
+To sort a set of items at a specific indentation, visually select (V) the
+items you want to sort (including all the children of those items) and press
+<leader>s and the items in the range will be alphabetically sorted - but only
+the items on the same level/indentation as the first item selected. The sorted
+items will keep their children. This is useful if parts of a HyperList is 
+numbered and you get the numbering out of sequence and wants to resort them.
+One caveat, the last line in the selection cannot be the very last line in
+the document (there must be an item or an empty line below it).
 
 If you want to know the overall complexity of a HyperList, use:
 

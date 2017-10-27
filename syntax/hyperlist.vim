@@ -12,10 +12,11 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2.3.7 - compatible with the HyperList definition v. 2.3
-" Modified:	2017-08-11
-" Changes:  Autonumbering now works also with numbers ending in a period
-"           (both 4.2.1 and 4.2.1. now works for <cr>, <c-t> and <c-d>)
+" Version:	2.3.8 - compatible with the HyperList definition v. 2.3
+" Modified:	2017-10-27
+" Changes:  Added a real hack for sorting a visual selected set of items
+"           (lines) by the top item's indentation. Use <leader>s to sort
+"           the area.
 
 " INSTRUCTIONS {{{1
 "
@@ -83,7 +84,6 @@ autocmd InsertLeave * :syntax sync fromstart
 " Lower the next two values if you have a slow computer
 syn sync minlines=50
 syn sync maxlines=100
-
 
 " Functions {{{1
 "  Folding {{{2
@@ -574,7 +574,7 @@ syn match   HLquote     '".\{-}"' contains=HLtodo,HLref
 " TODO  or FIXME
 syn keyword HLtodo    TODO FIXME 
 
-" Item motion
+" Item motion (uncomment if you want this syntax feature)
 "syn match   HLmove      '>>\|<<\|->\|<-'
 
 " Bold and Italic
@@ -656,13 +656,13 @@ nmap zx               i<esc>
 
 map <leader>u         :call STunderline()<CR>
 
-map <leader>v	      :call CheckItem("")<CR>
+map <leader>v	        :call CheckItem("")<CR>
 map <leader>V         :call CheckItem("stamped")<CR>
 
 map <leader><SPACE>   /=\s*$<CR>A
 
-nmap gr		      m':call GotoRef()<CR>
-nmap <CR>	      m':call GotoRef()<CR>
+nmap gr		            m':call GotoRef()<CR>
+nmap <CR>	            m':call GotoRef()<CR>
 
 nmap gf               :call OpenFile()<CR>
 
@@ -681,6 +681,10 @@ nmap <leader>X        :call HLdecrypt()<CR>:%!openssl bf -d -a 2>/dev/null<CR><C
 
 nmap <leader>L        :call LaTeXconversion()<CR>
 nmap <leader>H        :call HTMLconversion()<CR>
+
+" Sort hack (sort the visual selected lines by the top item's indentation
+" The last item in the visual selection cannot be the last line in the document.
+vmap <leader>s <esc>`<^"iy0gv:s/^<c-r>i\S\@=/<c-v><c-a>/<cr>gv:s/\t/<c-v><c-b>/g<cr>gv:s/\n<c-v><c-b>/<c-v><c-x>/<cr>gvk:!sort<cr>:%s/<c-v><c-a>/<c-r>i/<cr>:%s/<c-v><c-x>/\r<c-v><c-b>/g<cr>:%s/<c-v><c-b>/\t/g<cr>
 
 " vim modeline {{{1
 " vim: set sw=2 sts=2 et fdm=marker fillchars=fold\:\ :
