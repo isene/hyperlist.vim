@@ -12,11 +12,9 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2.3.8 - compatible with the HyperList definition v. 2.3
-" Modified:	2017-10-27
-" Changes:  Added a real hack for sorting a visual selected set of items
-"           (lines) by the top item's indentation. Use <leader>s to sort
-"           the area.
+" Version:	2.3.9 - compatible with the HyperList definition v. 2.3
+" Modified:	2018-01-26
+" Changes:  Fixed bugs in LaTeX & HTML conversion (to accept space in refs)
 
 " INSTRUCTIONS {{{1
 "
@@ -37,7 +35,7 @@
 " 
 " Use "gr" when the cursor is on a reference to jump to the referenced item.
 " A reference can be in the list or to a file by the use of
-" #file:/pathto/filename, #file:~/filename or #file:filename.
+" <file:/pathto/filename>, <file:~/filename> or <file:filename>.
 "
 " Use <leader>u to toggle underlining of Transitions, States or no underlining.
 "
@@ -275,7 +273,7 @@ function! HTMLconversion ()
     endtry
     try
         "HLref
-        execute "%s/\\(<\\{1,2}\\[a-zA-ZæøåÆØÅ0-9.:/_&?%=\\-\\*]\\+>\\{1,2}\\)/<font color=\"purple\">\\1<\\/font>/g"
+        execute "%s/\\(<\\{1,2}\\[a-zA-ZæøåÆØÅ0-9.:/_&?%=\\-\\* ]\\+>\\{1,2}\\)/<font color=\"purple\">\\1<\\/font>/g"
     catch
     endtry
     try
@@ -372,7 +370,7 @@ function! LaTeXconversion ()
     endtry
     try
         "HLindent
-        execute '%s/\(\t\|\*\)\@<=\([0-9.]\+\.\s\)/\1\\textcolor{v}{\2}/g'
+        execute '%s/\(\t\|\*\|^\)\@<=\([0-9.]\+\s\)/\1\\textcolor{v}{\2}/g'
     catch
     endtry
     try
@@ -387,7 +385,7 @@ function! LaTeXconversion ()
     endtry
     try
         "HLref
-        execute "%s/\\(<\\{1,2}[a-zA-ZæøåÆØÅ0-9.:/_&?%=\\-\\*]\\+>\\{1,2}\\)/\\\\textcolor{v}{\\1}/g"
+        execute "%s/\\(<\\{1,2}[a-zA-ZæøåÆØÅ0-9.:/_&?%=\\-\\* ]\\+>\\{1,2}\\)/\\\\textcolor{v}{\\1}/g"
     catch
     endtry
     try
@@ -417,7 +415,7 @@ function! LaTeXconversion ()
     endtry
     try
         "HLprop
-        execute "%s/\\(\\s\\|\\*\\)\\@<=\\([a-zA-ZæøåÆØÅ0-9,._&?%= \\-\\/+<>#']\\{-2,}:\\s\\)/\\\\textcolor{r}{\\emph{\\2}}/g"
+        execute "%s/\\(\\s\\|\\*\\)\\@<=\\([a-zA-ZæøåÆØÅ0-9,._&?%= \\-\\/+<>#']\\{-2,}:\\s\\)/\\\\textcolor{r}{\\\\emph{\\2}}/g"
     catch
     endtry
     try
@@ -554,7 +552,7 @@ syn match   HLsc	';'
 syn match   HLhash	'#[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9.:/_&?%=+\-\*]\+'
 
 " References
-syn match   HLref	'<\{1,2}[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,.:/ _&@?%=+\-\*]\+>\{1,2}' contains=HLcomment
+syn match   HLref	'<\{1,2}[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,.:/ _~&@?%=\-\*]\+>\{1,2}' contains=HLcomment
 
 " Reserved key words
 syn keyword HLkey     END SKIP
