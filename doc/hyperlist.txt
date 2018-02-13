@@ -1,4 +1,4 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.9, 2018-01-26)
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.10, 2018-02-13)
 
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -12,7 +12,7 @@ this plugin to make a password safe.
 
 The VIM plugin version numbers correspond to the HyperList definition version
 numbers with the VIM plugin adding another increment of versioning, e.g VIM
-plugin version 2.3.9 would be compatible with HyperList definition version 2.3.
+plugin version 2.3.10 would be compatible with HyperList definition version 2.3.
 
 This documentation contains the full HyperList definition. For a more
 comprehensive manual that also includes plenty of examples, read the official
@@ -1065,6 +1065,10 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.com
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.3.10			2018-02-13
+
+	Prettified LaTeX output
 
 VERSION 2.3.9			2018-01-26
 

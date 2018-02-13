@@ -12,9 +12,9 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2.3.9 - compatible with the HyperList definition v. 2.3
-" Modified:	2018-01-26
-" Changes:  Fixed bugs in LaTeX & HTML conversion (to accept space in refs)
+" Version:	2.3.10 - compatible with the HyperList definition v. 2.3
+" Modified:	2018-02-13
+" Changes:  Prettified LaTeX output
 
 " INSTRUCTIONS {{{1
 "
@@ -433,9 +433,17 @@ function! LaTeXconversion ()
     normal o%http://vim.sourceforge.net/scripts/script.php?script_id=2518
     normal o
     normal o\documentclass[10pt]{article}
-    normal o\usepackage[margin=1cm]{geometry}
-    normal o\usepackage[usenames]{color}
+    normal o\usepackage[margin=2cm]{geometry}
+    normal o\usepackage[utf8]{inputenc}
+    normal o\usepackage[english]{babel}
+    normal o\usepackage[T1]{fontenc}
     normal o\usepackage{alltt}
+    normal o\usepackage{fancyhdr}
+    normal o\pagestyle{fancy}
+    normal o\fancyhead[RO]{\raggedleft XXX}
+    normal o\fancyfoot{}
+    normal o\usepackage{pdfpages}
+    normal o\usepackage[usenames]{color}
     normal o\definecolor{r}{rgb}{0.5,0,0}
     normal o\definecolor{g}{rgb}{0,0.5,0}
     normal o\definecolor{b}{rgb}{0,0,0.5}
