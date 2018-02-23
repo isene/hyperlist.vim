@@ -47,6 +47,7 @@
 "
 " Use <leader>L to convert the entire document to LaTaX.
 " Use <leader>H to convert the entire document to HTML.
+" Use <leader>T to convert the entire document to a basic TPP presentation.
 "
 " Use <leader>z encrypts the current line (including all sublevels if folded).
 " Use <leader>Z encrypts the current file (all lines).
@@ -432,17 +433,7 @@ function! LaTeXconversion ()
     normal ggO%Created by the HyperList vim plugin, see:
     normal o%http://vim.sourceforge.net/scripts/script.php?script_id=2518
     normal o
-    normal o\documentclass[10pt]{article}
-    normal o\usepackage[margin=2cm]{geometry}
-    normal o\usepackage[utf8]{inputenc}
-    normal o\usepackage[english]{babel}
-    normal o\usepackage[T1]{fontenc}
-    normal o\usepackage{alltt}
-    normal o\usepackage{fancyhdr}
-    normal o\pagestyle{fancy}
-    normal o\fancyhead[RO]{\raggedleft XXX}
-    normal o\fancyfoot{}
-    normal o\usepackage{pdfpages}
+    normal o\documentclass[10pt,a4paper,usenames]{article}
     normal o\usepackage[usenames]{color}
     normal o\definecolor{r}{rgb}{0.5,0,0}
     normal o\definecolor{g}{rgb}{0,0.5,0}
@@ -450,6 +441,16 @@ function! LaTeXconversion ()
     normal o\definecolor{v}{rgb}{0.4,0,0.4}
     normal o\definecolor{t}{rgb}{0,0.4,0.4}
     normal o\definecolor{0}{rgb}{0.6,0.6,0}
+    normal o\usepackage[margin=2cm]{geometry}
+    normal o\usepackage[utf8]{inputenc}
+    normal o\usepackage[english]{babel}
+    normal o\usepackage[T1]{fontenc}
+    normal o\usepackage{alltt}
+    normal o\usepackage{fancyhdr}
+    normal o\pagestyle{fancy}
+    normal o\fancyhead[RO]{\raggedleft FIXME}
+    normal o\fancyfoot{}
+    normal o\usepackage{pdfpages}
     normal o
     normal o\begin{document}
     normal o\begin{alltt}
@@ -494,8 +495,8 @@ function! TPPconversion ()
     catch
     endtry
     try
-        "strip tabs/indents
-        execute '%s/^\(\t\|\*\)*//'
+        "strip two tabs/indents
+        execute '%s/^\(\t\|\*\)\{2}//'
     catch
     endtry
     "Document start

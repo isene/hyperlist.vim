@@ -120,6 +120,11 @@ the colors used for HyperList files within VIM.
 
 Use <leader>T to convert the entire document to a basic TPP presentation file.
 
+Top level of the HyperList will become the presentation header. First indented
+level will become headers on a new page. Other indented levels will be
+preserved.  No HyperList coloring will be done. Bold, italics and underlined
+parts of the HyperList will be preserved.
+
 See https://github.com/cbbrowne/tpp for information on TPP (Text Presentation Program)
 
 Use <leader>z to encrypt the current line (including all sublevels if folded).
