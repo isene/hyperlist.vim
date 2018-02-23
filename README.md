@@ -3,7 +3,7 @@ This VIM plugin makes it easy to create and manage HyperLists using VIM
 
 ---------------------------------------------------------------------------
 
-GENERAL INFORAMTION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.3.10)
+GENERAL INFORAMTION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.3.11)
 
 HyperLists are used to describe anything - any state, item(s), pattern,
 action, process, transition, program, instruction set etc. So, you can use
@@ -91,6 +91,10 @@ Use <leader><SPACE> to go to the next open template element
 
 Use <leader>L to convert the entire document to LaTaX.
 Use <leader>H to convert the entire document to HTML.
+Use <leader>T to convert the entire document to a basic TPP presentation.
+
+For information on the Text Presentation Programi (TPP), see: 
+https://github.com/cbbrowne/tpp
 
 Use <leader>z encrypts the current line (including all sublevels if folded).
 Use <leader>Z encrypts the current file (all lines).

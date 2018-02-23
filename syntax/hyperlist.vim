@@ -12,9 +12,9 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2.3.10 - compatible with the HyperList definition v. 2.3
-" Modified:	2018-02-13
-" Changes:  Prettified LaTeX output
+" Version:	2.3.11 - compatible with the HyperList definition v. 2.3
+" Modified:	2018-02-23
+" Changes:  Added TPP-conversion (mapped to <leader>T)
 
 " INSTRUCTIONS {{{1
 "
@@ -459,6 +459,50 @@ function! LaTeXconversion ()
     set filetype=tex
 endfunction
 
+"  TPP conversion{{{2
+"  Mapped to '<leader>T'
+"  See https://github.com/cbbrowne/tpp
+function! TPPconversion ()
+    try
+        "Remove VIM tagline
+        execute '%s/^vim:.*//'
+    catch
+    endtry
+    try
+        "first line of a HyperList is title
+        execute '%s/^\(\S.*\)$/\r--title \1/'
+    catch
+    endtry
+    try
+        "second line of a HyperList is a new slide
+        execute '%s/^\(\t\|\*\)\(\S.*\)$/\r--newpage\r\r--header \2/'
+    catch
+    endtry
+    try
+        "HLb
+        execute '%s/ \@<=\*\(.\{-}\)\* /--boldon\r\1\r--boldoff/g'
+    catch
+    endtry
+    try
+        "HLi
+        execute '%s/ \@<=\/\(.\{-}\)\/ /--revon\r\1\r--revoff/g'
+    catch
+    endtry
+    try
+        "HLu
+        execute '%s/ \@<=_\(.\{-}\)_ /--ulon\n\1\r--uloff/g'
+    catch
+    endtry
+    try
+        "strip tabs/indents
+        execute '%s/^\(\t\|\*\)*//'
+    catch
+    endtry
+    "Document start
+    normal ggO--bgcolor white
+    normal o--fgcolor black
+    normal o--date today
+endfunction
 "  Show/Hide{{{2
 "  Useful for easily showing e.g. a specific tag or hash 
 "  Taken from VIM script #1594 (thanks to Amit Sethi)
@@ -685,8 +729,9 @@ nmap <leader>x        :call HLdecrypt()<CR>V:!openssl bf -d -a 2>/dev/null<CR><C
 vmap <leader>x        :call HLdecrypt()<CR>gv:!openssl bf -d -a 2>/dev/null<CR><C-L>
 nmap <leader>X        :call HLdecrypt()<CR>:%!openssl bf -d -a 2>/dev/null<CR><C-L>
 
-nmap <leader>L        :call LaTeXconversion()<CR>
 nmap <leader>H        :call HTMLconversion()<CR>
+nmap <leader>L        :call LaTeXconversion()<CR>
+nmap <leader>T        :call TPPconversion()<CR>
 
 " Sort hack (sort the visual selected lines by the top item's indentation
 " The last item in the visual selection cannot be the last line in the document.

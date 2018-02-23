@@ -1,4 +1,4 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.10, 2018-02-13)
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.11, 2018-02-23)
 
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -12,7 +12,7 @@ this plugin to make a password safe.
 
 The VIM plugin version numbers correspond to the HyperList definition version
 numbers with the VIM plugin adding another increment of versioning, e.g VIM
-plugin version 2.3.10 would be compatible with HyperList definition version 2.3.
+plugin version 2.3.11 would be compatible with HyperList definition version 2.3.
 
 This documentation contains the full HyperList definition. For a more
 comprehensive manual that also includes plenty of examples, read the official
@@ -67,56 +67,65 @@ subdirectory.  It also includes a file in the "ftdetect" directory so that
 files with a ".hl" extension is automatically detected and treated as a
 HyperList file.
 
-When working wiht HyperLists in VIM:
+WHEN WORKING WITH HYPERLISTS IN VIM:
 
-	Use tabs/shifts or * for indentations.
+Use tabs/shifts or * for indentations.
 
-	Use <SPACE> to toggle one fold.
-	Use \0 to \9, \a, \b, \c, \d, \e, \f to show up to 15 levels expanded.
+Use <SPACE> to toggle one fold.
+Use \0 to \9, \a, \b, \c, \d, \e, \f to show up to 15 levels expanded.
 
-	<leader># or <leader>an toggles autonumbering of new items (the previous
-	item must be numbered for the next item to be autonumbered). An item is
-	indented to the right with <c-t>, adding one level of numbering. An item
-	is indented to the left with <c-d>, removing one level of numbering and
-	increasing the number by one.
+<leader># or <leader>an toggles autonumbering of new items (the previous
+item must be numbered for the next item to be autonumbered). An item is
+indented to the right with <c-t>, adding one level of numbering. An item
+is indented to the left with <c-d>, removing one level of numbering and
+increasing the number by one.
 
-	Use <leader>u to toggle underlining of States (prefixed with "S: " or "| "),
-	Transitions (prefixed with "T: " or "/ ") or underline nothing.
+Use <leader>u to toggle underlining of States (prefixed with "S: " or "| "),
+Transitions (prefixed with "T: " or "/ ") or underline nothing.
 
-	Use <leader>v to add a checkbox at start of item or to toggle a checkbox
-	Use <leader>V to add/toggle a checkbox with a date stamp for completion
+Use <leader>v to add a checkbox at start of item or to toggle a checkbox
+Use <leader>V to add/toggle a checkbox with a date stamp for completion
 
-	Use "gr" (without the quotation marks, signifies "Goto Ref") or simply press
-	the "Enter" ("<CR>") key while the cursor is on a HyperList reference to jump
-	to that destination in a HyperList. Use "n" after a "gr" to verify that the
-	reference destination is unique. A reference can be in the list or to a file
-	by the use of <file:/pathto/filename>, <file:~/filename> or <file:filename>.
+Use "gr" (without the quotation marks, signifies "Goto Ref") or simply press
+the "Enter" ("<CR>") key while the cursor is on a HyperList reference to jump
+to that destination in a HyperList. Use "n" after a "gr" to verify that the
+reference destination is unique. A reference can be in the list or to a file
+by the use of <file:/pathto/filename>, <file:~/filename> or <file:filename>.
 
-	Use "gf" to open the file under the cursor. Graphic files are opened in
-	"feh", pdf files in "zathura" and MS/OOO docs in "LibreOffice". Other
-	filetypes are opened in VIM for editing. All this can be changed by
-	editing the function OpenFile() in the file "hyperlist.vim".
+Use "gf" to open the file under the cursor. Graphic files are opened in
+"feh", pdf files in "zathura" and MS/OOO docs in "LibreOffice". Other
+filetypes are opened in VIM for editing. All this can be changed by
+editing the function OpenFile() in the file "hyperlist.vim".
 
-	Whenever you jump to a reference in this way, the mark "'" is set at the
-	point you jumped from so that you may easily jump back by hitting "''"
-	(single quoutes twice). 
+Whenever you jump to a reference in this way, the mark "'" is set at the
+point you jumped from so that you may easily jump back by hitting "''"
+(single quoutes twice). 
 
-	Use <leader><SPACE> to go to the next open template element
-	(A template element is a HyperList item ending in an equal sign).
+Use <leader><SPACE> to go to the next open template element
+(A template element is a HyperList item ending in an equal sign).
 
-  As a sort of "presentation mode", you can traverse a HyperList by using
-  g<DOWN> or g<UP> to view only the current line and its ancestors.
-  An alternative is <leader><DOWN> and <leader><UP> to open more levels down.
+As a sort of "presentation mode", you can traverse a HyperList by using
+g<DOWN> or g<UP> to view only the current line and its ancestors.
+An alternative is <leader><DOWN> and <leader><UP> to open more levels down.
 
-	Use <leader>L to convert the entire document to LaTaX.
+Use <leader>L to convert the entire document to LaTaX.
 
 The LaTeX conversion includes color coding of the various elements similar to
 the colors used for HyperList files within VIM.
 
-  Use <leader>z to encrypt the current line (including all sublevels if folded).
-  Use <leader>Z to encrypt the current file (all lines).
-  Use <leader>x to decrypt the current line (mark all subsequent encrypted lines).
-  Use <leader>X to decrypt the current file (all lines).
+Use <leader>H to convert the entire document to HTML.
+
+The HTML conversion includes color coding of the various elements similar to
+the colors used for HyperList files within VIM.
+
+Use <leader>T to convert the entire document to a basic TPP presentation file.
+
+See https://github.com/cbbrowne/tpp for information on TPP (Text Presentation Program)
+
+Use <leader>z to encrypt the current line (including all sublevels if folded).
+Use <leader>Z to encrypt the current file (all lines).
+Use <leader>x to decrypt the current line (mark all subsequent encrypted lines).
+Use <leader>X to decrypt the current file (all lines).
 
 If you enter the wrong password while trying to decrypt, you will end up with
 garbage characters. To fix it, press "u" (undo) and try decrypting again with
@@ -174,10 +183,10 @@ You can show/hide words or regex patterns by using these keys and commands:
 	zh    Hide all lines containing word under cursor
 	z0    Go back to normal HyperList folding
 	:SHOW word/pattern
-				Show lines containing either word or pattern
+			Show lines containing either word or pattern
 	:HIDE word/pattern
-				Hide lines containing either word or pattern
-				Pattern can be any regular expression
+			Hide lines containing either word or pattern
+			Pattern can be any regular expression
 
 This functionality is useful for easily showing e.g. a specific tag or hash. 
 The functionality is taken from VIM script #1594 (thanks to Amit Sethi).
@@ -1065,6 +1074,10 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.com
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.3.11			2018-02-23
+
+	Added TPP conversion (info on TPP: https://github.com/cbbrowne/tpp)
 
 VERSION 2.3.10			2018-02-13
 
