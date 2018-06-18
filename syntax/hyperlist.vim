@@ -12,9 +12,9 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2.3.11 - compatible with the HyperList definition v. 2.3
-" Modified:	2018-02-23
-" Changes:  Added TPP-conversion (mapped to <leader>T)
+" Version:	2.3.12 - compatible with the HyperList definition v. 2.3
+" Modified:	2018-06-18
+" Changes:  Minor fix to bold/italics/underlined elements
 
 " INSTRUCTIONS {{{1
 "
@@ -629,9 +629,9 @@ syn keyword HLtodo    TODO FIXME
 "syn match   HLmove      '>>\|<<\|->\|<-'
 
 " Bold and Italic
-syn match   HLb	        ' \@<=\*.\{-}\* \@='
-syn match   HLi	        ' \@<=/.\{-}/ \@='
-syn match   HLu	        ' \@<=_.\{-}_ \@='
+syn match   HLb	        '\(\t\| \)\@<=\*.\{-}\*\($\| \)\@='
+syn match   HLi	        '\(\t\| \)\@<=/.\{-}/\($\| \)\@='
+syn match   HLu	        '\(\t\| \)\@<=_.\{-}_\($\| \)\@='
 
 " Cluster the above
 syn cluster HLtxt contains=HLident,HLmulti,HLop,HLqual,HLtag,HLhash,HLref,HLkey,HLlit,HLlc,HLcomment,HLquote,HLsc,HLtodo,HLmove,HLb,HLi,HLu,HLstate,HLtrans

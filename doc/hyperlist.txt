@@ -1,4 +1,4 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.11, 2018-02-23)
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.12, 2018-06-18)
 
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -1079,6 +1079,10 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.com
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.3.12			2018-06-18
+
+	Minor fix to bold/italics/underlined elements
 
 VERSION 2.3.11			2018-02-23
 
