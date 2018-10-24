@@ -3,7 +3,7 @@ This VIM plugin makes it easy to create and manage HyperLists using VIM
 
 ---------------------------------------------------------------------------
 
-GENERAL INFORAMTION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.3.12)
+## GENERAL INFORAMTION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.3.13)
 
 HyperLists are used to describe anything - any state, item(s), pattern,
 action, process, transition, program, instruction set etc. So, you can use
@@ -19,6 +19,7 @@ HyperList or take advantage of the autoencryption feature by making the
 HyperList a dot file - i.e. prefixing the file name with a dot (such as
 ".test.hl"). You can use this plugin to make a password safe.
 
+### Installation
 As you most certainly have already done, to install the HyperList plugin
 for VIM, dowmload woim.vba and do:
 
@@ -36,6 +37,7 @@ From now on all files with the ".hl" file extension will be treated as a
 HyperList file, syntax highlighted corrrectly and you can use all the neat
 HyperList functionality for VIM.
 
+### Include Hyperlists in other document types
 To use HyperLists within other file types (other than ".hl"), add the
 following to those syntax files:
 
@@ -49,30 +51,32 @@ part of the full specification for HyperList as found here:
   http://isene.me/hyperlist/
 
 
-INSTRUCTIONS
-
+## INSTRUCTIONS
 Use tabs for indentation.
 
-Use <SPACE> to toggle one fold.
+Use SPACE to toggle one fold.
 Use \0 to \9, \a, \b, \c, \d, \e, \f to show up to 15 levels expanded.
 
-<leader># or <leader>an toggles autonumbering of new items (the previous
+### Autonumbering and renumbering
+\# or \an toggles autonumbering of new items (the previous
 item must be numbered for the next item to be autonumbered). An item is
-indented to the right with <c-t>, adding one level of numbering. An item
-is indented to the left with <c-d>, removing one level of numbering and
+indented to the right with c-t, adding one level of numbering. An item
+is indented to the left with c-d, removing one level of numbering and
 increasing the number by one.
 
 To number or renumber a set of items, select them visually (using V in VIM)
-and press <leader>R. If the items are not previously numbered, they will now
+and press \R. If the items are not previously numbered, they will now
 be numbered from 1 and onward. Only items with the same indentation as the
 first selected line will be numbered. If the first item is already numbered
 (such as 1.2.6), the remaining items within the selection (with the same
 indentation) will be numbered accordingly (such as 1.2.7, 1.2.8, etc.).
 
+### Presentation mode
 As a sort of "presentation mode", you can traverse a WOIM list by using
 g<DOWN> or g<UP> to view only the current line and its ancestors.
-An alternative is <leader><DOWN> and <leader><UP> to open more levels down.
+An alternative is \<DOWN> and \<UP> to open more levels down.
 
+### Jumping to references
 Use "gr" (without the quotation marks, signifies "Goto Ref") or simply
 press the "Enter" ("<CR>") key while the cursor is on a HyperList
 reference to jump to that destination in a HyperList. Use "n" after a "gr"
@@ -83,37 +87,44 @@ Whenever you jump to a reference in this way, the mark "'" is set at the
 point you jumped from so that you may easily jump back by hitting "''"
 (single quoutes twice). 
 
+### Opening referenced files
 Use "gf" to open the file under the cursor. Graphic files are opened in
 "feh", pdf files in "zathura" and MS/OOO docs in "LibreOffice". Other
 filetypes are opened in VIM for editing. All this can be changed by
 editing the function OpenFile() in the file "hyperlist.vim".
 
-Use <leader>u to toggle underlining of Transitions, States or no underlining.
+### Simple tricks
+Use \u to toggle underlining of Transitions, States or no underlining.
 
-Use <leader>v to add a checkbox at start of item or to toggle a checkbox.
-Use <leader>V to add/toggle a checkbox with a date stamp for completion.
+Use \v to add a checkbox at start of item or to toggle a checkbox.
+Use \V to add/toggle a checkbox with a date stamp for completion.
 
-Use <leader><SPACE> to go to the next open template element
+Use \SPACE to go to the next open template element
 (A template element is a WOIM item ending in an equal sign).
 
-Use <leader>L to convert the entire document to LaTaX.
-Use <leader>H to convert the entire document to HTML.
-Use <leader>T to convert the entire document to a basic TPP presentation.
+Use \L to convert the entire document to LaTaX.
+Use \H to convert the entire document to HTML.
+Use \T to convert the entire document to a basic TPP presentation.
 
-For information on the Text Presentation Programi (TPP), see: 
+For information on the Text Presentation Program (TPP), see: 
 https://github.com/cbbrowne/tpp
 
-Use <leader>z encrypts the current line (including all sublevels if folded).
-Use <leader>Z encrypts the current file (all lines).
-Use <leader>x decrypts the current line.
-Use <leader>X decrypts the current file (all lines).
-<leader>z and <leader>x can be used with visual ranges.
+### Encryption
+Use \z encrypts the current line (including all sublevels if folded).
+Use \Z encrypts the current file (all lines).
+Use \x decrypts the current line.
+Use \X decrypts the current file (all lines).
+\z and \x can be used with visual ranges.
 
 A dot file (file name starts with a "." such as .test.woim) is
 automatically encrypted on save and decrypted on opening.
 
+### Syntax refresh
+
 Syntax updated at start and every time you leave Insert mode, or you can
 press "zx" to update the syntax. 
+
+### Speeding up hyperlist.vim
 
 You may speed up larger HyperLists by setting the the global variable
 "disable_collapse" - add the following to your .vimrc:
@@ -125,6 +136,7 @@ to your .vimrc file:
 
   let "g:HLDisableMapping" = 1
 
+### Show/hide
 You can show/hide words or regex patterns by using these keys and commands:
 
   zs    Show all lines containing word under cursor
@@ -143,15 +155,17 @@ You can show/hide words or regex patterns by using these keys and commands:
 This functionality is useful for easily showing e.g. a specific tag or hash.
 The functionality is taken from VIM script #1594 (thanks to Amit Sethi).
 
+### Sort items
 To sort a set of items at a specific indentation, visually select (V) the
 items you want to sort (including all the children of those items) and press
-<leader>s and the items in the range will be alphabetically sorted - but only
+\s and the items in the range will be alphabetically sorted - but only
 the items on the same level/indentation as the first item selected. The sorted
 items will keep their children. This is useful if parts of a HyperList is 
 numbered and you get the numbering out of sequence and wants to resort them.
 One caveat, the last line in the selection cannot be the very last line in
 the document (there must be an item or an empty line below it).
 
+### More help
 For this help and more, including the full HyperList definition/description, type 
 
   :help HyperList
@@ -162,7 +176,8 @@ tags in the documentation.
 
 Enjoy.
 
+## Contact
 
 Geir Isene <g@isene.com>
 ...explorer of free will
-   http://isene.com
+   http://isene.org
