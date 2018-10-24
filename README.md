@@ -58,7 +58,7 @@ Use SPACE to toggle one fold.
 Use \0 to \9, \a, \b, \c, \d, \e, \f to show up to 15 levels expanded.
 
 ### Autonumbering and renumbering
-Use \# or \an toggles autonumbering of new items (the previous
+Use \\# or \an toggles autonumbering of new items (the previous
 item must be numbered for the next item to be autonumbered). An item is
 indented to the right with c-t, adding one level of numbering. An item
 is indented to the left with c-d, removing one level of numbering and
@@ -157,8 +157,8 @@ The functionality is taken from VIM script #1594 (thanks to Amit Sethi).
 
 ### Sort items
 To sort a set of items at a specific indentation, visually select (V) the
-items you want to sort (including all the children of those items) and press
-\s and the items in the range will be alphabetically sorted - but only
+items you want to sort (including all the children of those items) and press \s 
+and the items in the range will be alphabetically sorted - but only
 the items on the same level/indentation as the first item selected. The sorted
 items will keep their children. This is useful if parts of a HyperList is 
 numbered and you get the numbering out of sequence and wants to resort them.
