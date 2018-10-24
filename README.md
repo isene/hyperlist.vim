@@ -58,7 +58,7 @@ Use SPACE to toggle one fold.
 Use \0 to \9, \a, \b, \c, \d, \e, \f to show up to 15 levels expanded.
 
 ### Autonumbering and renumbering
-\# or \an toggles autonumbering of new items (the previous
+Use \# or \an toggles autonumbering of new items (the previous
 item must be numbered for the next item to be autonumbered). An item is
 indented to the right with c-t, adding one level of numbering. An item
 is indented to the left with c-d, removing one level of numbering and
@@ -72,13 +72,13 @@ first selected line will be numbered. If the first item is already numbered
 indentation) will be numbered accordingly (such as 1.2.7, 1.2.8, etc.).
 
 ### Presentation mode
-As a sort of "presentation mode", you can traverse a WOIM list by using
-g<DOWN> or g<UP> to view only the current line and its ancestors.
-An alternative is \<DOWN> and \<UP> to open more levels down.
+As a sort of presentation mode, you can traverse a WOIM list by using
+"g DOWN" or "g UP" to view only the current line and its ancestors.
+An alternative is \DOWN and \UP to open more levels down.
 
 ### Jumping to references
 Use "gr" (without the quotation marks, signifies "Goto Ref") or simply
-press the "Enter" ("<CR>") key while the cursor is on a HyperList
+press the "Enter" ("CR") key while the cursor is on a HyperList
 reference to jump to that destination in a HyperList. Use "n" after a "gr"
 to verify that the reference destination is unique. A reference can be in
 the list or to a file by the use of <file:/pathto/filename>,
@@ -110,11 +110,11 @@ For information on the Text Presentation Program (TPP), see:
 https://github.com/cbbrowne/tpp
 
 ### Encryption
-Use \z encrypts the current line (including all sublevels if folded).
-Use \Z encrypts the current file (all lines).
-Use \x decrypts the current line.
-Use \X decrypts the current file (all lines).
-\z and \x can be used with visual ranges.
+Using \z encrypts the current line (including all sublevels if folded).
+Using \Z encrypts the current file (all lines).
+Using \x decrypts the current line.
+Using \X decrypts the current file (all lines).
+Using \z and \x can be used with visual ranges.
 
 A dot file (file name starts with a "." such as .test.woim) is
 automatically encrypted on save and decrypted on opening.
