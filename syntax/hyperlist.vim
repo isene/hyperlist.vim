@@ -12,9 +12,9 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2.3.12 - compatible with the HyperList definition v. 2.3
-" Modified:	2018-06-18
-" Changes:  Minor fix to bold/italics/underlined elements
+" Version:	2.3.13 - compatible with the HyperList definition v. 2.3
+" Modified:	2018-10-24
+" Changes:  Added function Renumber() to (re)number items on same indent
 
 " INSTRUCTIONS {{{1
 "
@@ -101,7 +101,7 @@ endfunction
 
 "  Toggle AutoNumbering {{{2
 "  Mapped to <leader># and <leader>an
-"  When activated, <cr> increments the next item on the samee level
+"  When activated, <cr> increments the next item on the same level
 "  <c-t> indents the item and adds one level of numbering
 "  <c-d> de-indents the item and renumbers it.
 let s:an = 0
@@ -120,6 +120,43 @@ function! ToggleAutonum()
 endfunction
 nmap <leader>an :call ToggleAutonum()<cr>
 nmap <leader># :call ToggleAutonum()<cr>
+
+"  Renumber {{{2
+"  Mapped to <leader>R
+function! Renumber() range
+	let l1 = a:firstline
+	let l2 = a:lastline
+	"If the first line is without a number, add a 1 in the front
+	try
+		if match(getline(l1),'^\t*\d\+') != 0
+			exe l1 's/\(^\t*\)\(.*\)/\11 \2'
+		endif
+	catch
+	endtry
+	"Get the indent and store it in 'tabs'
+	let tabs = substitute(getline(l1), '^\(\t*\).*', '\1', '')
+	"The first part of numbering (like 1.2.) in 'initnum'
+	let initnum = substitute(getline(l1), '^\t*\([0-9.]\+\)*\d\+\.* .*', '\1', '')
+	"The numbering after initnum starts with 1
+	let numx = substitute(getline(l1), '^\t*\([0-9.]\+\)*\(\d\+\)\.* .*', '\2', '')
+	"Start from first line 
+	let lx = l1 + 1
+	"Loop until the last line
+	while lx <= l2
+		"If the indent matches (we will not number lines with greater indentations)
+		if match(getline(lx),tabs."[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9<>#()\*:]") == 0
+			let numx += 1
+			silent! exe lx 's/\(^\t*\)[0-9.]* \(.*\)/\1\2'
+			let startline = substitute(getline(lx), '\(^\t*\).*', '\1', '')
+			let numline = initnum . numx
+			let endline = substitute(getline(lx), '^\t*\(.*\)', ' \1', '')
+			let wholeline = startline . numline . endline
+			call setline(lx, wholeline)
+		endif
+		let lx += 1
+	endwhile
+endfunction
+vmap <leader>R :call Renumber()<cr>
 
 "  Encryption {{{2
 "  Remove traces of secure info upon decrypting (part of) a HyperList

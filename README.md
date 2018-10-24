@@ -62,6 +62,13 @@ indented to the right with <c-t>, adding one level of numbering. An item
 is indented to the left with <c-d>, removing one level of numbering and
 increasing the number by one.
 
+To number or renumber a set of items, select them visually (using V in VIM)
+and press <leader>R. If the items are not previously numbered, they will now
+be numbered from 1 and onward. Only items with the same indentation as the
+first selected line will be numbered. If the first item is already numbered
+(such as 1.2.6), the remaining items within the selection (with the same
+indentation) will be numbered accordingly (such as 1.2.7, 1.2.8, etc.).
+
 As a sort of "presentation mode", you can traverse a WOIM list by using
 g<DOWN> or g<UP> to view only the current line and its ancestors.
 An alternative is <leader><DOWN> and <leader><UP> to open more levels down.

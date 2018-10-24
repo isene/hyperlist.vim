@@ -1,4 +1,4 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.12, 2018-06-18)
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.13, 2018-10-24)
 
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -12,13 +12,13 @@ this plugin to make a password safe.
 
 The VIM plugin version numbers correspond to the HyperList definition version
 numbers with the VIM plugin adding another increment of versioning, e.g VIM
-plugin version 2.3.11 would be compatible with HyperList definition version 2.3.
+plugin version 2.3.13 would be compatible with HyperList definition version 2.3.
 
 This documentation contains the full HyperList definition. For a more
 comprehensive manual that also includes plenty of examples, read the official
 definition document:
 
-	http://isene.com/hyperlist/
+	http://isene.org/hyperlist/
 
 Here you will also find HyperGraph - a Ruby script to graph both State
 HyperLists (like mindmaps) and Transitions Hyperlists (like flowcharts).
@@ -79,6 +79,13 @@ item must be numbered for the next item to be autonumbered). An item is
 indented to the right with <c-t>, adding one level of numbering. An item
 is indented to the left with <c-d>, removing one level of numbering and
 increasing the number by one.
+
+To number or renumber a set of items, select them visually (using V in VIM)
+and press <leader>R. If the items are not previously numbered, they will now
+be numbered from 1 and onward. Only items with the same indentation as the
+first selected line will be numbered. If the first item is already numbered
+(such as 1.2.6), the remaining items within the selection (with the same
+indentation) will be numbered accordingly (such as 1.2.7, 1.2.8, etc.).
 
 Use <leader>u to toggle underlining of States (prefixed with "S: " or "| "),
 Transitions (prefixed with "T: " or "/ ") or underline nothing.
@@ -593,7 +600,7 @@ either be a "Reference", a "Comment", a "Quote" or a "Change Markup".
 
 A reference is enclosed in angle brackets ("<>"). A reference can be the name
 of an Item, another HyperList or anything else. An example would be a Reference
-to a website, such as <http://www.isene.com/>, a file,
+to a website, such as <http://www.isene.org/>, a file,
 <file:/path/to/filename>, or another item <The referenced item's Description>.
 
 There are two types of References:
@@ -994,7 +1001,7 @@ HLstart
 					Reference
 						+ An Item name or Identifier, list name or anything else
 						 enclosed in angle brackets ("<>"); EXAMPLES: 
-							Reference to a website = "<http://www.isene.com/>"
+							Reference to a website = "<http://www.isene.org/>"
 							Reference to a file = "<file:/path/to/filename>"
 						+ There are two types of References; OR: 
 							Redirection (hard Reference)
@@ -1075,10 +1082,14 @@ while. It's all there. The whole markup.
 6 About                                                      *HyperList-About*
 
 The author of the VIM plugin for HyperList is also the chief maintainer of the
-HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.com 
+HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org 
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.3.13			2018-10-24
+
+	Added function Renumber() to (re)number items on same indent
 
 VERSION 2.3.12			2018-06-18
 
