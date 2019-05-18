@@ -104,6 +104,7 @@ filetypes are opened in VIM for editing. All this can be changed by
 editing the function OpenFile() in the file "hyperlist.vim".
 
 ### Simple tricks
+```
 Use \u to toggle underlining of Transitions, States or no underlining.
 
 Use \v to add a checkbox at start of item or to toggle a checkbox.
@@ -115,16 +116,19 @@ Use \SPACE to go to the next open template element
 Use \L to convert the entire document to LaTaX.
 Use \H to convert the entire document to HTML.
 Use \T to convert the entire document to a basic TPP presentation.
+```
 
 For information on the Text Presentation Program (TPP), see: 
 https://github.com/cbbrowne/tpp
 
 ### Encryption
+```
 Using \z encrypts the current line (including all sublevels if folded).
 Using \Z encrypts the current file (all lines).
 Using \x decrypts the current line.
 Using \X decrypts the current file (all lines).
 Using \z and \x can be used with visual ranges.
+```
 
 A dot file (file name starts with a "." such as .test.woim) is
 automatically encrypted on save and decrypted on opening.
@@ -148,19 +152,16 @@ to your .vimrc file:
 
 ### Show/hide
 You can show/hide words or regex patterns by using these keys and commands:
-
+```
   zs    Show all lines containing word under cursor
-
   zh    Hide all lines containing word under cursor
-
   z0    Go back to normal HyperList folding
-
   :SHOW word/pattern
         Show lines containing either word or pattern
-
   :HIDE word/pattern
         Hide lines containing either word or pattern
         Pattern can be any regular expression
+```
 
 This functionality is useful for easily showing e.g. a specific tag or hash.
 The functionality is taken from VIM script #1594 (thanks to Amit Sethi).
