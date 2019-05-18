@@ -23,9 +23,11 @@ HyperList a dot file - i.e. prefixing the file name with a dot (such as
 As you most certainly have already done, to install the HyperList plugin
 for VIM, dowmload woim.vba and do:
 
+----
   vim hyperlist.vba
   :so %
   :q
+----
 
 You will then discover that this file (README_HyperList will appear in the
 VIM directory, while the documentation will be placed in the "doc"
@@ -41,9 +43,11 @@ HyperList functionality for VIM.
 To use HyperLists within other file types (other than ".hl"), add the
 following to those syntax files:
 
+----
   syn include @HL ~/.vim/syntax/hyperlist.vim
   syn region HLSnip matchgroup=Snip start="HLstart" end="HLend" contains=@HL
   hi link Snip SpecialComment
+----
 
 The documentation file contains all of the HyperList definition and is
 part of the full specification for HyperList as found here:
@@ -135,12 +139,12 @@ press "zx" to update the syntax.
 You may speed up larger HyperLists by setting the the global variable
 "disable_collapse" - add the following to your .vimrc:
 
-  let "g:disable_collapse" = 1
+  `let "g:disable_collapse" = 1`
 
 If you want to disable or override these keymaps with your own, simply add
 to your .vimrc file:
 
-  let "g:HLDisableMapping" = 1
+  `let "g:HLDisableMapping" = 1`
 
 ### Show/hide
 You can show/hide words or regex patterns by using these keys and commands:
@@ -174,7 +178,7 @@ the document (there must be an item or an empty line below it).
 ### More help
 For this help and more, including the full HyperList definition/description, type 
 
-  :help HyperList
+  `:help HyperList`
 
 If you use tab completion after the "HyperList", you will find all the help
 tags in the documentation.
