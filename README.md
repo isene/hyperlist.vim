@@ -23,11 +23,11 @@ HyperList a dot file - i.e. prefixing the file name with a dot (such as
 As you most certainly have already done, to install the HyperList plugin
 for VIM, dowmload woim.vba and do:
 
-----
+```
 vim hyperlist.vba
 :so %
 :q
-----
+```
 
 You will then discover that this file (README_HyperList will appear in the
 VIM directory, while the documentation will be placed in the "doc"
@@ -43,11 +43,11 @@ HyperList functionality for VIM.
 To use HyperLists within other file types (other than ".hl"), add the
 following to those syntax files:
 
-----
+```
 syn include @HL ~/.vim/syntax/hyperlist.vim
 syn region HLSnip matchgroup=Snip start="HLstart" end="HLend" contains=@HL
 hi link Snip SpecialComment
-----
+```
 
 The documentation file contains all of the HyperList definition and is
 part of the full specification for HyperList as found here:
