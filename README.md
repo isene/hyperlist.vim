@@ -72,9 +72,15 @@ first selected line will be numbered. If the first item is already numbered
 indentation) will be numbered accordingly (such as 1.2.7, 1.2.8, etc.).
 
 ### Presentation mode
-As a sort of presentation mode, you can traverse a WOIM list by using
+As a sort of presentation mode, you can traverse a HyperList by using
 "g DOWN" or "g UP" to view only the current line and its ancestors.
 An alternative is \DOWN and \UP to open more levels down.
+
+### Highlighting
+To highlight the current part of a HyperList (the current item and all its
+children), press \h. This will uncollapse the whole HyperList and dim
+the whole HyperList except the current item and its children. To remove the
+highlighting, simply press \h again (the fold level is restored).
 
 ### Jumping to references
 Use "gr" (without the quotation marks, signifies "Goto Ref") or simply

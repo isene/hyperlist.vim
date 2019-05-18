@@ -12,8 +12,8 @@
 "		Further, I am under no obligation to maintain or extend
 "		this software. It is provided on an 'as is' basis without
 "		any expressed or implied warranty.
-" Version:	2.3.13 - compatible with the HyperList definition v. 2.3
-" Modified:	2018-10-24
+" Version:	2.3.14 - compatible with the HyperList definition v. 2.3
+" Modified:	2019-05-17 (Norway's Constitution Day)
 " Changes:  Added function Renumber() to (re)number items on same indent
 
 " INSTRUCTIONS {{{1
@@ -33,6 +33,11 @@
 " g<DOWN> or g<UP> to view only the current line and its ancestors.
 " An alternative is <leader><DOWN> and <leader><UP> to open more levels down.
 " 
+" To highlight the current part of a HyperList (the current item and all its
+" children), press <leader>h. This will uncollapse the whole HyperList and dim
+" the whole HyperList except the current item and its children. To remove the
+" highlighting, simply press <leader>h again (the fold level is restored).
+"
 " Use "gr" when the cursor is on a reference to jump to the referenced item.
 " A reference can be in the list or to a file by the use of
 " <file:/pathto/filename>, <file:~/filename> or <file:filename>.
@@ -70,6 +75,7 @@ endif
 
 " Basic settings {{{1
 let b:current_syntax="HyperList"
+let b:highlight="false"
 set autoindent
 set textwidth=0
 set shiftwidth=3
@@ -98,6 +104,42 @@ function! HLFoldText()
   endwhile
   return line
 endfunction
+
+" Highlighting {{{2
+"  Simplified Limelight - thanks to Junegunn Choi for the inspiration
+"  (https://travis-ci.org/junegunn/limelight.vim.svg?branch=master)
+
+function! HighLight()
+  if b:highlight=="false"
+    let b:fl=&fdl
+    set foldlevel=15
+    let b:highlight="true"
+    autocmd CursorMoved,CursorMovedI * call HighLightHL()
+  else
+    let &fdl=b:fl
+    autocmd!
+    autocmd InsertLeave * :syntax sync fromstart
+    let b:highlight="false"
+    execute 'syn clear HLdim0'
+    execute 'syn clear HLdim1'
+  endif
+endfunction
+
+function! HighLightHL()
+	let start_line_number = line('.')
+	let end_line_number   = start_line_number + 1
+	let start_line_indent = indent('.')
+	while indent(end_line_number) > start_line_indent
+		let end_line_number += 1
+	endwhile
+  let start = start_line_number
+	let end = end_line_number - 1
+  execute 'syn clear HLdim0'
+  execute 'syn clear HLdim1'
+  execute 'syn match HLdim0 ".*\%<' . string(start) . 'l"'
+  execute 'syn match HLdim1 ".*\%>' . string(end)   . 'l"'
+endfunction
+nmap <leader>h :call HighLight()<cr>
 
 "  Toggle AutoNumbering {{{2
 "  Mapped to <leader># and <leader>an
@@ -633,7 +675,7 @@ syn match   HLqual      '\[.\{-}\]' contains=HLtodo,HLref,HLcomment
 syn match   HLtag	'\(^\|\s\|\*\)\@<=[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,._&?!%= \-\/+<>#'"()\*:]\{-2,}:\s' contains=HLtodo,HLcomment,HLquote,HLref
 
 " HyperList operators
-syn match   HLop	'\(^\|\s\|\*\)\@<=[A-ZÆØÅÁÉÓÚÃÕÂÊÔÇÀ_/\-()]\{-2,}:\s' contains=HLcomment,HLquote
+syn match   HLop	'\(^\|\s\|\*\)\@<=[A-ZÆØÅÁÉÓÚÃÕÂÊÔÇÀ_\-()]\{-2,}:\s' contains=HLcomment,HLquote
 
 " Mark semicolon as stringing together lines
 syn match   HLsc	';'
@@ -671,7 +713,7 @@ syn match   HLi	        '\(\t\| \)\@<=/.\{-}/\($\| \)\@='
 syn match   HLu	        '\(\t\| \)\@<=_.\{-}_\($\| \)\@='
 
 " Cluster the above
-syn cluster HLtxt contains=HLident,HLmulti,HLop,HLqual,HLtag,HLhash,HLref,HLkey,HLlit,HLlc,HLcomment,HLquote,HLsc,HLtodo,HLmove,HLb,HLi,HLu,HLstate,HLtrans
+syn cluster HLtxt contains=HLident,HLmulti,HLop,HLqual,HLtag,HLhash,HLref,HLkey,HLlit,HLlc,HLcomment,HLquote,HLsc,HLtodo,HLmove,HLb,HLi,HLu,HLstate,HLtrans,HLdim0,HLdim1
 
 "  HyperList indentation (folding levels) {{{2
 if !exists("g:disable_collapse")
@@ -689,14 +731,16 @@ syn region L5 start="^\(\t\|\*\)\{4} \=\S"   end="^\(^\(\t\|\*\)\{5,} \=\S\)\@!"
 syn region L4 start="^\(\t\|\*\)\{3} \=\S"   end="^\(^\(\t\|\*\)\{4,} \=\S\)\@!"  fold contains=@HLtxt,L5,L6,L7,L8,L9,L10,L11,L12,L13,L14,L15
 syn region L3 start="^\(\t\|\*\)\{2} \=\S"   end="^\(^\(\t\|\*\)\{3,} \=\S\)\@!"  fold contains=@HLtxt,L4,L5,L6,L7,L8,L9,L10,L11,L12,L13,L14,L15
 syn region L2 start="^\(\t\|\*\)\{1} \=\S"   end="^\(^\(\t\|\*\)\{2,} \=\S\)\@!"  fold contains=@HLtxt,L3,L4,L5,L6,L7,L8,L9,L10,L11,L12,L13,L14,L15
-syn region L1 start="^\S"                    end="^\(^\(\t\|\*\)\{1,} \=\S\)\@!"  fold contains=@HLtxt,L2,L3,L4,L5,L6,L7,L8,L9,L10,L11,L12,L13,L14,L15
+syn region L1 start="^\(\t\|\*\)\{0} \=\S"   end="^\(^\(\t\|\*\)\{1,} \=\S\)\@!"  fold contains=@HLtxt,L2,L3,L4,L5,L6,L7,L8,L9,L10,L11,L12,L13,L14,L15
 endif
 
 "  VIM parameters (VIM modeline) {{{2
 syn match   HLvim "^vim:.*"
 
 " Highlighting and Linking {{{1
-hi	        Folded	  gui=bold term=bold cterm=bold
+"hi	        Folded	  guibg=#555555 ctermbg=8
+hi          HLdim0    ctermfg=241
+hi          HLdim1    ctermfg=241
 hi def link HLident	  Define
 hi def link HLmulti	  Constant
 hi def link HLtag	    Constant

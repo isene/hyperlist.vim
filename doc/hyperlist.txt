@@ -1,4 +1,4 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.13, 2018-10-24)
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.14, 2019-05-17)
 
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -12,7 +12,7 @@ this plugin to make a password safe.
 
 The VIM plugin version numbers correspond to the HyperList definition version
 numbers with the VIM plugin adding another increment of versioning, e.g VIM
-plugin version 2.3.13 would be compatible with HyperList definition version 2.3.
+plugin version 2.3.14 would be compatible with HyperList definition version 2.3.
 
 This documentation contains the full HyperList definition. For a more
 comprehensive manual that also includes plenty of examples, read the official
@@ -57,6 +57,8 @@ CONTENTS                                                  *HyperList-Contents*
 
 ==============================================================================
 1 HyperList VIM Plugin                                      *HyperList-Plugin*
+
+One of the most feature rich VIM plugins ever created.
 
 This plugin does both highlighting and various automatic handling of
 HyperLists, like collapsing lists or parts of lists in a sophisticated way. 
@@ -114,6 +116,11 @@ Use <leader><SPACE> to go to the next open template element
 As a sort of "presentation mode", you can traverse a HyperList by using
 g<DOWN> or g<UP> to view only the current line and its ancestors.
 An alternative is <leader><DOWN> and <leader><UP> to open more levels down.
+
+To highlight the current part of a HyperList (the current item and all its
+children), press <leader>h. This will uncollapse the whole HyperList and dim
+the whole HyperList except the current item and its children. To remove the
+highlighting, simply press <leader>h again (the fold level is restored).
 
 Use <leader>L to convert the entire document to LaTaX.
 
@@ -1086,6 +1093,10 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.3.14			2019-05-17 (Norway's Constitution Day)
+
+	Added function highlight/focus the current part of a HyperList
 
 VERSION 2.3.13			2018-10-24
 
