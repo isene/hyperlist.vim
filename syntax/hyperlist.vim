@@ -1,20 +1,22 @@
 " Vim syntax and filetype plugin for HyperList files (.hl)
-" Language:	Self defined markup and functions for HyperLists in Vim
-" Author:	Geir Isene <g@isene.com>
-" Web_site:	http://isene.com/
-" HyperList:	http://isene.com/hyperlist/
-" License:	I release all copyright claims. 
-"		This code is in the public domain.
-"		Permission is granted to use, copy modify, distribute, and
-"		sell this software for any purpose. I make no guarantee
-"		about the suitability of this software for any purpose and
-"		I am not liable for any damages resulting from its use.
-"		Further, I am under no obligation to maintain or extend
-"		this software. It is provided on an 'as is' basis without
-"		any expressed or implied warranty.
-" Version:	2.3.14 - compatible with the HyperList definition v. 2.3
-" Modified:	2019-05-17 (Norway's Constitution Day)
-" Changes:  Added function Renumber() to (re)number items on same indent
+" Language:   Self defined markup and functions for HyperLists in Vim
+" Author:     Geir Isene <g@isene.com>
+" Web_site:   http://isene.com/
+" HyperList:  http://isene.org/hyperlist/
+" Github:     https://github.com/isene/hyperlist.vim
+" License:    I release all copyright claims. 
+"             This code is in the public domain.
+"             Permission is granted to use, copy modify, distribute, and
+"             sell this software for any purpose. I make no guarantee
+"             about the suitability of this software for any purpose and
+"             I am not liable for any damages resulting from its use.
+"             Further, I am under no obligation to maintain or extend
+"             this software. It is provided on an 'as is' basis without
+"             any expressed or implied warranty.
+" Version:    2.3.15 - compatible with the HyperList definition v. 2.3
+" Modified:   2019-07-31 (Norway's Constitution Day)
+" Changes:    Added function CalendarAdd to add items with future dates
+"             as events to your Google calendar.
 
 " INSTRUCTIONS {{{1
 "
@@ -76,6 +78,8 @@ endif
 " Basic settings {{{1
 let b:current_syntax="HyperList"
 let b:highlight="false"
+" Change this to add events as reminders to your Google calendar:
+let b:calendar="geir@a-circle.no"
 set autoindent
 set textwidth=0
 set shiftwidth=3
@@ -108,7 +112,6 @@ endfunction
 " Highlighting {{{2
 "  Simplified Limelight - thanks to Junegunn Choi for the inspiration
 "  (https://travis-ci.org/junegunn/limelight.vim.svg?branch=master)
-
 function! HighLight()
   if b:highlight=="false"
     let b:fl=&fdl
@@ -630,7 +633,6 @@ endfunction
 "  Complexity{{{2
 "  :call Complexity() will show the complexity score for your HyperList
 "  It adds up all HyperList Items and all references to the total score
-
 function! Complexity()
 	let l = 0
 	let c = 0
@@ -653,6 +655,47 @@ function! Complexity()
   let plex = c + l
   echo "Complexity = ". plex
   return plex
+endfunction
+
+"  CalendarAdd{{{2
+"  :call CalendarAdd() will take all items containing a future date and add them 
+"  as reminder to your Google Calendar. If the item includes a time, the event 
+"  is added from that time with duration of 30 minutes.
+"  This function requires gcalcli (https://github.com/insanum/gcalcli)
+"  The function is mapped to <leader>G to add events to the default
+"  calendar - defined as b:calendar at the start of this script.
+"  To add the events to another calendar, do :call CalendarAdd("yourcalendar")
+function! CalendarAdd(...)
+  let l:count = 0
+  let l:cal = a:0 > 0 ? a:1 : b:calendar
+  let l:date = strftime("%Y-%m-%d")
+  let l:tm = ""
+  let l:linenr = 0 
+  while l:linenr < line("$") 
+    let l:linenr += 1
+    let l:line = getline(l:linenr)
+    let l:line = substitute(l:line, "\t", "", "g")
+    if match(l:line,'\d\d\d\d-\d\d-\d\d') >= 0
+      let l:dt = matchstr(l:line,'\d\d\d\d-\d\d-\d\d')
+      if l:dt > l:date
+        if match(l:line,' \d\d\.\d\d') >= 0
+          let l:tm = matchstr(l:line,'\d\d\.\d\d')
+          let l:tm = substitute(l:tm, '\.', ":", "")
+        endif
+        let l:gcalcli = "gcalcli --calendar " . l:cal . " quick \"" . l:line . " (Created by HyperList.vim) " . l:dt . " " . l:tm . "\""
+        call system(l:gcalcli)
+        let l:count += 1
+      endif
+    endif
+  endwhile
+  if l:count == 0
+    let l:msg = "No events added"
+  elseif l:count == 1
+    let l:msg = "Added 1 event"
+  else
+    let l:msg = "Added " . l:count . " events"
+  endif
+  echo l:msg
 endfunction
 
 " Syntax definitions {{{1
@@ -814,6 +857,8 @@ nmap <leader>X        :call HLdecrypt()<CR>:%!openssl bf -d -a 2>/dev/null<CR><C
 nmap <leader>H        :call HTMLconversion()<CR>
 nmap <leader>L        :call LaTeXconversion()<CR>
 nmap <leader>T        :call TPPconversion()<CR>
+
+nmap <leader>G        ::call CalendarAdd()<CR>
 
 " Sort hack (sort the visual selected lines by the top item's indentation
 " The last item in the visual selection cannot be the last line in the document.

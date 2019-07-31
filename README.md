@@ -3,7 +3,7 @@ This VIM plugin makes it easy to create and manage HyperLists using VIM
 
 ---------------------------------------------------------------------------
 
-## GENERAL INFORMATION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.3.14)
+## GENERAL INFORMATION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.3.15)
 
 HyperLists are used to describe anything - any state, item(s), pattern,
 action, process, transition, program, instruction set etc. So, you can use
@@ -18,6 +18,9 @@ The plugin incorporates encryption. You can encrypt any part of a
 HyperList or take advantage of the autoencryption feature by making the
 HyperList a dot file - i.e. prefixing the file name with a dot (such as
 ".test.hl"). You can use this plugin to make a password safe.
+
+You can even add items marked with future dates as reminders to your
+Google calendar.
 
 ### Installation
 As you most certainly have already done, to install the HyperList plugin
@@ -175,6 +178,17 @@ items will keep their children. This is useful if parts of a HyperList is
 numbered and you get the numbering out of sequence and wants to resort them.
 One caveat, the last line in the selection cannot be the very last line in
 the document (there must be an item or an empty line below it).
+
+### Add items as reminders to your Google Calendar
+By doing :call CalendarAdd() all items containing a future date will be added
+as reminders to your Google Calendar. If an item includes a time, the event is
+added from that time with duration of 30 minutes.
+
+This function requires gcalcli (https://github.com/insanum/gcalcli)
+
+The function is mapped to \G to add events to the default calendar. The default
+calendar is defined as b:calendar at the start of the HyperList.vim script.
+To add the events to another calendar, do :call CalendarAdd("yourcalendar")
 
 ### More help
 For this help and more, including the full HyperList definition/description, type 
