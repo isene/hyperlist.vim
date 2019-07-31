@@ -1,4 +1,4 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.14, 2019-05-17)
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.15, 2019-07-31)
 
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -12,7 +12,7 @@ this plugin to make a password safe.
 
 The VIM plugin version numbers correspond to the HyperList definition version
 numbers with the VIM plugin adding another increment of versioning, e.g VIM
-plugin version 2.3.14 would be compatible with HyperList definition version 2.3.
+plugin version 2.3.15 would be compatible with HyperList definition version 2.3.
 
 This documentation contains the full HyperList definition. For a more
 comprehensive manual that also includes plenty of examples, read the official
@@ -218,6 +218,16 @@ items will keep their children. This is useful if parts of a HyperList is
 numbered and you get the numbering out of sequence and wants to resort them.
 One caveat, the last line in the selection cannot be the very last line in
 the document (there must be an item or an empty line below it).
+
+By doing :call CalendarAdd() all items containing a future date will be added
+as reminders to your Google Calendar. If an item includes a time, the event is
+added from that time with duration of 30 minutes.
+
+This function requires gcalcli (https://github.com/insanum/gcalcli)
+
+The function is mapped to <leader>G to add events to the default calendar. The
+default calendar is defined as b:calendar at the start of the HyperList.vim
+script.  To add the events to another calendar, do :call CalendarAdd("yourcalendar")
 
 If you want to know the overall complexity of a HyperList, use:
 
@@ -1093,6 +1103,11 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.3.15			2019-07-31
+
+	Added function CalendarAdd to add items with future dates as events to your
+	Google calendar (mapped to <leader>G)
 
 VERSION 2.3.14			2019-05-17 (Norway's Constitution Day)
 
