@@ -66,7 +66,8 @@
 " automatically encrypted on save and decrypted on opening.
 "
 " Syntax is updated at start and every time you leave Insert mode.
-
+"
+" Much more information is found in the documentation (:help hyperlist.txt)
 
 " Initializing {{{1
 if version < 600
@@ -75,11 +76,16 @@ elseif exists("b:current_syntax")
     finish
 endif
 
-" Basic settings {{{1
-let b:current_syntax="HyperList"
-let b:highlight="false"
+" USER DEFINED SETTINGS (change these as you wish) {{{1
 " Change this to add events as reminders to your Google calendar:
 let b:calendar="geir@a-circle.no"
+" Lower the next two values if you have a slow computer
+syn sync minlines=50
+syn sync maxlines=100
+
+" Settings {{{1
+let b:current_syntax="HyperList"
+let b:highlight="false"
 set autoindent
 set textwidth=0
 set shiftwidth=3
@@ -90,9 +96,6 @@ set foldmethod=syntax
 set fillchars=fold:\ 
 syn sync fromstart
 autocmd InsertLeave * :syntax sync fromstart
-" Lower the next two values if you have a slow computer
-syn sync minlines=50
-syn sync maxlines=100
 
 " Functions {{{1
 "  Folding {{{2
@@ -682,7 +685,12 @@ function! CalendarAdd(...)
           let l:tm = matchstr(l:line,'\d\d\.\d\d')
           let l:tm = substitute(l:tm, '\.', ":", "")
         endif
-        let l:gcalcli = "gcalcli --calendar " . l:cal . " quick \"" . l:line . " (Created by HyperList.vim) " . l:dt . " " . l:tm . "\""
+        if @% == ""
+          let l:filename = ""
+        else
+          let l:filename = " <" . @% . ">)"
+        endif
+        let l:gcalcli = "gcalcli --calendar " . l:cal . " quick \"" . l:line . " (created by HyperList.vim" . l:filename . ") " . l:dt . " " . l:tm . "\""
         call system(l:gcalcli)
         let l:count += 1
       endif
