@@ -1112,7 +1112,7 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 VERSION 2.3.16			2019-08-03
 
 	Improved the CalendarAdd functionality to include the item and all its
-	children in the evnet description and the filename in the header for easy
+	children in the event description and the filename in the header for easy
 	reference
 
 VERSION 2.3.15			2019-07-31
