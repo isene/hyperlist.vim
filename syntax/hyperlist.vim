@@ -13,10 +13,9 @@
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.3.15 - compatible with the HyperList definition v. 2.3
-" Modified:   2019-07-31 (Norway's Constitution Day)
-" Changes:    Added function CalendarAdd to add items with future dates
-"             as events to your Google calendar.
+" Version:    2.3.16 - compatible with the HyperList definition v. 2.3
+" Modified:   2019-08-03
+" Changes:    Improved CalendarAdd functionality
 
 " INSTRUCTIONS {{{1
 "
@@ -64,6 +63,10 @@
 "
 " A dot file (file name starts with a "." such as .test.hl) is
 " automatically encrypted on save and decrypted on opening.
+"
+" You can add item tagged with future dates as items in your Google calendar.
+" Use <leader>G to automatically add all items with future dates to your
+" default calendar. Change your default under USER DEFINED SETTINGS below.
 "
 " Syntax is updated at start and every time you leave Insert mode.
 "
@@ -684,13 +687,39 @@ function! CalendarAdd(...)
         if match(l:line,' \d\d\.\d\d') >= 0
           let l:tm = matchstr(l:line,'\d\d\.\d\d')
           let l:tm = substitute(l:tm, '\.', ":", "")
+          let l:tm = " " . l:tm
         endif
         if @% == ""
           let l:filename = ""
         else
           let l:filename = " <" . @% . ">)"
         endif
-        let l:gcalcli = "gcalcli --calendar " . l:cal . " quick \"" . l:line . " (created by HyperList.vim" . l:filename . ") " . l:dt . " " . l:tm . "\""
+        let l:title = substitute(l:line, '.*\d\d\d\d-\d\d-\d\d\( \d\d.\d\d\)*: ', '', '')
+        let l:start_line_number = l:linenr
+        let l:end_line_number   = l:start_line_number + 1
+        let l:start_line_indent = indent(l:start_line_number)
+        let l:tabs = repeat("\t", l:start_line_indent/&tabstop)
+        while indent(l:end_line_number) > l:start_line_indent
+          let l:end_line_number += 1
+        endwhile
+        let l:start    = l:start_line_number
+        let l:end      = l:end_line_number - 1
+        let l:dlist    = getline(l:start,l:end)
+        let l:g_desc   = ""
+        for i in l:dlist
+          let l:g_desc = l:g_desc . substitute(i, l:tabs, '', '') . "\n"
+        endfor
+        let l:g_cal    = " --calendar '" . l:cal . "'"
+        let l:g_title  = " --title '" . l:title
+        if @% == ""
+          let l:filename = ""
+        else
+          let l:filename = " <" . @% . ">"
+        endif
+        let l:created  = " (created by HyperList.vim" . l:filename . ")' "
+        let l:g_when   = " --when '" . l:dt . l:tm . "'"
+        let l:g_desc   = " --description '" . l:g_desc . "'"
+        let l:gcalcli  = "gcalcli add --where '' --duration 30 --reminder 0" . l:g_cal . l:g_title . l:created . l:g_when . l:g_desc
         call system(l:gcalcli)
         let l:count += 1
       endif

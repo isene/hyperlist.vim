@@ -1,4 +1,4 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.15, 2019-07-31)
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.16, 2019-08-03)
 
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -12,7 +12,7 @@ this plugin to make a password safe.
 
 The VIM plugin version numbers correspond to the HyperList definition version
 numbers with the VIM plugin adding another increment of versioning, e.g VIM
-plugin version 2.3.15 would be compatible with HyperList definition version 2.3.
+plugin version 2.3.16 would be compatible with HyperList definition version 2.3.
 
 This documentation contains the full HyperList definition. For a more
 comprehensive manual that also includes plenty of examples, read the official
@@ -228,6 +228,11 @@ This function requires gcalcli (https://github.com/insanum/gcalcli)
 The function is mapped to <leader>G to add events to the default calendar. The
 default calendar is defined as b:calendar at the start of the HyperList.vim
 script.  To add the events to another calendar, do :call CalendarAdd("yourcalendar")
+The title of the calendar is the item in the HyperList without the date/time tag.
+If there is no time tag for the item, an event is created at the start of the date.
+If there is a time tag for the item, the event is created at that time with the
+default duration (30 minutes). The description for the event is the item and all
+its child items.
 
 If you want to know the overall complexity of a HyperList, use:
 
@@ -1103,6 +1108,12 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.3.16			2019-08-03
+
+	Improved the CalendarAdd functionality to include the item and all its
+	children in the evnet description and the filename in the header for easy
+	reference
 
 VERSION 2.3.15			2019-07-31
 
