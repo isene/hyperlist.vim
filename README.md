@@ -3,7 +3,7 @@ This VIM plugin makes it easy to create and manage HyperLists using VIM
 
 ---------------------------------------------------------------------------
 
-## GENERAL INFORMATION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.3.15)
+## GENERAL INFORMATION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.3.16)
 
 HyperLists are used to describe anything - any state, item(s), pattern,
 action, process, transition, program, instruction set etc. So, you can use
@@ -189,6 +189,12 @@ This function requires gcalcli (https://github.com/insanum/gcalcli)
 The function is mapped to \G to add events to the default calendar. The default
 calendar is defined as b:calendar at the start of the HyperList.vim script.
 To add the events to another calendar, do :call CalendarAdd("yourcalendar")
+
+The title of the calendar is the item in the HyperList without the date/time
+tag. If there is no time tag for the item, an event is created at the start of
+the date. If there is a time tag for the item, the event is created at that
+time with the default duration (30 minutes). The description for the event is
+the item and all its child items.
 
 ### More help
 For this help and more, including the full HyperList definition/description, type 
