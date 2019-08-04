@@ -199,7 +199,7 @@ the item and all its child items.
 ### More help
 For this help and more, including the full HyperList definition/description, type 
 
-  `:help HyperList`
+  `:help hyperlist`
 
 If you use tab completion after the "HyperList", you will find all the help
 tags in the documentation.
