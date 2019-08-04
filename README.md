@@ -114,7 +114,7 @@ Use \v to add a checkbox at start of item or to toggle a checkbox.
 Use \V to add/toggle a checkbox with a date stamp for completion.
 
 Use \SPACE to go to the next open template element
-(A template element is a WOIM item ending in an equal sign).
+(A template element is a HyperList item ending in an equal sign).
 
 Use \L to convert the entire document to LaTaX.
 Use \H to convert the entire document to HTML.
