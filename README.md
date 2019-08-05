@@ -24,16 +24,11 @@ Google calendar.
 
 For a compact primer on HyperList, read this OnePageBook:
 
-<img src="/assets/onepagebooks/7-hyperlist/cover.jpg" width="250"><br />
-**[Downloadable PDF](/assets/onepagebooks/7-hyperlist/1PB_HyperList.pdf)**
+<img src="https://isene.org/assets/onepagebooks/7-hyperlist/cover.jpg"
+width="250"><br /> **[Downloadable PDF](/assets/onepagebooks/7-hyperlist/1PB_HyperList.pdf)**
 
-And for an introduction to the VIM plugin's most sexy features, watch this
-screencast:
-
-<center><iframe width="700" height="394"
-src="https://isene.org/assets/videos/HyperListVIM.mp4" frameborder="0"
-allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
-allowfullscreen></iframe></center>
+And for an introduction to the VIM plugin's most sexy features, watch the
+screencast over at https://isene.org/hyperlist
 
 
 ### Installation
