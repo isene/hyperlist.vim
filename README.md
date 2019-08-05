@@ -25,7 +25,7 @@ Google calendar.
 For a compact primer on HyperList, read this OnePageBook:
 
 <img src="https://isene.org/assets/onepagebooks/7-hyperlist/cover.jpg"
-width="250"><br /> **[Downloadable PDF](/assets/onepagebooks/7-hyperlist/1PB_HyperList.pdf)**
+width="400"><br /> **[Downloadable PDF](/assets/onepagebooks/7-hyperlist/1PB_HyperList.pdf)**
 
 And for an introduction to the VIM plugin's most sexy features, watch the
 screencast over at https://isene.org/hyperlist
