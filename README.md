@@ -22,6 +22,20 @@ HyperList a dot file - i.e. prefixing the file name with a dot (such as
 You can even add items marked with future dates as reminders to your
 Google calendar.
 
+For a compact primer on HyperList, read this OnePageBook:
+
+<img src="/assets/onepagebooks/7-hyperlist/cover.jpg" width="250"><br />
+**[Downloadable PDF](/assets/onepagebooks/7-hyperlist/1PB_HyperList.pdf)**
+
+And for an introduction to the VIM plugin's most sexy features, watch this
+screencast:
+
+<center><iframe width="700" height="394"
+src="https://isene.org/assets/videos/HyperListVIM.mp4" frameborder="0"
+allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+allowfullscreen></iframe></center>
+
+
 ### Installation
 As you most certainly have already done, to install the HyperList plugin
 for VIM, dowmload woim.vba and do:
