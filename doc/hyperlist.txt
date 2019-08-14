@@ -1,18 +1,19 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.16, 2019-08-03)
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.3.17, 2019-08-14)
 
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
 outliner, a ToDo list handler, a process design tool, a data modeler, or any
 other way you want to describe something.
 
-This plugin incorporates encryption. You can encrypt any part of a HyperList or
-take advantage of the autoencryption feature by making the HyperList a dot file
-- i.e. prefixing the file name wiht a dot (such as ".password.hl"). You can use
-this plugin to make a password safe.
+This VIM plugin makes it easy to work with HyperLists. It has a vast range of
+features - from (un)collapsing whole or parts of lists, autonumbering of items,
+checkbox toggling, jumping to referenced items... to encryption, presentation 
+modes, export to various formats, automatically transferring of items tagged
+with future events to a Google calendar... and many more sexy features.
 
 The VIM plugin version numbers correspond to the HyperList definition version
 numbers with the VIM plugin adding another increment of versioning, e.g VIM
-plugin version 2.3.16 would be compatible with HyperList definition version 2.3.
+plugin version 2.3.17 would be compatible with HyperList definition version 2.3.
 
 This documentation contains the full HyperList definition. For a more
 comprehensive manual that also includes plenty of examples, read the official
@@ -24,7 +25,7 @@ Here you will also find HyperGraph - a Ruby script to graph both State
 HyperLists (like mindmaps) and Transitions Hyperlists (like flowcharts).
 
 HyperList was formerly known as WOIM. The ftdetect file contains the file
-suffix ".woim" for backward compatability so that these file typeas are also
+suffix ".woim" for backward compatability so that these file types are also
 treated as HyperList files.
 
 ==============================================================================
@@ -158,6 +159,10 @@ When using encryption in a HyperList or for the whole file, you will be asked
 for a password - twice when saving the file and once when opening it. You must
 have OpenSSL in your path to take advantage of these features.
 
+When running gVIM under Windows, encryption will spawn a DOS window where you
+enter the password for encryption/decryption. This window may be hidden under
+other windows.
+
 Syntax updated at start and every time you leave Insert mode, or you can press
 "zx" to update the syntax. 
 
@@ -239,6 +244,8 @@ If you want to know the overall complexity of a HyperList, use:
   :call Complexity()
 
 The score shown is the total of Items and References in your HyperList.
+
+GVIM users can enjoy a menu with most of the commands organized in submenus.
 
 ==============================================================================
 2 Background and definition                             *HyperList-Background*
@@ -1108,6 +1115,13 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.3.17			2019-08-14
+
+	Added a GVIM menu. Full rework of the color schemes for VIM & gVIM.
+   Improvement to Goto Reference (gr) and Autonumbering.
+   Several minor changes and improvement in the docs.
+   Thanks to Don Kelley for the gVIM suggestions and for extensive testing.
 
 VERSION 2.3.16			2019-08-03
 

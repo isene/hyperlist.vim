@@ -13,9 +13,12 @@
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.3.16 - compatible with the HyperList definition v. 2.3
-" Modified:   2019-08-03
-" Changes:    Improved CalendarAdd functionality
+" Version:    2.3.17 - compatible with the HyperList definition v. 2.3
+" Modified:   2019-08-14
+" Changes:    Added a GVIM menu. Full rework of the color schemes for VIM & gVIM.
+"             Improvement to Goto Reference (gr) and Autonumbering.
+"             Several minor changes and improvement in the docs.
+"             Thanks to Don Kelley for the gVIM suggestions and for extensive testing.
 
 " INSTRUCTIONS {{{1
 "
@@ -79,9 +82,44 @@ elseif exists("b:current_syntax")
     finish
 endif
 
+let s:UNIX  = has("unix")  || has("macunix") || has("win32unix")
+let s:MSWIN = has("win16") || has("win32")   || has("win64")     || has("win95")
+if s:MSWIN
+  if mapcheck("\<c-a>","n") != ""
+    nunmap <c-a>
+  endif
+endif
+
 " USER DEFINED SETTINGS (change these as you wish) {{{1
 " Change this to add events as reminders to your Google calendar:
-let b:calendar="geir@a-circle.no"
+let b:calendar      = "geir@a-circle.no"
+
+" Programs to handle opening of files with "gf" (programs must be in PATH)
+" Add more programs if you want and make additions to the function OpenFile()
+" If you are running Linux/Unix/MacOSX/win32unix
+if s:UNIX
+  let b:wordprocessingprogram = "libreoffice"
+  let b:spreadsheetprogram    = "libreoffice"
+  let b:presentationprogram   = "libreoffice"
+  let b:pdfprogram            = "zathura"
+  let b:imageprogram          = "feh"
+  let b:browserprogram        = "qutebrowser"
+endif
+" If you are running MS Windows:
+if s:MSWIN
+  " Add the path to the programs if you don't want to mess around with a path variable
+  " ...such as: '/Program^ Files^ (x86)/Microsoft^ Office/root/Office16/'
+  let b:wordprocessingprogram = "winword"
+  let b:spreadsheetprogram    = "excel"
+  let b:presentationprogram   = "powerpnt"
+  let b:pdfprogram            = "AcroRd32"
+  let b:imageprogram          = "i_view32"
+  let b:browserprogram        = "firefox"
+endif
+" You can add programs to open other file types - and add the opener to the
+" function "OpenFile()" (see example there). Example::
+" let b:scadprogram           = "openscad"
+
 " Lower the next two values if you have a slow computer
 syn sync minlines=50
 syn sync maxlines=100
@@ -95,6 +133,7 @@ set shiftwidth=3
 set tabstop=3
 set softtabstop=3
 set noexpandtab
+set guioptions+=t
 set foldmethod=syntax
 set fillchars=fold:\ 
 syn sync fromstart
@@ -120,11 +159,13 @@ endfunction
 "  (https://travis-ci.org/junegunn/limelight.vim.svg?branch=master)
 function! HighLight()
   if b:highlight=="false"
+    echo "Highlight ON"
     let b:fl=&fdl
     set foldlevel=15
     let b:highlight="true"
     autocmd CursorMoved,CursorMovedI * call HighLightHL()
   else
+    echo "Highlight OFF"
     let &fdl=b:fl
     autocmd!
     autocmd InsertLeave * :syntax sync fromstart
@@ -148,9 +189,8 @@ function! HighLightHL()
   execute 'syn match HLdim0 ".*\%<' . string(start) . 'l"'
   execute 'syn match HLdim1 ".*\%>' . string(end)   . 'l"'
 endfunction
-nmap <leader>h :call HighLight()<cr>
 
-"  Toggle AutoNumbering {{{2
+"  AutoNumbering {{{2
 "  Mapped to <leader># and <leader>an
 "  When activated, <cr> increments the next item on the same level
 "  <c-t> indents the item and adds one level of numbering
@@ -158,19 +198,19 @@ nmap <leader>h :call HighLight()<cr>
 let s:an = 0
 function! ToggleAutonum()
   if s:an == 0
-    imap <cr> <esc>yypf D<left><c-a>A 
-    imap <c-t> <esc>>>f <left><left><c-x>a.1<esc><end>a
-    imap <c-d> <esc><<f <left>T.diw<left>x<left><c-a><end>a
+    echo "Autonumber ON"
+    imap   <cr> <cr><esc><up>yypf D<left><c-a>gJ:s/\(.*\d.\)\s*/\1 /<cr>A
+    imap   <c-t> <esc>>>f <left><left><c-x>a.1<esc><end>a
+    imap   <c-d> <esc><<f <left>T.diw<left>x<left><c-a><end>a
     let s:an = 1
   else
+    echo "Autonumber OFF"
     iunmap <cr>
     iunmap <c-t>
     iunmap <c-d>
     let s:an = 0
   endif
 endfunction
-nmap <leader>an :call ToggleAutonum()<cr>
-nmap <leader># :call ToggleAutonum()<cr>
 
 "  Renumber {{{2
 "  Mapped to <leader>R
@@ -190,6 +230,8 @@ function! Renumber() range
 	let initnum = substitute(getline(l1), '^\t*\([0-9.]\+\)*\d\+\.* .*', '\1', '')
 	"The numbering after initnum starts with 1
 	let numx = substitute(getline(l1), '^\t*\([0-9.]\+\)*\(\d\+\)\.* .*', '\2', '')
+  "Get the last period"
+  let period = substitute(getline(l1), '^\t*\([0-9.]\+\)*\(\d\+\)\(\.*\) .*', '\3', '')
 	"Start from first line 
 	let lx = l1 + 1
 	"Loop until the last line
@@ -199,7 +241,7 @@ function! Renumber() range
 			let numx += 1
 			silent! exe lx 's/\(^\t*\)[0-9.]* \(.*\)/\1\2'
 			let startline = substitute(getline(lx), '\(^\t*\).*', '\1', '')
-			let numline = initnum . numx
+			let numline = initnum . numx . period
 			let endline = substitute(getline(lx), '^\t*\(.*\)', ' \1', '')
 			let wholeline = startline . numline . endline
 			call setline(lx, wholeline)
@@ -207,7 +249,6 @@ function! Renumber() range
 		let lx += 1
 	endwhile
 endfunction
-vmap <leader>R :call Renumber()<cr>
 
 "  Encryption {{{2
 "  Remove traces of secure info upon decrypting (part of) a HyperList
@@ -259,6 +300,7 @@ endfunction
 "  Mapped to 'gr' and <CR>
 if !exists("*GotoRef") 
   function! GotoRef()
+    normal m'
     let current_line = getline('.')
     let ref_multi = 0
     if match(current_line,'<.*>') >= 0
@@ -273,6 +315,7 @@ if !exists("*GotoRef")
       let ref_dest = substitute(ref_word, '/', '\\_.\\{-}\\t', 'g')
       let ref_dest = "\\s" . ref_dest
       let @/ = ref_dest
+      normal gg
       call search(ref_dest)
       let new_line = getline('.')
       if new_line == current_line
@@ -293,14 +336,28 @@ endif
 function! OpenFile()
   if expand('<cWORD>') =~ '<' && expand('<cWORD>') =~ '>'
     let gofl = expand('<cfile>')
-    if gofl =~ '\(odt$\|doc$\|docx$\|odc$\|xls$\|xlsx$\|odp$\|ppt$\|pptx$\)'
-      exe '!libreoffice "'.gofl.'"'
+    if gofl =~ '\(odt$\|doc$\|docx$\)'
+      exe '!' . b:wordprocessingprogram . ' "' . gofl . '"'
+    elseif gofl =~ '\(odc$\|xls$\|xlsx$\)'
+      exe '!' . b:spreadsheetprogram . ' "' . gofl . '"'
+    elseif gofl =~ '\(odp$\|ppt$\|pptx$\)'
+      exe '!' . b:presentationprogram . ' "' . gofl . '"'
     elseif gofl =~ '\(jpg$\|jpeg$\|png$\|bmp$\|gif$\)'
-      exe '!feh "'.gofl.'"'
+      exe '!' . b:imageprogram . ' "' . gofl . '"'
     elseif gofl =~ 'pdf$'
-      exe '!zathura "'.gofl.'"'
+      exe '!' . b:pdfprogram . ' "' . gofl . '"'
+    elseif gofl =~ '://'
+      exe '!' . b:browserprogram . ' "' . gofl . '"'
+  " You add more file openers here by using variables defined in the user
+  " settings at the start of this script. Example:
+  " elseif gofl =~ 'scad$'
+  "   exe '!' . b:scadprogram . ' "' . gofl . '"'
     else
-      exe '!edit '.gofl
+      if has("gui_running")
+        exe '!gvim '.gofl
+      else
+        exe '!vim '.gofl
+      endif
     endif
   else
     echo "No reference"
@@ -604,14 +661,13 @@ endfunction
 "        Hide lines containing either word or pattern
 "        Pattern can be any regular expression
 
-map   <silent>    zs    :call <SID>ShowHideWord('z', 's', '')<CR>
-map   <silent>    zh    :call <SID>ShowHideWord('z', 'h', '')<CR>
-map   <silent>    z0    :set foldmethod=syntax<CR>
 command! -nargs=+  SHOW  :call <SID>ShowHideWord('c', 's', <f-args>)
 command! -nargs=+  HIDE  :call <SID>ShowHideWord('c', 'h', <f-args>)
 
 function! <SID>ShowHideWord(mode, show, ...)
    if (a:mode == 'z')
+      if a:show == 's' | echo "ShowHide Show" | endif
+      if a:show == 'h' | echo "ShowHide Hide" | endif
       let cur_word = '\\<' . expand("<cword>") . '\\>'
    else
       let i = 1
@@ -634,33 +690,6 @@ function! <SID>ShowHideWord(mode, show, ...)
    set foldminlines=0
    set foldmethod=expr
    exec myfoldexpr
-endfunction
-
-"  Complexity{{{2
-"  :call Complexity() will show the complexity score for your HyperList
-"  It adds up all HyperList Items and all references to the total score
-function! Complexity()
-	let l = 0
-	let c = 0
-	try
-		redir => l
-			silent exe '%s/\S//n'
-		redir END
-	catch
-		let l = 0
-	endtry
-  let l = substitute(l, '\_.\{-}\(\d\+\)\_.*', '\1', "")
-	try
-		redir => c
-			silent exe '%s/<\{1,2}[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,.:/ _&@?%=+\-\*]\+>\{1,2}//gn'
-		redir END
-	catch
-		let c = 0
-	endtry
-  let c = substitute(c, '\_.\{-}\(\d\+\)\_.*', '\1', "")
-  let plex = c + l
-  echo "Complexity = ". plex
-  return plex
 endfunction
 
 "  CalendarAdd{{{2
@@ -733,6 +762,33 @@ function! CalendarAdd(...)
     let l:msg = "Added " . l:count . " events"
   endif
   echo l:msg
+endfunction
+
+"  Complexity{{{2
+"  :call Complexity() will show the complexity score for your HyperList
+"  It adds up all HyperList Items and all references to the total score
+function! Complexity()
+	let l = 0
+	let c = 0
+	try
+		redir => l
+			silent exe '%s/\S//n'
+		redir END
+	catch
+		let l = 0
+	endtry
+  let l = substitute(l, '\_.\{-}\(\d\+\)\_.*', '\1', "")
+	try
+		redir => c
+			silent exe '%s/<\{1,2}[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,.:/ _&@?%=+\-\*]\+>\{1,2}//gn'
+		redir END
+	catch
+		let c = 0
+	endtry
+  let c = substitute(c, '\_.\{-}\(\d\+\)\_.*', '\1', "")
+  let plex = c + l
+  echo "Complexity = ". plex
+  return plex
 endfunction
 
 " Syntax definitions {{{1
@@ -818,27 +874,27 @@ endif
 syn match   HLvim "^vim:.*"
 
 " Highlighting and Linking {{{1
-"hi	        Folded	  guibg=#555555 ctermbg=8
-hi          HLdim0    ctermfg=241
-hi          HLdim1    ctermfg=241
-hi def link HLident	  Define
-hi def link HLmulti	  Constant
-hi def link HLtag	    Constant
-hi def link HLop	    Function
-hi def link HLqual	  Type
-hi def link HLhash	  Label
-hi def link HLref	    Define
-hi def link HLkey	    Define
-hi          HLlit     ctermfg=none ctermbg=none gui=italic term=italic cterm=italic
-hi          HLlc      ctermfg=white ctermbg=none
-hi def link HLcomment	Comment
-hi def link HLquote	  Comment
+hi	        Folded	  ctermfg=none ctermbg=none cterm=bold term=bold guifg=NONE guibg=NONE gui=bold
+hi          HLdim0    ctermfg=241     guifg=Grey
+hi          HLdim1    ctermfg=241     guifg=Grey
+hi          HLident	  ctermfg=Magenta guifg=Magenta
+hi          HLmulti	  ctermfg=Red     guifg=Red
+hi          HLtag	    ctermfg=Red     guifg=Red
+hi          HLop	    ctermfg=Blue    guifg=Blue
+hi          HLqual	  ctermfg=Green   guifg=LimeGreen
+hi          HLhash	  ctermfg=184     guifg=#aaa122
+hi          HLref	    ctermfg=Magenta guifg=Magenta
+hi          HLkey	    ctermfg=Magenta guifg=Magenta
+hi          HLcomment	ctermfg=Cyan    guifg=Cyan
+hi          HLquote	  ctermfg=Cyan    guifg=Cyan
+hi          HLlit     ctermfg=none ctermbg=none cterm=italic term=italic guifg=NONE guibg=NONE gui=italic
+hi          HLlc      ctermfg=none ctermbg=none
+hi	        HLb	      ctermfg=none ctermbg=none cterm=bold   term=bold   guifg=NONE guibg=NONE gui=bold
+hi	        HLi	      ctermfg=none ctermbg=none cterm=italic term=italic guifg=NONE guibg=NONE gui=italic
+hi link	    HLu	      underlined
 hi def link HLsc	    Type
 hi def link HLtodo	  Todo
 hi def link HLmove	  Error
-hi	        HLb	      ctermfg=none ctermbg=none gui=bold term=bold cterm=bold
-hi	        HLi	      ctermfg=none ctermbg=none gui=italic term=italic cterm=italic
-hi link	    HLu	      underlined
 hi def link HLvim     Function
 
 " Keymap {{{1
@@ -873,8 +929,8 @@ map <leader>V         :call CheckItem("stamped")<CR>
 
 map <leader><SPACE>   /=\s*$<CR>A
 
-nmap gr		            m':call GotoRef()<CR>
-nmap <CR>	            m':call GotoRef()<CR>
+nmap gr		            :call GotoRef()<CR>
+nmap <CR>	            :call GotoRef()<CR>
 
 nmap gf               :call OpenFile()<CR>
 
@@ -884,22 +940,78 @@ nmap g<UP>            <leader>f<UP><leader>0zv
 nmap <leader><DOWN>   <DOWN><leader>0zv<SPACE>zO
 nmap <leader><UP>     <leader>f<UP><leader>0zv<SPACE>zO
 
-nmap <leader>z        :call HLdecrypt()<CR>V:!openssl bf -e -a -salt 2>/dev/null<CR><C-L>
-vmap <leader>z        :call HLdecrypt()<CR>gv:!openssl bf -e -a -salt 2>/dev/null<CR><C-L>
-nmap <leader>Z        :call HLdecrypt()<CR>:%!openssl bf -e -a -salt 2>/dev/null<CR><C-L>
-nmap <leader>x        :call HLdecrypt()<CR>V:!openssl bf -d -a 2>/dev/null<CR><C-L>
-vmap <leader>x        :call HLdecrypt()<CR>gv:!openssl bf -d -a 2>/dev/null<CR><C-L>
-nmap <leader>X        :call HLdecrypt()<CR>:%!openssl bf -d -a 2>/dev/null<CR><C-L>
+nmap <leader>z        :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
+vmap <leader>z        :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
+nmap <leader>Z        :call HLdecrypt()<CR>:%!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
+nmap <leader>x        :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
+vmap <leader>x        :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
+nmap <leader>X        :call HLdecrypt()<CR>:%!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
 
 nmap <leader>H        :call HTMLconversion()<CR>
 nmap <leader>L        :call LaTeXconversion()<CR>
 nmap <leader>T        :call TPPconversion()<CR>
 
-nmap <leader>G        ::call CalendarAdd()<CR>
+nmap <leader>h        :call HighLight()<CR>
+nmap <leader>an       :call ToggleAutonum()<CR>
+nmap <leader>#        :call ToggleAutonum()<CR>
+vmap <leader>R        :call Renumber()<CR>
+
+map  <silent> zs      :call <SID>ShowHideWord('z', 's', '')<CR>
+map  <silent> zh      :call <SID>ShowHideWord('z', 'h', '')<CR>
+map  <silent> z0      :set foldmethod=syntax<CR><bar>:echo "ShowHide Remove"<CR>
+
+nmap <leader>G        :call CalendarAdd()<CR>
 
 " Sort hack (sort the visual selected lines by the top item's indentation
 " The last item in the visual selection cannot be the last line in the document.
 vmap <leader>s <esc>`<^"iy0gv:s/^<c-r>i\S\@=/<c-v><c-a>/<cr>gv:s/\t/<c-v><c-b>/g<cr>gv:s/\n<c-v><c-b>/<c-v><c-x>/<cr>gvk:!sort<cr>:%s/<c-v><c-a>/<c-r>i/<cr>:%s/<c-v><c-x>/\r<c-v><c-b>/g<cr>:%s/<c-v><c-b>/\t/g<cr>
+
+" GVIM menu {{{1
+let s:HL_RootMenu  = 'HyperList.'
+exe 'menu '.s:HL_RootMenu.'HyperList <Nop>'
+exe 'menu '.s:HL_RootMenu.'-Sep00-  <Nop>'
+menu HyperList.Toggle\ fold<Tab>SPACE              za
+menu HyperList.Set\ fold\ level.0<Tab>\\0          :set foldlevel=0<CR>
+menu HyperList.Set\ fold\ level.1<Tab>\\1          :set foldlevel=1<CR>
+menu HyperList.Set\ fold\ level.2<Tab>\\2          :set foldlevel=2<CR>
+menu HyperList.Set\ fold\ level.3<Tab>\\3          :set foldlevel=3<CR>
+menu HyperList.Set\ fold\ level.4<Tab>\\4          :set foldlevel=4<CR>
+menu HyperList.Set\ fold\ level.5<Tab>\\5          :set foldlevel=5<CR>
+menu HyperList.Set\ fold\ level.6<Tab>\\6          :set foldlevel=6<CR>
+menu HyperList.Set\ fold\ level.7<Tab>\\7          :set foldlevel=7<CR>
+menu HyperList.Set\ fold\ level.8<Tab>\\8          :set foldlevel=8<CR>
+menu HyperList.Set\ fold\ level.9<Tab>\\9          :set foldlevel=9<CR>
+menu HyperList.Set\ fold\ level.10<Tab>\\a         :set foldlevel=10<CR>
+menu HyperList.Set\ fold\ level.11<Tab>\\b         :set foldlevel=11<CR>
+menu HyperList.Set\ fold\ level.12<Tab>\\c         :set foldlevel=12<CR>
+menu HyperList.Set\ fold\ level.13<Tab>\\d         :set foldlevel=13<CR>
+menu HyperList.Set\ fold\ level.14<Tab>\\e         :set foldlevel=14<CR>
+menu HyperList.Set\ fold\ level.15<Tab>\\f         :set foldlevel=15<CR>
+menu HyperList.Toggle\ State/Transition<Tab>\\u    :call STunderline()<CR>
+menu HyperList.Checklist.Toggle<Tab>\\v            :call CheckItem("")<CR>
+menu HyperList.Checklist.Timestamp<Tab>\\V         :call CheckItem("stamped")<CR>
+menu HyperList.Goto\ reference<Tab>gr              :call GotoRef()<CR>
+menu HyperList.Open\ file\ under\ cursor<Tab>gf    :call OpenFile()<CR>
+menu HyperList.Show/Hide.Show\ Word\ under\ Cursor<Tab>zs :call <SID>ShowHideWord('z', 's', '')<CR>
+menu HyperList.Show/Hide.Hide\ Word\ under\ Cursor<Tab>zh :call <SID>ShowHideWord('z', 'h', '')<CR>
+menu HyperList.Show/Hide.Remove\ Show/Hide<Tab>z0  :set foldmethod=syntax<CR><bar>:echo "ShowHide Remove"<CR>
+menu HyperList.Autonumber.Toggle<Tab>\\an          :call ToggleAutonum()<CR>
+vmenu HyperList.Autonumber.Renumber\ visual\ selection<Tab>\\R :call Renumber()<CR>
+menu HyperList.Next\ Template\ Item<Tab>\\SPACE    /=\s*$<CR>A<CR>
+menu HyperList.Highlight\ Toggle<Tab>\\h           :call HighLight()<CR>
+menu HyperList.Presentation\ Move\ Down<Tab>gDOWN  <DOWN><leader>0zv
+menu HyperList.Presentation\ Move\ Up<Tab>gUP      <leader>f<UP><leader>0zv
+menu HyperList.Encryption\ (Requires\ OpenSSL).Encrypt<Tab>\\z :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
+vmenu HyperList.Encryption\ (Requires\ OpenSSL).Encrypt\ Visual\ Selection<Tab>\\z :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
+menu HyperList.Encryption\ (Requires\ OpenSSL).Encrypt\ All<Tab>\\Z :call HLdecrypt()<CR>:%!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
+menu HyperList.Encryption\ (Requires\ OpenSSL).Decrypt<Tab>\\x :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
+vmenu HyperList.Encryption\ (Requires\ OpenSSL).Decrypt\ Visual\ Selection<Tab>\\x :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
+menu HyperList.Encryption\ (Requires\ OpenSSL).Decrypt\ All<Tab>\\X :call HLdecrypt()<CR>:%!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
+menu HyperList.Conversion.HTML<Tab>\\H             :call HTMLconversion()<CR>
+menu HyperList.Conversion.LaTeX<Tab>\\L            :call LaTeXconversion()<CR>
+menu HyperList.Conversion.TPP<Tab>\\T              :call TPPconversion()<CR>
+menu HyperList.Add\ Calendar\ Events\ (Requires\ gcalcli)<Tab>\\G :call CalendarAdd()<CR>
+menu HyperList.Show\ Complexity\ of\ List<Tab>:call\ Complexity() :call Complexity()<CR>
 
 " vim modeline {{{1
 " vim: set sw=2 sts=2 et fdm=marker fillchars=fold\:\ :
