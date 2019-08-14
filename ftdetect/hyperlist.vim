@@ -11,7 +11,7 @@ augroup hl_autoencryption
     autocmd BufReadPre,FileReadPre			.*.hl set bin
     autocmd BufReadPre,FileReadPre     	.*.hl set cmdheight=2
     autocmd BufReadPre,FileReadPre     	.*.hl	set shell=/bin/sh
-    autocmd BufReadPost,FileReadPost    .*.hl %!openssl bf -d -a 2>/dev/null
+    autocmd BufReadPost,FileReadPost    .*.hl %!openssl bf -pbkdf2 -d -a 2>/dev/null
     autocmd BufReadPost,FileReadPost		.*.hl set nobin
     autocmd BufReadPost,FileReadPost    .*.hl set cmdheight&
     autocmd BufReadPost,FileReadPost		.*.hl set shell&
@@ -19,7 +19,7 @@ augroup hl_autoencryption
     autocmd BufWritePre,FileWritePre		.*.hl set bin
     autocmd BufWritePre,FileWritePre		.*.hl set cmdheight=2
     autocmd BufWritePre,FileWritePre		.*.hl set shell=/bin/sh
-    autocmd BufWritePre,FileWritePre    .*.hl %!openssl bf -e -a -salt 2>/dev/null
+    autocmd BufWritePre,FileWritePre    .*.hl %!openssl bf -pbkdf2 -e -a -salt 2>/dev/null
     autocmd BufWritePost,FileWritePost	.*.hl silent u
     autocmd BufWritePost,FileWritePost	.*.hl set nobin
     autocmd BufWritePost,FileWritePost	.*.hl set cmdheight&
@@ -33,7 +33,7 @@ augroup woim_autoencryption
     autocmd BufReadPre,FileReadPre			.*.woim set bin
     autocmd BufReadPre,FileReadPre     	.*.woim set cmdheight=2
     autocmd BufReadPre,FileReadPre     	.*.woim	set shell=/bin/sh
-    autocmd BufReadPost,FileReadPost    .*.woim %!openssl bf -d -a 2>/dev/null
+    autocmd BufReadPost,FileReadPost    .*.woim %!openssl bf -pbkdf2 -d -a 2>/dev/null
     autocmd BufReadPost,FileReadPost		.*.woim set nobin
     autocmd BufReadPost,FileReadPost    .*.woim set cmdheight&
     autocmd BufReadPost,FileReadPost		.*.woim set shell&
@@ -41,7 +41,7 @@ augroup woim_autoencryption
     autocmd BufWritePre,FileWritePre		.*.woim set bin
     autocmd BufWritePre,FileWritePre		.*.woim set cmdheight=2
     autocmd BufWritePre,FileWritePre		.*.woim set shell=/bin/sh
-    autocmd BufWritePre,FileWritePre    .*.woim %!openssl bf -e -a -salt 2>/dev/null
+    autocmd BufWritePre,FileWritePre    .*.woim %!openssl bf -pbkdf2 -e -a -salt 2>/dev/null
     autocmd BufWritePost,FileWritePost	.*.woim silent u
     autocmd BufWritePost,FileWritePost	.*.woim set nobin
     autocmd BufWritePost,FileWritePost	.*.woim set cmdheight&
