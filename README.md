@@ -48,7 +48,9 @@ For a compact primer on HyperList, read this OnePageBook:
 **[Downloadable PDF](/assets/onepagebooks/7-hyperlist/1PB_HyperList.pdf)**
 
 And for an introduction to the VIM plugin's most sexy features, watch the
-screencast over at https://isene.org/hyperlist
+screencast:
+
+[![HyperList screencast](https://isene.com/assets/videos/screencast.jpg "Click to view the screencast")](https://isene.org/assets/videos/HyperListVIM.mp4)
 
 GVIM users can enjoy the commands organized in a menu with submenus.
 
