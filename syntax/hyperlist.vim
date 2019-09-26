@@ -13,12 +13,11 @@
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.3.17 - compatible with the HyperList definition v. 2.3
-" Modified:   2019-08-14
-" Changes:    Added a GVIM menu. Full rework of the color schemes for VIM & gVIM.
-"             Improvement to Goto Reference (gr) and Autonumbering.
-"             Several minor changes and improvement in the docs.
-"             Thanks to Don Kelley for the gVIM suggestions and for extensive testing.
+" Version:    2.3.18 - compatible with the HyperList definition v. 2.3
+" Modified:   2019-08-24
+" Changes:    Added a test suite to make future versions bullet proof
+"             Thanks to Don Kelley for the work on the test suite
+"             Small fixes (like highlighting tags inside comments)
 
 " INSTRUCTIONS {{{1
 "
@@ -479,6 +478,8 @@ endfunction
 "  LaTeX conversion{{{2
 "  Mapped to '<leader>L'
 function! LaTeXconversion ()
+    set expandtab
+    retab
     try
         "Remove VIM tagline
         execute '%s/^vim:.*//g'
@@ -516,12 +517,12 @@ function! LaTeXconversion ()
     endtry
     try
         "HLindent
-        execute '%s/\(\t\|\*\|^\)\@<=\([0-9.]\+\s\)/\1\\textcolor{v}{\2}/g'
+        execute '%s/\(\s\s\s\|\*\|^\)\([0-9.]\+\s\)/\1\\textcolor{v}{\2}/g'
     catch
     endtry
     try
         "HLmulti
-        execute '%s/\(\t\|\*\)+/\\tab \\textcolor{v}{+}/g'
+        execute '%s/\(\s\s\s\|\*\)+/\s\s\s\\textcolor{v}{+}/g'
     catch
     endtry
     try
@@ -556,12 +557,12 @@ function! LaTeXconversion ()
     endtry
     try
         "HLop
-        execute "%s/\\(\\s\\|\\*\\)\\@<=\\([A-ZÆØÅ_/]\\{-2,}:\\s\\)/\\\\textcolor{b}{\\2}/g"
+        execute "%s/\\(\\s\*\\|\\*\*\\)\\([A-ZÆØÅ_/]\\{-2,}:\\s\\)/\\1\\\\textcolor{b}{\\2}/g"
     catch
     endtry
     try
         "HLprop
-        execute "%s/\\(\\s\\|\\*\\)\\@<=\\([a-zA-ZæøåÆØÅ0-9,._&?%= \\-\\/+<>#']\\{-2,}:\\s\\)/\\\\textcolor{r}{\\\\emph{\\2}}/g"
+        execute "%s/\\(\\s\*\\|\\*\*\\)\\([a-zA-ZæøåÆØÅ0-9,._&?%= \\-\\/+<>#']\\{-2,}:\\s\\)/\\1\\\\textcolor{r}{\\\\emph{\\2}}/g"
     catch
     endtry
     try
@@ -570,8 +571,8 @@ function! LaTeXconversion ()
     catch
     endtry
     try
-        "Substitute tabs
-        execute '%s/\(^\|\t\|\*\)\@<=\(\t\|\*\)/   /g'
+        "ldots
+        execute '%s/\.\.\./\\ldots /g'
     catch
     endtry
     "Document start
@@ -807,7 +808,8 @@ syn match   HLtrans	'\(\(^\|\s\|\*\)\(T: \|/ \)\)\@<=.*' contains=HLtodo,HLop,HL
 " Qualifiers are enclosed within [ ]
 syn match   HLqual      '\[.\{-}\]' contains=HLtodo,HLref,HLcomment
 
-" Tags - anything that ends in a colon
+" Properties (formerly known as Tags) - anything that ends in a colon that is
+" not only uppercase letters (which would make it an Operator)
 syn match   HLtag	'\(^\|\s\|\*\)\@<=[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,._&?!%= \-\/+<>#'"()\*:]\{-2,}:\s' contains=HLtodo,HLcomment,HLquote,HLref
 
 " HyperList operators
@@ -832,10 +834,10 @@ syn match   HLlit       '\(\s\|\*\)\@<=\\$'
 syn match   HLlc        '\(\s\|\*\)\\\_.\{-}\(\s\|\*\)\\' contains=HLlit
 
 " Comments are enclosed within ( )
-syn match   HLcomment   '(.\{-})' contains=HLtodo,HLref
+syn match   HLcomment   '(.\{-})' contains=HLtodo,HLref,HLhash
 
 " Text in quotation marks
-syn match   HLquote     '".\{-}"' contains=HLtodo,HLref
+syn match   HLquote     '".\{-}"' contains=HLtodo,HLref,HLhash
 
 " TODO  or FIXME
 syn keyword HLtodo    TODO FIXME 

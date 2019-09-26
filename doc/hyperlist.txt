@@ -972,7 +972,7 @@ HLstart
 						Several Qualifiers can be strung together, separated by commas
 							All Qualifiers need to be fulfilled for the Item to be valid
 							EXAMPLE: "[+YYYY-MM-DD 02.30, Button color = Red, 4, ?] Push button"
-						Successive Qualifiers can be strung together, separated by periods\textcolor; EXAMPLE: 
+						Successive Qualifiers can be strung together, separated by periods; EXAMPLE: 
 							"[Apples. Oranges. Grapes]"
 								Do Item in the context of "apples", then "oranges", then "grapes"
 						EXAMPLES: 
