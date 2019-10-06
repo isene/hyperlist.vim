@@ -1,6 +1,6 @@
 " WOIM files are included for backward compatability (HyperList was earlier WOIM)
-au BufRead,BufNewFile *.hl		set filetype=hyperlist
-au BufRead,BufNewFile *.woim            set filetype=hyperlist
+au BufRead,BufNewFile *.hl									  set filetype=hyperlist
+au BufRead,BufNewFile *.woim								  set filetype=hyperlist
 
 " Using code from openssl.vim by Noah Spurrier <noah@noah.org>
 " dot-files (files starting with ".") gets auto en-/decryption
