@@ -3,7 +3,7 @@ This VIM plugin makes it easy to create and manage HyperLists using VIM
 
 ---------------------------------------------------------------------------
 
-## GENERAL INFORMATION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.3.18)
+## GENERAL INFORMATION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.4.1)
 
 HyperLists are used to describe anything - any state, item(s), pattern,
 action, process, transition, program, instruction set etc. So, you can use it
@@ -41,6 +41,8 @@ features:
 * Description on how to include HyperLists within other filetypes, taking full advantage of the above features when including a HyperList in e.g. a normal .txt document
 * Menus with submenus for gVIM users
 * ... and there are many more features. Check out the comprehensive documentation (type ":help HyperList" in VIM after install)
+
+For a complete tutorial, go through the file HyperListTutorialAndTestSuite.hl in the documentation folder (~/.vim/doc/HyperListTutorialAndTestSuite.hl). This file also serves as a complete test suite for releases of this plugin. 
 
 For a compact primer on HyperList, read this OnePageBook:
 
@@ -131,7 +133,8 @@ Use "gr" (without the quotation marks, signifies "Goto Ref") or simply press
 the "Enter" ("CR") key while the cursor is on a HyperList reference to jump to
 that destination in a HyperList. Use "n" after a "gr" to verify that the
 reference destination is unique. A reference can be in the list or to a file
-by the use of <file:/pathto/filename>,
+by the use of <file:/pathto/filename> or an relative reference such as <-4> to
+reference four items/lines up the list.
 
 Whenever you jump to a reference in this way, the mark "'" is set at the point
 you jumped from so that you may easily jump back by hitting "''" (single
