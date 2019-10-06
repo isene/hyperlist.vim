@@ -13,11 +13,15 @@
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.3.18 - compatible with the HyperList definition v. 2.3
-" Modified:   2019-08-24
-" Changes:    Added a test suite to make future versions bullet proof
-"             Thanks to Don Kelley for the work on the test suite
-"             Small fixes (like highlighting tags inside comments)
+" Version:    2.4.1 - compatible with the HyperList definition v. 2.4
+" Modified:   2019-10-06
+" Changes:    Updated to be compatible with HyperList definition v. 2.4
+"             Included full tutorial/test suite (thanks to Don Kelley).
+"             Improved LaTeX export.
+"             Improved GotoRef() (mapped to 'gr' and '<CR>')
+"               GotoRef() now also opens files if the format is <file:...>
+"               GotoRef() handles the new relative references like <+2> and <-5>
+"             Some other minor changes and clean-ups of the documentation.
 
 " INSTRUCTIONS {{{1
 "
@@ -307,26 +311,39 @@ if !exists("*GotoRef")
       let ref_word = substitute(ref_word, "<", '', 'g')
       let ref_word = substitute(ref_word, '>', '', 'g')
       let ref_end  = ref_word
-      if match(ref_word,"\/") >= 0
-        let ref_end = substitute(ref_end, '^.*/', '\t', 'g')
-        let ref_multi = 1
-      endif
-      let ref_dest = substitute(ref_word, '/', '\\_.\\{-}\\t', 'g')
-      let ref_dest = "\\s" . ref_dest
-      let @/ = ref_dest
-      normal gg
-      call search(ref_dest)
-      let new_line = getline('.')
-      if new_line == current_line
-        echo "No destination"
+      if match(ref_word,"^file:") >= 0
+        let ref_word = substitute(ref_word, 'file:', '', 'g')
+        normal 0
+        call search(ref_word)
+        call OpenFile()
+      elseif match(ref_word,"^[-+][0-9]") >= 0
+        let ref_word = str2nr(ref_word)
+        let dest = line(".") + ref_word
+        exe ":" . dest
+        normal z.
       else
-        if ref_multi == 1
-          call search(ref_end)
-        end
+        if match(ref_word,"\/") >= 0
+          let ref_end = substitute(ref_end, '^.*/', '\t', 'g')
+          let ref_multi = 1
+        endif
+        let ref_dest = substitute(ref_word, '/', '\\_.\\{-}\\t', 'g')
+        let ref_dest = "\\s" . ref_dest
+        let @/ = ref_dest
+        normal gg
+        call search(ref_dest)
+        let new_line = getline('.')
+        if new_line == current_line
+          echo "No destination"
+        else
+          if ref_multi == 1
+            call search(ref_end)
+          end
+        endif
+        normal z.
       endif
     else
       echo "No reference in the HyperList item"
-    endif
+    endif  
   endfunction
 endif
 
@@ -594,7 +611,7 @@ function! LaTeXconversion ()
     normal o\usepackage{alltt}
     normal o\usepackage{fancyhdr}
     normal o\pagestyle{fancy}
-    normal o\fancyhead[RO]{\raggedleft FIXME}
+    normal o\fancyhead[RO]{\raggedleft FIXME }
     normal o\fancyfoot{}
     normal o\usepackage{pdfpages}
     normal o
@@ -766,7 +783,7 @@ function! CalendarAdd(...)
 endfunction
 
 "  Complexity{{{2
-"  :call Complexity() will show the complexity score for your HyperList
+"  :call Complexity() will show the complexity score for your HyperList (mapped to <leader>C)
 "  It adds up all HyperList Items and all references to the total score
 function! Complexity()
 	let l = 0
@@ -822,7 +839,7 @@ syn match   HLsc	';'
 syn match   HLhash	'#[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9.:/_&?%=+\-\*]\+'
 
 " References
-syn match   HLref	'<\{1,2}[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,.:/ _~&@?%=\-\*]\+>\{1,2}' contains=HLcomment
+syn match   HLref	'<\{1,2}[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,.:/ _~&@?%=\+\-\*]\+>\{1,2}' contains=HLcomment
 
 " Reserved key words
 syn keyword HLkey     END SKIP
@@ -963,6 +980,8 @@ map  <silent> zh      :call <SID>ShowHideWord('z', 'h', '')<CR>
 map  <silent> z0      :set foldmethod=syntax<CR><bar>:echo "ShowHide Remove"<CR>
 
 nmap <leader>G        :call CalendarAdd()<CR>
+
+nmap <leader>C        :call Complexity()<CR>
 
 " Sort hack (sort the visual selected lines by the top item's indentation
 " The last item in the visual selection cannot be the last line in the document.

@@ -1,0 +1,150 @@
+HyperList Test Suite (V0.99); Press '\f' to uncollapse this whole HyperList
+	This HyperList serves two purposes
+		A tutorial for all hyperlist.vim features 
+			Do each item and you will learn all the features of this VIM plugin
+		A fully fledged test suite
+			Doing each item will confirm the plugin version is working correctly
+	Requires the files <HyperListTestSuite.hl> and <~/.vim/syntax/hyperlist.vim>
+		Set the cursor on a file link and press 'gf' to open the file
+	Tests are broken into 3 major categories, "SYNTAX HIGHLIGHTING", "FUNCTIONALITY TEST" And "MENU TEST"
+	SYNTAX HIGHLIGHTING
+		Ensure that all HyperList elements are correctly highlighted in the <~/.vim/doc/HyperList.hl>
+		Check: The Property should be in red
+		CHECK: The Operator should be in blue
+		[? OK] Qualifier in green
+		A #hashtag should be in yellow; And the preceding semicolon in green
+		1. The numbering is an identifier and should appear in magenta
+		+ The multi-line indicator should appear in red
+		 and indicates the item runs across more than one line
+		This link should be in magenta <link to nowhere>
+		This comment should be in teal with the link inside in magenta (the <link to nowhere>)
+		Quotes are also in "teal" and with "links inside in magenta, <link to nowhere>"
+		Check (comment): Comment within a Property should be in teal
+		Keywords END and SKIP should be in magenta
+		Keywords FIXME and TODO should be in black on yellow
+		Markup like *bold* /italics/ and _underline_ should appear correctly
+		Fold this item and child by pressing 'SPACE' and see that it appears in bold
+			This is a child item
+		Press '\h' and move the cursor one line down
+			This line should appear as normal while all other lines are dimmed
+			Press '\h' again to remove the highlighting
+		Collapse and uncollapse the next line to hide/show the literal block of lines
+		\
+			Check: This "literal" block should not contain any colors
+			[? OK] *bold* /italics/ _underline_ FIXME TODO #hashtag
+		\
+		Check that State items and Transition items are underlined correctly
+			By pressing '\u' State items should be underlined
+			Pressing it again, Transition items should be underlined
+			Pressing it a third time should toggle off underling of such items
+			Now press '\u' three times
+				S: This is a state item (indicates an item that is describing something)
+				| This is a state item (indicates an item that is describing something)
+				T: This is a transition item (indicates an item to be done/processed)
+				/ This is a transition item (indicates an item to be done/processed)
+	FUNCTIONALITY TEST
+		Toggle folds; Press 'SPACE' twice to see the child of this line collapse and uncollapse
+			This is a child item
+		Do all these: '\3' '\4' '\5' '\6' '\7' '\8' '\9' '\a' '\b' '\c' '\d' '\e' '\f'
+			Observe that the children appear at the correct fold level
+			'\3'
+				'\4'
+					'\5' 
+						'\6' 
+							'\7'
+								'\8'
+									'\9'
+										'\a'
+											'\b'
+												'\c'
+													'\d'
+														'\e'
+															'\f'
+		By placing the cursor in the reference and press 'gr' you jump to the next item (<42>)
+		42. This is an item that you will jump to
+		By placing the cursor in the file reference and press 'gf' you open the file (<~/.vim/doc/HyperList.hl>)
+			Close that file to come back to this file
+		Toggle autonumbering of items
+			Press '\an' or '\#' to toggle autonumbering on/off; Press '\an' now and go to next line
+				You should see the message "Autonumber ON"
+			1.1. Go to the end of this line and enter insert mode and press enter
+			1.3. You should now have a line "1.2." above this line
+				Place the cursor on that "1.2." line in normal mode and press 'CTRL-T'
+					Observe that it numbers the line as a child of "1.1." (1.1.1.)
+				On that line, press 'CTRL-D' to observe it goes back to "1.2."
+			Press '\#' to toggle off autonumbering; You should see the message "Autonumber OFF"
+		Sort lines correctly
+			The following lines are incorrectly sorted
+				2 Item2
+				3 Item3
+					3.1 Child of Item3
+				1 Item1
+					1.1 Child of Item1
+			Mark the numbered lines visually ('V') and press '\s'
+				Observe that the lines are now sorted correctly with their children in the right places
+		Create and use checkboxes for items
+			With the cursor on this line, press '\v' to see a checkbox appear
+				With the cursor on the above line, press '\v' again to see an "x" appear in the checkbox
+			[_] With the cursor on this line, press '\V' to mark the checkbox with a time stamp
+		Show/hide items with specific words
+			This is an item with the word "simple"
+			This is an item with the word "amazing"
+			This is an item with the word "simple"
+			Now go to the word "simple" and press 'zs'
+			Observe that all items that does not contain "simple are folded"; Press 'zh'
+				Observe that items containing the word are hidden/folded
+				Go here and press 'z0' to remove all hide/show behaviour; Press '\f' to again uncollapse the whole HyperList
+		Check "presentation mode"
+			With the cursor on this item, press 'gDOWN' to go to the next item and collapse all other items
+				Now again press 'gDOWN' to go to the next item in presentation mode (see this line collapsed)
+			With the above line collapsed, again press 'gDOWN' to go to the next item in presentation mode
+				Now again press 'gDOWN' to go to the next item in presentation mode
+			Now press 'gUP' three times and 'gDOWN' three times and observe the current line "presented"
+		Check that filling put forms work correctly
+			Press '\SPACE' to jump to the next line in insert mode to fill out the item
+				Fill out the rest = 
+		Encryption and decryption
+			Note: Encryption requires OpenSSL to be installed
+			With the cursor on this line, press '\z' and enter the required password twice to encrypt the line
+			Mark the above encrypted lines visually and press '\x' to decrypt it with the password you used
+			You can now create a HyperList password file and save it as ".pass.hl" (not the dot preceding the file name)
+				When opening the encrypted file, VIM will automatically ask you for a password to decrypt that hyperlist
+		Export to HTML
+			You can convert this whole HyperList to HTML and save the output to "test.html"
+			Pressing 'u' will undo the conversion, but you need to do ':set ft=hyperlist' to set the right filetype again
+			Press '\H' to convert this whole HyperList to HTML format
+		Export to LaTeX
+			You can convert this whole HyperList to LaTeX and save the output to "test.tex"
+			Pressing 'u' will undo the conversion, but you need to do ':set ft=hyperlist' to set the right filetype again
+			Press '\L' to convert this whole HyperList to HTML format
+		Export to TPP
+			tpp: <https://github.com/cbbrowne/tpp>
+			You can convert this whole HyperList to the TPP presentation format and save the output to "test.tpp"
+			Pressing 'u' will undo the conversion, but you need to do ':set ft=hyperlist' to set the right filetype again
+			Press '\T' to convert this whole HyperList to HTML format
+		Export lines to your Google calendar
+			To use this feature, you need to have the program 'gcalcli' installed and properly set up
+				gcalcli: <https://github.com/insanum/gcalcli>
+				Now press '\G' to see that the below item appears in your Google calendar at the correct time
+				2020-01-01 08:00: Item from the HyperList Test Suite
+		Show the complexity level of this HyperList
+			Using ':call Complexity()' you should see the number "157" displayed
+	MENU TEST
+		When opening <HyperListTestSuite.hl>
+				The "HyperList" menu item should appear in the menu line
+			During insert operations('i,'o','O','a','A', etc)
+				The menu should be greyed out
+			Using 'ESC' at the end of insert operations should un-grey the menu
+		Selecting the menu
+			A TearOff dashed line appear at the top
+				Clicking the TearOff dashed line
+					The Hyperlist menu should detach and be moveable
+					Menu items ending with '>>', when selected, also show a TearOff line and a submenu
+					Each submenu should detach when their TearOff line is clicked
+		Closing TearOff Menus
+			Each Torn off menu should have an 'x' in the upper right corner
+			Each Torn off menu should close when the 'x' is clicked
+			All torn off menus should close when Gvim closes
+		Go through all parts of the <FUNCTIONALITY TEST> using the gVIM menus to see that they work correctly
+
+
