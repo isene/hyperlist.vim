@@ -259,6 +259,4 @@ Enjoy.
 
 ## Contact
 
-Geir Isene <g@isene.com>
-...explorer of free will
-   http://isene.org
+Geir Isene <g@isene.com> ...explorer of free will... http://isene.org
