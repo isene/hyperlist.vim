@@ -47,7 +47,7 @@ For a complete tutorial, go through the file HyperListTutorialAndTestSuite.hl in
 For a compact primer on HyperList, read this OnePageBook:
 
 ![HyperList OnePageBook cover](https://isene.org/assets/onepagebooks/7-hyperlist/cover.jpg)
-**[Downloadable PDF](/assets/onepagebooks/7-hyperlist/1PB_HyperList.pdf)**
+**[Downloadable PDF](https://isene.org/assets/onepagebooks/7-hyperlist/1PB_HyperList.pdf)**
 
 And for an introduction to the VIM plugin's most sexy features, watch the
 screencast:
@@ -59,10 +59,10 @@ GVIM users can enjoy the commands organized in a menu with submenus.
 ### Installation
 
 As you most certainly have already done, to install the HyperList plugin for
-VIM, dowmload woim.vba and do:
+VIM, dowmload hyperlist.vmb and do:
 
 ```
-vim hyperlist.vba
+vim hyperlist.vmb
 :so %
 :q
 ```
