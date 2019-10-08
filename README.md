@@ -58,13 +58,17 @@ GVIM users can enjoy the commands organized in a menu with submenus.
 
 ### Installation
 
-As you most certainly have already done, to install the HyperList plugin for
-VIM, dowmload hyperlist.vmb and do:
+The easiest way to install this VIM plugin is to use [Vizardry](https://github.com/ardagnir/vizardry). Simply do
+
+```
+:Invoke hyperlist
+```
+
+Or download hyperlist.vmb and do:
 
 ```
 vim hyperlist.vmb
 :so %
-:q
 ```
 
 You will then discover that this file (README_HyperList will appear in the VIM
@@ -90,7 +94,7 @@ hi link Snip SpecialComment
 The documentation file contains all of the HyperList definition and is part of
 the full specification for HyperList as found here:
 
-  http://isene.me/hyperlist/
+  https://isene.org/hyperlist/
 
 
 ## INSTRUCTIONS
