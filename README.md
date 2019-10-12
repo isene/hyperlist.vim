@@ -34,7 +34,7 @@ features:
 * "Presentation mode" that folds everything but the current item
 * Highlighting of the current item and its children
 * Encrypt and decrypt whole lists or parts of a list
-* Autoencrypt/decrypt files that has a file name starting with a doti
+* Autoencrypt/decrypt files that have a file name starting with a dot
 * Export a HyperList to HTML, LaTeX or TPP formats
 * Transfer all items tagged with future dates/times to a Google calendar
 * Show the complexity level of a HyperList
@@ -77,7 +77,7 @@ the HyperList plugin will be placed in the "syntax" subdirectory. A HyperList
 filetype detection file is placed in the "ftdetect" subdirectory.
 
 From now on all files with the ".hl" file extension will be treated as a
-HyperList file, syntax highlighted corrrectly and you can use all the neat
+HyperList file, syntax highlighted correctly and you can use all the neat
 HyperList functionality for VIM.
 
 ### Include Hyperlists in other document types
@@ -161,7 +161,7 @@ Use \V to add/toggle a checkbox with a date stamp for completion.
 Use \SPACE to go to the next open template element
 (A template element is a HyperList item ending in an equal sign).
 
-Use \L to convert the entire document to LaTaX.
+Use \L to convert the entire document to LaTeX.
 Use \H to convert the entire document to HTML.
 Use \T to convert the entire document to a basic TPP presentation.
 ```
@@ -225,8 +225,8 @@ To sort a set of items at a specific indentation, visually select (V) the
 items you want to sort (including all the children of those items) and press
 \s and the items in the range will be alphabetically sorted - but only the
 items on the same level/indentation as the first item selected. The sorted
-items will keep their children. This is useful if parts of a HyperList is
-numbered and you get the numbering out of sequence and wants to resort them.
+items will keep their children. This is useful if parts of a HyperList are
+numbered and you get the numbering out of sequence and want to resort them.
 One caveat, the last line in the selection cannot be the very last line in the
 document (there must be an item or an empty line below it).
 
@@ -251,7 +251,7 @@ the item and all its child items.
 
 ### More help
 
-For this help and more, including the full HyperList definition/description, type 
+For this help and more, including the full HyperList definition/description, type:
 
   `:help hyperlist`
 
