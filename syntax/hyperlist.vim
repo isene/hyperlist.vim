@@ -574,12 +574,12 @@ function! LaTeXconversion ()
     endtry
     try
         "HLop
-        execute "%s/\\(\\s\*\\|\\*\*\\)\\([A-ZÆØÅ_/]\\{-2,}:\\s\\)/\\1\\\\textcolor{b}{\\2}/g"
+        execute "%s/\\(\\s\\|\\*\\)\\{-1,}\\([A-ZÆØÅ_/]\\{-2,}:\\s\\)/\\1\\\\textcolor{b}{\\2}/g"
     catch
     endtry
     try
         "HLprop
-        execute "%s/\\(\\s\*\\|\\*\*\\)\\([a-zA-ZæøåÆØÅ0-9,._&?%= \\-\\/+<>#']\\{-2,}:\\s\\)/\\1\\\\textcolor{r}{\\\\emph{\\2}}/g"
+        execute "%s/\\(\\s\\{1,}\\|\\*\\{1,}\\)\\([a-zA-ZæøåÆØÅ0-9,._&?%= \\-\\/+<>#']\\{-2,}:\\s\\)/\\1\\\\textcolor{r}{\\\\emph{\\2}}/g"
     catch
     endtry
     try
