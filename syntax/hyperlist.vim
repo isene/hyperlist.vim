@@ -14,7 +14,7 @@
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
 " Version:    2.4.1 - compatible with the HyperList definition v. 2.4
-" Modified:   2019-10-06
+" Modified:   2019-10-06 
 " Changes:    Updated to be compatible with HyperList definition v. 2.4
 "             Included full tutorial/test suite (thanks to Don Kelley).
 "             Improved LaTeX export.
