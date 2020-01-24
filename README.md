@@ -64,6 +64,10 @@ The easiest way to install this VIM plugin is to use [Vizardry](https://github.c
 :Invoke hyperlist
 ```
 
+Or use any other plugin manager like
+[vim-plug](https://github.com/junegunn/vim-plug) to install the HyperList
+plugin.
+
 Or download hyperlist.vmb and do:
 
 ```
