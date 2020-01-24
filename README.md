@@ -66,7 +66,11 @@ The easiest way to install this VIM plugin is to use [Vizardry](https://github.c
 
 Or use any other plugin manager like
 [vim-plug](https://github.com/junegunn/vim-plug) to install the HyperList
-plugin.
+plugin. With [minpac](https://github.com/k-takata/minpac) you would do:
+
+```
+call minpac#add('isene/hyperlist.vim')
+```
 
 Or download hyperlist.vmb and do:
 
