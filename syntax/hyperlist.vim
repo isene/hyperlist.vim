@@ -13,21 +13,16 @@
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.4.1 - compatible with the HyperList definition v. 2.4
-" Modified:   2019-10-06 
-" Changes:    Updated to be compatible with HyperList definition v. 2.4
-"             Included full tutorial/test suite (thanks to Don Kelley).
-"             Improved LaTeX export.
-"             Improved GotoRef() (mapped to 'gr' and '<CR>')
-"               GotoRef() now also opens files if the format is <file:...>
-"               GotoRef() handles the new relative references like <+2> and <-5>
-"             Some other minor changes and clean-ups of the documentation.
+" Version:    2.4.2 - compatible with the HyperList definition v. 2.4
+" Modified:   2020-07-23 
+" Changes:    Quickfix: C-SPACE now maps to zA (toggles fold recursively)
+"             Several bugfixes in the HTML conversion
 
 " INSTRUCTIONS {{{1
 "
 " Use tabs/shifts or * for indentations
 "
-" Use <SPACE> to toggle one fold.
+" Use <SPACE> to toggle one fold. Use <c-SPACE> to toggle a fold recursively.
 " Use \0 to \9, \a, \b, \c, \d, \e, \f to show up to 15 levels expanded.
 "
 " <leader># or <leader>an toggles autonumbering of new items (the previous
@@ -372,7 +367,7 @@ function! OpenFile()
       if has("gui_running")
         exe '!gvim '.gofl
       else
-        exe '!vim '.gofl
+        exe '!'.$EDITOR.' '.gofl
       endif
     endif
   else
@@ -380,118 +375,7 @@ function! OpenFile()
   endif
 endfunction
 
-"  HTML conversion{{{2
-"  Mapped to '<leader>H'
-function! HTMLconversion ()
-    try
-        "Remove VIM tagline
-        execute '%s/^vim:.*//g'
-    catch
-    endtry
-    try
-        "first line of a HyperList is bold
-        execute '%s/^\(\S.*\)$/<strong>\1<\/strong>/g'
-    catch
-    endtry
-    try
-        "HLb
-        execute '%s/ \@<=\*\(.\{-}\)\* /<strong>\1<\/strong>/g'
-    catch
-    endtry
-    try
-        "HLi
-        execute '%s/ \@<=\/\(.\{-}\)\/ /<em>\1<\/em>/g'
-    catch
-    endtry
-    try
-        "HLu
-        execute '%s/ \@<=_\(.\{-}\)_ /<u>\1<\/u>/g'
-    catch
-    endtry
-    try
-        "HLquote
-        execute '%s/\(\".*\"\)/<em>\1<\/em>/g'
-    catch
-    endtry
-    try
-        "HLcomment
-        execute '%s/\((.*)\)/<em>\1<\/em>/g'
-    catch
-    endtry
-    try
-        "HLindent
-        execute "%s/\\(\\t\\|\\*\\)\\@<=\\(\\d.\\{-}\\)\\s/<font color=\"purple\">\\2<\\/font> /g"
-    catch
-    endtry
-    try
-        "HLmulti (+)
-        execute '%s/\(\t\|\*\)+/\t<font color="purple">+<\/font>/g'
-    catch
-    endtry
-    try
-        "HLhash
-        execute "%s/\\(#[a-zA-ZæøåÆØÅ0-9.:/_&?%=\\-\\*]\\+\\)/<font color=\"yellow\">\\1<\\/font>/g"
-    catch
-    endtry
-    try
-        "HLref
-        execute "%s/\\(<\\{1,2}\\[a-zA-ZæøåÆØÅ0-9.:/_&?%=\\-\\* ]\\+>\\{1,2}\\)/<font color=\"purple\">\\1<\\/font>/g"
-    catch
-    endtry
-    try
-        "HLmove
-        execute '%s/\(>>\|<<\|->\|<-\)/<font color="red"><strong>\1</strong><\/font>/g'
-    catch
-    endtry
-    try
-        "HLqual
-        execute '%s/\(\[.\{-}\]\)/<font color="green">\1<\/font>/g'
-    catch
-    endtry
-    try
-        "HLop
-        execute "%s/\\(\\s\\|\\*\\)\\@<=\\([A-ZÆØÅ_/]\\{-2,}:\\s\\)/<font color=\"blue\">\\2<\\/font>/g"
-    catch
-    endtry
-    try
-        "HLprop
-        execute "%s/\\(\\s\\|\\*\\)\\@<=\\([a-zA-ZæøåÆØÅ0-9,._&?%= \\-\\/+<>#']\\{-2,}:\\s\\)/<font color=\"red\">\\2<\\/font>/g"
-    catch
-    endtry
-    try
-        "HLsc
-        execute '%s/\(;\)/<font color="green">\1<\/font>/g'
-    catch
-    endtry
-    try
-        "Substitute space in second line of multi-item
-        execute '%s/\(^\|\t\|\*\)\@<=\(\t\|\*\) /\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;/g'
-    catch
-    endtry
-    try
-        "Substitute tabs
-        execute '%s/\(^\|\t\|\*\)\@<=\(\t\|\*\)/\&nbsp;\&nbsp;\&nbsp;\&nbsp;/g'
-    catch
-    endtry
-    try
-        "Substitute newlines with <br />
-        execute '%s/\n/<br \/>\r/g'
-    catch
-    endtry
-    "Document start
-    normal ggO<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-    normal o<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-    normal o<head>
-    normal o<title>HyperList</title>
-    normal o<meta name="creator" content="HyperList plugin for VIM: http://vim.sourceforge.net/scripts/script.php?script_id=2518" />
-    normal o<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-    normal o</head>
-    normal o<body>
-    "Document end
-    normal GO</body>
-    normal o</html>
-    set filetype=html
-endfunction
+
 "  LaTeX conversion{{{2
 "  Mapped to '<leader>L'
 function! LaTeXconversion ()
@@ -623,6 +507,120 @@ function! LaTeXconversion ()
     set filetype=tex
 endfunction
 
+"  HTML conversion{{{2
+"  Mapped to '<leader>H'
+function! HTMLconversion ()
+  try
+    "Remove VIM tagline
+    execute '%s/^vim:.*//g'
+  catch
+  endtry
+  try
+    "HLref
+    execute '%s/\(<.\{-}>\)/<font color=Ŀ>\1<\/font>/g'
+  catch
+  endtry
+  try
+    "HLquote
+    execute '%s/\(\".*\"\)/<font color="teal">\1<\/font>/g'
+    execute '%s/Ŀ/"purple"/g'
+  catch
+  endtry
+  try
+    "first line of a HyperList is bold
+    execute '%s/^\(\S.*\)$/<strong>\1<\/strong>/g'
+  catch
+  endtry
+  try
+    "HLb
+    execute '%s/ \@<=\*\(.\{-}\)\* / <strong>\1<\/strong> /g'
+  catch
+  endtry
+  try
+    "HLi
+    execute '%s/ \@<=\/\(.\{-}\)\/ /<em>\1<\/em>/g'
+  catch
+  endtry
+  try
+    "HLu
+    execute '%s/ \@<=_\(.\{-}\)_ / <u>\1<\/u> /g'
+  catch
+  endtry
+  try
+    "HLcomment
+    execute '%s/\((.*)\)/<font color="teal">\1<\/font>/g'
+  catch
+  endtry
+  try
+    "HLindent
+    execute "%s/\\(\\t\\|\\*\\)\\@<=\\(\\d.\\{-}\\)\\s/<font color=\"purple\">\\2<\\/font> /g"
+  catch
+  endtry
+  try
+    "HLmulti (+)
+    execute '%s/\(\t\|\*\)+/\t<font color="purple">+<\/font>/g'
+  catch
+  endtry
+  try
+    "HLhash
+    execute '%s/\(#.\{-} \)/<font color="yellow">\1<\/font>/g'
+  catch
+  endtry
+  try
+    "HLmove
+    execute '%s/\(>>\|<<\|->\|<-\)/<font color="red"><strong>\1</strong><\/font>/g'
+  catch
+  endtry
+  try
+    "HLqual
+    execute '%s/\(\[.\{-}\]\)/<font color="green">\1<\/font>/g'
+  catch
+  endtry
+  try
+    "HLop
+    execute "%s/\\(\\s\\|\\*\\)\\@<=\\([A-ZÆØÅ_/]\\{-2,}:\\s\\)/<font color=\"blue\">\\2<\\/font>/g"
+  catch
+  endtry
+  try
+    "HLprop
+    execute "%s/\\(\\s\\|\\*\\)\\@<=\\([a-zA-ZæøåÆØÅ0-9,._&?%= \\-\\/+<>#']\\{-2,}:\\s\\)/<font color=\"red\">\\2<\\/font>/g"
+  catch
+  endtry
+  try
+    "HLsc
+    execute '%s/\(;\)/<font color="green">\1<\/font>/g'
+  catch
+  endtry
+  try
+    "Substitute newlines with <br />
+    execute '%s/\n/<br \/>\r/g'
+  catch
+  endtry
+  try
+    "Substitute space in second line of multi-item
+    execute '%s/\(^\|\t\|\*\)\@<=\(\t\|\*\) /\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;/g'
+  catch
+  endtry
+  try
+    "Substitute tabs
+    execute '%s/\(^\|\t\|\*\)\@<=\(\t\|\*\)/\&nbsp;\&nbsp;\&nbsp;\&nbsp;/g'
+  catch
+  endtry
+  "Document start
+  normal ggO<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  normal o<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  normal o<head>
+  normal o<title>HyperList</title>
+  normal o<meta name="creator" content="HyperList plugin for VIM: http://vim.sourceforge.net/scripts/script.php?script_id=2518" />
+  normal o<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+  normal o</head>
+  normal o<body>
+  "Document end
+  normal GO</body>
+  normal o</html>
+  set filetype=html
+endfunction
+
 "  TPP conversion{{{2
 "  Mapped to '<leader>T'
 "  See https://github.com/cbbrowne/tpp
@@ -634,7 +632,7 @@ function! TPPconversion ()
     endtry
     try
         "first line of a HyperList is title
-        execute '%s/^\(\S.*\)$/\r--title \1/'
+        execute '1s/^\(\S.*\)$/\r--title \1/'
     catch
     endtry
     try
@@ -938,6 +936,7 @@ map <leader>c         :set foldlevel=12<CR>
 map <leader>d         :set foldlevel=13<CR>
 map <leader>e         :set foldlevel=14<CR>
 map <leader>f         :set foldlevel=15<CR>
+map <NUL>             zA
 map <SPACE>           za
 nmap zx               i<esc>
 
@@ -966,8 +965,8 @@ nmap <leader>x        :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -d -a 2>/dev/nu
 vmap <leader>x        :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
 nmap <leader>X        :call HLdecrypt()<CR>:%!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
 
-nmap <leader>H        :call HTMLconversion()<CR>
 nmap <leader>L        :call LaTeXconversion()<CR>
+nmap <leader>H        :call HTMLconversion()<CR>
 nmap <leader>T        :call TPPconversion()<CR>
 
 nmap <leader>h        :call HighLight()<CR>

@@ -3,7 +3,7 @@ This VIM plugin makes it easy to create and manage HyperLists using VIM
 
 ---------------------------------------------------------------------------
 
-## GENERAL INFORMATION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.4.1)
+## GENERAL INFORMATION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.4.2)
 
 HyperLists are used to describe anything - any state, item(s), pattern,
 action, process, transition, program, instruction set etc. So, you can use it
@@ -109,7 +109,7 @@ the full specification for HyperList as found here:
 
 Use tabs for indentation.
 
-Use SPACE to toggle one fold.
+Use SPACE to toggle one fold. Use <c-SPACE> to toggle a fold recursively.
 Use \0 to \9, \a, \b, \c, \d, \e, \f to show up to 15 levels expanded.
 
 ### Autonumbering and renumbering
