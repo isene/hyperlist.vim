@@ -1,4 +1,4 @@
-HyperList Test Suite (V0.99); Press '\f' to uncollapse this whole HyperList
+HyperList Test Suite (V1.0); Press '\f' to uncollapse this whole HyperList
 	This HyperList serves two purposes
 		A tutorial for all hyperlist.vim features 
 			Do each item and you will learn all the features of this VIM plugin
@@ -45,6 +45,7 @@ HyperList Test Suite (V0.99); Press '\f' to uncollapse this whole HyperList
 	FUNCTIONALITY TEST
 		Toggle folds; Press 'SPACE' twice to see the child of this line collapse and uncollapse
 			This is a child item
+		On the next item, press 'CONTROL+SPACE' twice to see that the fold toggles recursively
 		Do all these: '\3' '\4' '\5' '\6' '\7' '\8' '\9' '\a' '\b' '\c' '\d' '\e' '\f'
 			Observe that the children appear at the correct fold level
 			'\3'
