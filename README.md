@@ -3,7 +3,7 @@ This VIM plugin makes it easy to create and manage HyperLists using VIM
 
 ---------------------------------------------------------------------------
 
-## GENERAL INFORMATION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.4.2)
+## GENERAL INFORMATION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.4.3)
 
 HyperLists are used to describe anything - any state, item(s), pattern,
 action, process, transition, program, instruction set etc. So, you can use it
