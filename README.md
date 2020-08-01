@@ -156,8 +156,16 @@ quoutes twice).
 
 Use "gf" to open the file under the cursor. Graphic files are opened in "feh",
 pdf files in "zathura" and MS/OOO docs in "LibreOffice". Other filetypes are
-opened in VIM for editing. All this can be changed by editing the file
-handlers at the top of the hyperlist.vim script in your VIM syntax folder.
+opened in VIM for editing. These can be changed by setting these global
+variables in your vimrc:
+```
+g:wordprocessingprogram = ""
+  g:spreadsheetprogram    = ""
+  g:presentationprogram   = ""
+  g:imageprogram          = ""
+  g:pdfprogram            = ""
+  g:browserprogram        = ""
+```
 
 ### Simple tricks
 ```
