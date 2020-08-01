@@ -160,11 +160,11 @@ opened in VIM for editing. These can be changed by setting these global
 variables in your vimrc:
 ```
 g:wordprocessingprogram = ""
-  g:spreadsheetprogram    = ""
-  g:presentationprogram   = ""
-  g:imageprogram          = ""
-  g:pdfprogram            = ""
-  g:browserprogram        = ""
+g:spreadsheetprogram    = ""
+g:presentationprogram   = ""
+g:imageprogram          = ""
+g:pdfprogram            = ""
+g:browserprogram        = ""
 ```
 
 ### Simple tricks
