@@ -1,3 +1,4 @@
+" Script info {{{1
 " Vim syntax and filetype plugin for HyperList files (.hl)
 " Language:   Self defined markup and functions for HyperLists in Vim
 " Author:     Geir Isene <g@isene.com>
@@ -13,12 +14,19 @@
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.4.2 - compatible with the HyperList definition v. 2.4
-" Modified:   2020-07-23 
-" Changes:    Quickfix: C-SPACE now maps to zA (toggles fold recursively)
-"             Several bugfixes in the HTML conversion
+" Version:    2.4.3 - compatible with the HyperList definition v. 2.4
+" Modified:   2020-08-02 
+" Changes:    Several important upgrades under the hood
+"             Programs for opening files in references can now be set by
+"             the user by setting the global variables in vimrc:
+"             g:wordprocessingprogram = ""
+"             g:spreadsheetprogram    = ""
+"             g:presentationprogram   = ""
+"             g:imageprogram          = ""
+"             g:pdfprogram            = ""
+"             g:browserprogram        = ""
 
-" INSTRUCTIONS {{{1
+" Instructions {{{1
 "
 " Use tabs/shifts or * for indentations
 "
@@ -76,25 +84,29 @@
 " Initializing {{{1
 if version < 600
     syntax clear
-elseif exists("b:current_syntax")
+elseif exists('b:current_syntax')
     finish
 endif
+let b:current_syntax = "HyperList"
 
-let s:UNIX  = has("unix")  || has("macunix") || has("win32unix")
-let s:MSWIN = has("win16") || has("win32")   || has("win64")     || has("win95")
+" OS specific settings
+let s:UNIX  = has("unix")  || has("win32unix")
+let s:MAC   = has("macunix")
+let s:MSWIN = has("win16") || has("win32") || has("win64") || has("win95")
+
 if s:MSWIN
   if mapcheck("\<c-a>","n") != ""
     nunmap <c-a>
   endif
 endif
 
-" USER DEFINED SETTINGS (change these as you wish) {{{1
-" Change this to add events as reminders to your Google calendar:
-let b:calendar      = "geir@a-circle.no"
-
-" Programs to handle opening of files with "gf" (programs must be in PATH)
-" Add more programs if you want and make additions to the function OpenFile()
-" If you are running Linux/Unix/MacOSX/win32unix
+" Settings {{{1
+" You can override all of these by setting global variables in your vimrc
+" file, like this (note the "g" in front of the program type):
+" let g:imageprogram          = "eog"
+"
+" The following are the default programs for opening files in various OSes.
+" If you are running Linux/Unix/win32unix
 if s:UNIX
   let b:wordprocessingprogram = "libreoffice"
   let b:spreadsheetprogram    = "libreoffice"
@@ -102,6 +114,15 @@ if s:UNIX
   let b:pdfprogram            = "zathura"
   let b:imageprogram          = "feh"
   let b:browserprogram        = "qutebrowser"
+endif
+" If you are running MacOSX
+if s:MAC
+  let b:wordprocessingprogram = "open"
+  let b:spreadsheetprogram    = "open"
+  let b:presentationprogram   = "open"
+  let b:pdfprogram            = "open"
+  let b:imageprogram          = "open"
+  let b:browserprogram        = "open"
 endif
 " If you are running MS Windows:
 if s:MSWIN
@@ -118,24 +139,27 @@ endif
 " function "OpenFile()" (see example there). Example::
 " let b:scadprogram           = "openscad"
 
+" To be able to post events to your Google calendar, you must add the
+" global calendar variable to your vimrc file, like this:
+" let g:calendar       = "youremail@provider.com"
+
 " Lower the next two values if you have a slow computer
 syn sync minlines=50
 syn sync maxlines=100
 
-" Settings {{{1
-let b:current_syntax="HyperList"
-let b:highlight="false"
-set autoindent
-set textwidth=0
-set shiftwidth=3
-set tabstop=3
-set softtabstop=3
-set noexpandtab
-set guioptions+=t
-set foldmethod=syntax
-set fillchars=fold:\ 
+setlocal autoindent
+setlocal textwidth=0
+setlocal shiftwidth=3
+setlocal tabstop=3
+setlocal softtabstop=3
+setlocal noexpandtab
+setlocal guioptions+=t
+setlocal foldmethod=syntax
+setlocal fillchars=fold:\ 
 syn sync fromstart
 autocmd InsertLeave * :syntax sync fromstart
+" Set off with no highlighting - toggled with <leader>h
+let b:highlight      = "false"
 
 " Functions {{{1
 "  Folding {{{2
@@ -348,21 +372,48 @@ function! OpenFile()
   if expand('<cWORD>') =~ '<' && expand('<cWORD>') =~ '>'
     let gofl = expand('<cfile>')
     if gofl =~ '\(odt$\|doc$\|docx$\)'
-      exe '!' . b:wordprocessingprogram . ' "' . gofl . '"'
+      if exists('g:wordprocessingprogram')
+        exe '!' . g:wordprocessingprogram . ' "' . gofl . '"'
+      else
+        exe '!' . b:wordprocessingprogram . ' "' . gofl . '"'
+      endif
     elseif gofl =~ '\(odc$\|xls$\|xlsx$\)'
-      exe '!' . b:spreadsheetprogram . ' "' . gofl . '"'
+      if exists('g:spreadsheetprogram')
+        exe '!' . g:spreadsheetprogram . ' "' . gofl . '"'
+      else
+        exe '!' . b:spreadsheetprogram . ' "' . gofl . '"'
+      endif
     elseif gofl =~ '\(odp$\|ppt$\|pptx$\)'
-      exe '!' . b:presentationprogram . ' "' . gofl . '"'
+      if exists('g:presentationprogram')
+        exe '!' . g:presentationprogram . ' "' . gofl . '"'
+      else
+        exe '!' . b:presentationprogram . ' "' . gofl . '"'
+      endif
     elseif gofl =~ '\(jpg$\|jpeg$\|png$\|bmp$\|gif$\)'
-      exe '!' . b:imageprogram . ' "' . gofl . '"'
+      if exists('g:imageprogram')
+        exe '!' . g:imageprogram . ' "' . gofl . '"'
+      else
+        exe '!' . b:imageprogram . ' "' . gofl . '"'
+      endif
     elseif gofl =~ 'pdf$'
-      exe '!' . b:pdfprogram . ' "' . gofl . '"'
+      if exists('g:pdfprogram')
+        exe '!' . g:pdfprogram . ' "' . gofl . '"'
+      else
+        exe '!' . b:pdfprogram . ' "' . gofl . '"'
+      endif
     elseif gofl =~ '://'
-      exe '!' . b:browserprogram . ' "' . gofl . '"'
-  " You add more file openers here by using variables defined in the user
-  " settings at the start of this script. Example:
+      if exists('g:browserprogram')
+        exe '!' . g:browserprogram . ' "' . gofl . '"'
+      else
+        exe '!' . b:browserprogram . ' "' . gofl . '"'
+      endif
+  " You can add more file openers here by using global variables. Example:
+  " ---------------------------------------------------------------------------
   " elseif gofl =~ 'scad$'
-  "   exe '!' . b:scadprogram . ' "' . gofl . '"'
+  "   exe '!' . g:scadprogram . ' "' . gofl . '"'
+  " ---------------------------------------------------------------------------
+  " Just make sure to set the variable in your vimrc like this:
+  " let g:scadprogram = "autocad"
     else
       if has("gui_running")
         exe '!gvim '.gofl
@@ -714,11 +765,11 @@ endfunction
 "  is added from that time with duration of 30 minutes.
 "  This function requires gcalcli (https://github.com/insanum/gcalcli)
 "  The function is mapped to <leader>G to add events to the default
-"  calendar - defined as b:calendar at the start of this script.
+"  calendar - defined as g:calendar in your vimrc file.
 "  To add the events to another calendar, do :call CalendarAdd("yourcalendar")
 function! CalendarAdd(...)
   let l:count = 0
-  let l:cal = a:0 > 0 ? a:1 : b:calendar
+  let l:cal = a:0 > 0 ? a:1 : g:calendar
   let l:date = strftime("%Y-%m-%d")
   let l:tm = ""
   let l:linenr = 0 
@@ -920,71 +971,71 @@ if exists('g:HLDisableMapping') && g:HLDisableMapping
     finish
 endif
 
-map <leader>0         :set foldlevel=0<CR>
-map <leader>1         :set foldlevel=1<CR>
-map <leader>2         :set foldlevel=2<CR>
-map <leader>3         :set foldlevel=3<CR>
-map <leader>4         :set foldlevel=4<CR>
-map <leader>5         :set foldlevel=5<CR>
-map <leader>6         :set foldlevel=6<CR>
-map <leader>7         :set foldlevel=7<CR>
-map <leader>8         :set foldlevel=8<CR>
-map <leader>9         :set foldlevel=9<CR>
-map <leader>a         :set foldlevel=10<CR>
-map <leader>b         :set foldlevel=11<CR>
-map <leader>c         :set foldlevel=12<CR>
-map <leader>d         :set foldlevel=13<CR>
-map <leader>e         :set foldlevel=14<CR>
-map <leader>f         :set foldlevel=15<CR>
-map <NUL>             zA
-map <SPACE>           za
-nmap zx               i<esc>
+noremap <leader>0         :set foldlevel=0<CR>
+noremap <leader>1         :set foldlevel=1<CR>
+noremap <leader>2         :set foldlevel=2<CR>
+noremap <leader>3         :set foldlevel=3<CR>
+noremap <leader>4         :set foldlevel=4<CR>
+noremap <leader>5         :set foldlevel=5<CR>
+noremap <leader>6         :set foldlevel=6<CR>
+noremap <leader>7         :set foldlevel=7<CR>
+noremap <leader>8         :set foldlevel=8<CR>
+noremap <leader>9         :set foldlevel=9<CR>
+noremap <leader>a         :set foldlevel=10<CR>
+noremap <leader>b         :set foldlevel=11<CR>
+noremap <leader>c         :set foldlevel=12<CR>
+noremap <leader>d         :set foldlevel=13<CR>
+noremap <leader>e         :set foldlevel=14<CR>
+noremap <leader>f         :set foldlevel=15<CR>
+noremap <NUL>             zA
+noremap <SPACE>           za
+nnoremap zx               i<esc>
 
-map <leader>u         :call STunderline()<CR>
+noremap <leader>u         :call STunderline()<CR>
 
-map <leader>v	        :call CheckItem("")<CR>
-map <leader>V         :call CheckItem("stamped")<CR>
+noremap <leader>v	        :call CheckItem("")<CR>
+noremap <leader>V         :call CheckItem("stamped")<CR>
 
-map <leader><SPACE>   /=\s*$<CR>A
+noremap <leader><SPACE>   /=\s*$<CR>A
 
-nmap gr		            :call GotoRef()<CR>
-nmap <CR>	            :call GotoRef()<CR>
+nnoremap gr		            :call GotoRef()<CR>
+nnoremap <CR>	            :call GotoRef()<CR>
 
-nmap gf               :call OpenFile()<CR>
+nnoremap gf               :call OpenFile()<CR>
 
-nmap g<DOWN>          <DOWN><leader>0zv
-nmap g<UP>            <leader>f<UP><leader>0zv
+nnoremap g<DOWN>          <DOWN><leader>0zv
+nnoremap g<UP>            <leader>f<UP><leader>0zv
 
-nmap <leader><DOWN>   <DOWN><leader>0zv<SPACE>zO
-nmap <leader><UP>     <leader>f<UP><leader>0zv<SPACE>zO
+nnoremap <leader><DOWN>   <DOWN><leader>0zv<SPACE>zO
+nnoremap <leader><UP>     <leader>f<UP><leader>0zv<SPACE>zO
 
-nmap <leader>z        :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
-vmap <leader>z        :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
-nmap <leader>Z        :call HLdecrypt()<CR>:%!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
-nmap <leader>x        :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
-vmap <leader>x        :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
-nmap <leader>X        :call HLdecrypt()<CR>:%!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
+nnoremap <leader>z        :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
+vnoremap <leader>z        :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
+nnoremap <leader>Z        :call HLdecrypt()<CR>:%!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
+nnoremap <leader>x        :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
+vnoremap <leader>x        :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
+nnoremap <leader>X        :call HLdecrypt()<CR>:%!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
 
-nmap <leader>L        :call LaTeXconversion()<CR>
-nmap <leader>H        :call HTMLconversion()<CR>
-nmap <leader>T        :call TPPconversion()<CR>
+nnoremap <leader>L        :call LaTeXconversion()<CR>
+nnoremap <leader>H        :call HTMLconversion()<CR>
+nnoremap <leader>T        :call TPPconversion()<CR>
 
-nmap <leader>h        :call HighLight()<CR>
-nmap <leader>an       :call ToggleAutonum()<CR>
-nmap <leader>#        :call ToggleAutonum()<CR>
-vmap <leader>R        :call Renumber()<CR>
+nnoremap <leader>h        :call HighLight()<CR>
+nnoremap <leader>an       :call ToggleAutonum()<CR>
+nnoremap <leader>#        :call ToggleAutonum()<CR>
+vnoremap <leader>R        :call Renumber()<CR>
 
-map  <silent> zs      :call <SID>ShowHideWord('z', 's', '')<CR>
-map  <silent> zh      :call <SID>ShowHideWord('z', 'h', '')<CR>
-map  <silent> z0      :set foldmethod=syntax<CR><bar>:echo "ShowHide Remove"<CR>
+noremap  <silent> zs      :call <SID>ShowHideWord('z', 's', '')<CR>
+noremap  <silent> zh      :call <SID>ShowHideWord('z', 'h', '')<CR>
+noremap  <silent> z0      :set foldmethod=syntax<CR><bar>:echo "ShowHide Remove"<CR>
 
-nmap <leader>G        :call CalendarAdd()<CR>
+nnoremap <leader>G        :call CalendarAdd()<CR>
 
-nmap <leader>C        :call Complexity()<CR>
+nnoremap <leader>C        :call Complexity()<CR>
 
 " Sort hack (sort the visual selected lines by the top item's indentation
 " The last item in the visual selection cannot be the last line in the document.
-vmap <leader>s <esc>`<^"iy0gv:s/^<c-r>i\S\@=/<c-v><c-a>/<cr>gv:s/\t/<c-v><c-b>/g<cr>gv:s/\n<c-v><c-b>/<c-v><c-x>/<cr>gvk:!sort<cr>:%s/<c-v><c-a>/<c-r>i/<cr>:%s/<c-v><c-x>/\r<c-v><c-b>/g<cr>:%s/<c-v><c-b>/\t/g<cr>
+vnoremap <leader>s <esc>`<^"iy0gv:s/^<c-r>i\S\@=/<c-v><c-a>/<cr>gv:s/\t/<c-v><c-b>/g<cr>gv:s/\n<c-v><c-b>/<c-v><c-x>/<cr>gvk:!sort<cr>:%s/<c-v><c-a>/<c-r>i/<cr>:%s/<c-v><c-x>/\r<c-v><c-b>/g<cr>:%s/<c-v><c-b>/\t/g<cr>
 
 " GVIM menu {{{1
 let s:HL_RootMenu  = 'HyperList.'
