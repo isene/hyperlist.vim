@@ -113,12 +113,12 @@ Use "gf" to open the file under the cursor. Graphic files are opened in
 "feh", pdf files in "zathura" and MS/OOO docs in "LibreOffice". Other
 filetypes are opened in VIM for editing. All this can be changed by
 setting these global variables in your vimrc:
-  g:wordprocessingprogram = ""
-  g:spreadsheetprogram    = ""
-  g:presentationprogram   = ""
-  g:imageprogram          = ""
-  g:pdfprogram            = ""
-  g:browserprogram        = ""
+  let g:wordprocessingprogram = ""
+  let g:spreadsheetprogram    = ""
+  let g:presentationprogram   = ""
+  let g:imageprogram          = ""
+  let g:pdfprogram            = ""
+  let g:browserprogram        = ""
 
 Whenever you jump to a reference, the mark "'" is set at the point you jumped
 from so that you may easily jump back by hitting "''" (single quoutes twice). 
@@ -1127,12 +1127,12 @@ VERSION 2.4.3			2020-08-02
    Several important upgrades under the hood
    Programs for opening files in references can now be set by
    the user by setting the global variables in vimrc:
-	  g:wordprocessingprogram = ""
-     g:spreadsheetprogram    = ""
-     g:presentationprogram   = ""
-     g:imageprogram          = ""
-     g:pdfprogram            = ""
-     g:browserprogram        = ""
+	  let g:wordprocessingprogram = ""
+     let g:spreadsheetprogram    = ""
+     let g:presentationprogram   = ""
+     let g:imageprogram          = ""
+     let g:pdfprogram            = ""
+     let g:browserprogram        = ""
 
 VERSION 2.4.2			2020-07-23
 	Quickfix: C-SPACE now maps to zA (toggles fold recursively)
