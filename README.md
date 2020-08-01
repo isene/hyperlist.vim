@@ -211,12 +211,12 @@ Syntax updated at start and every time you leave Insert mode, or you can press
 You may speed up larger HyperLists by setting the the global variable
 "disable_collapse" - add the following to your .vimrc:
 
-  `let "g:disable_collapse" = 1`
+  `let g:disable_collapse = 1`
 
 If you want to disable or override these keymaps with your own, simply add to
 your .vimrc file:
 
-  `let "g:HLDisableMapping" = 1`
+  `let g:HLDisableMapping = 1`
 
 ### Show/hide
 
