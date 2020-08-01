@@ -159,12 +159,12 @@ pdf files in "zathura" and MS/OOO docs in "LibreOffice". Other filetypes are
 opened in VIM for editing. These can be changed by setting these global
 variables in your vimrc:
 ```
-g:wordprocessingprogram = ""
-g:spreadsheetprogram    = ""
-g:presentationprogram   = ""
-g:imageprogram          = ""
-g:pdfprogram            = ""
-g:browserprogram        = ""
+let g:wordprocessingprogram = ""
+let g:spreadsheetprogram    = ""
+let g:presentationprogram   = ""
+let g:imageprogram          = ""
+let g:pdfprogram            = ""
+let g:browserprogram        = ""
 ```
 
 ### Simple tricks
