@@ -1003,11 +1003,11 @@ nnoremap <CR>	            :call GotoRef()<CR>
 
 nnoremap gf               :call OpenFile()<CR>
 
-nnoremap g<DOWN>          <DOWN><leader>0zv
-nnoremap g<UP>            <leader>f<UP><leader>0zv
+nmap g<DOWN>          <DOWN><leader>0zv
+nmap g<UP>            <leader>f<UP><leader>0zv
 
-nnoremap <leader><DOWN>   <DOWN><leader>0zv<SPACE>zO
-nnoremap <leader><UP>     <leader>f<UP><leader>0zv<SPACE>zO
+nmap <leader><DOWN>   <DOWN><leader>0zv<SPACE>zO
+nmap <leader><UP>     <leader>f<UP><leader>0zv<SPACE>zO
 
 nnoremap <leader>z        :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
 vnoremap <leader>z        :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
