@@ -14,17 +14,9 @@
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.4.3 - compatible with the HyperList definition v. 2.4
-" Modified:   2020-08-02 
-" Changes:    Several important upgrades under the hood
-"             Programs for opening files in references can now be set by
-"             the user by setting the global variables in vimrc:
-"             g:wordprocessingprogram = ""
-"             g:spreadsheetprogram    = ""
-"             g:presentationprogram   = ""
-"             g:imageprogram          = ""
-"             g:pdfprogram            = ""
-"             g:browserprogram        = ""
+" Version:    2.4.4 - compatible with the HyperList definition v. 2.4
+" Modified:   2020-08-06
+" Changes:    Refactoring (thanks to Nick Jensen [nickspoons] for guidance)
 
 " Instructions {{{1
 "
@@ -101,12 +93,13 @@ if s:MSWIN
 endif
 
 " Settings {{{1
-" You can override all of these by setting global variables in your vimrc
-" file, like this (note the "g" in front of the program type):
-" let g:imageprogram          = "eog"
+"  File opening settings {{{2
+"  You can override all of these by setting global variables in your vimrc
+"  file, like this (note the "g" in front of the program type):
+"  let g:imageprogram          = "eog"
 "
-" The following are the default programs for opening files in various OSes.
-" If you are running Linux/Unix/win32unix
+"  The following are the default programs for opening files in various OSes.
+"  If you are running Linux/Unix/win32unix
 if s:UNIX
   let b:wordprocessingprogram = "libreoffice"
   let b:spreadsheetprogram    = "libreoffice"
@@ -115,7 +108,7 @@ if s:UNIX
   let b:imageprogram          = "feh"
   let b:browserprogram        = "qutebrowser"
 endif
-" If you are running MacOSX
+"  If you are running MacOSX
 if s:MAC
   let b:wordprocessingprogram = "open"
   let b:spreadsheetprogram    = "open"
@@ -124,7 +117,7 @@ if s:MAC
   let b:imageprogram          = "open"
   let b:browserprogram        = "open"
 endif
-" If you are running MS Windows:
+"  If you are running MS Windows:
 if s:MSWIN
   " Add the path to the programs if you don't want to mess around with a path variable
   " ...such as: '/Program^ Files^ (x86)/Microsoft^ Office/root/Office16/'
@@ -135,18 +128,21 @@ if s:MSWIN
   let b:imageprogram          = "i_view32"
   let b:browserprogram        = "firefox"
 endif
-" You can add programs to open other file types - and add the opener to the
-" function "OpenFile()" (see example there). Example::
-" let b:scadprogram           = "openscad"
+"  You can add programs to open other file types - and add the opener to the
+"  function "OpenFile()" (see example there). Example::
+"  let b:scadprogram           = "openscad"
 
-" To be able to post events to your Google calendar, you must add the
-" global calendar variable to your vimrc file, like this:
-" let g:calendar       = "youremail@provider.com"
+"  Calendar settings (in your .vimrc) {{{2
+"  To be able to post events to your Google calendar, you must add the
+"  global calendar variable to your vimrc file, like this:
+"  let g:calendar       = "youremail@provider.com"
 
-" Lower the next two values if you have a slow computer
+"  Sync settings {{{2
+"  Lower the next two values if you have a slow computer
 syn sync minlines=50
 syn sync maxlines=100
 
+"  General settings {{{2
 setlocal autoindent
 setlocal textwidth=0
 setlocal shiftwidth=3
@@ -158,13 +154,13 @@ setlocal foldmethod=syntax
 setlocal fillchars=fold:\ 
 syn sync fromstart
 autocmd InsertLeave * :syntax sync fromstart
-" Set off with no highlighting - toggled with <leader>h
+"  Set off with no highlighting - toggled with <leader>h
 let b:highlight      = "false"
 
 " Functions {{{1
 "  Folding {{{2
 "  Mapped to <SPACE> and <leader>0 - <leader>f
-set foldtext=HLFoldText()
+setlocal foldtext=HLFoldText()
 function! HLFoldText()
   let line = getline(v:foldstart)
   let myindent = indent(v:foldstart)
@@ -183,7 +179,7 @@ function! HighLight()
   if b:highlight=="false"
     echo "Highlight ON"
     let b:fl=&fdl
-    set foldlevel=15
+    setlocal foldlevel=15
     let b:highlight="true"
     autocmd CursorMoved,CursorMovedI * call HighLightHL()
   else
@@ -275,8 +271,8 @@ endfunction
 "  Encryption {{{2
 "  Remove traces of secure info upon decrypting (part of) a HyperList
 function! HLdecrypt()
-  set viminfo=""
-  set noswapfile
+  setlocal viminfo=""
+  setlocal noswapfile
 endfunction
 
 "  Underlining States/Transitions {{{2
@@ -430,7 +426,7 @@ endfunction
 "  LaTeX conversion{{{2
 "  Mapped to '<leader>L'
 function! LaTeXconversion ()
-    set expandtab
+    setlocal expandtab
     retab
     try
         "Remove VIM tagline
@@ -555,7 +551,7 @@ function! LaTeXconversion ()
     "Document end
     normal Go\end{alltt}
     normal o\end{document}
-    set filetype=tex
+    setlocal filetype=tex
 endfunction
 
 "  HTML conversion{{{2
@@ -669,7 +665,7 @@ function! HTMLconversion ()
   "Document end
   normal GO</body>
   normal o</html>
-  set filetype=html
+  setlocal filetype=html
 endfunction
 
 "  TPP conversion{{{2
@@ -728,8 +724,8 @@ endfunction
 "        Hide lines containing either word or pattern
 "        Pattern can be any regular expression
 
-command! -nargs=+  SHOW  :call <SID>ShowHideWord('c', 's', <f-args>)
-command! -nargs=+  HIDE  :call <SID>ShowHideWord('c', 'h', <f-args>)
+command! -buffer -nargs=+  SHOW  :call <SID>ShowHideWord('c', 's', <f-args>)
+command! -buffer -nargs=+  HIDE  :call <SID>ShowHideWord('c', 'h', <f-args>)
 
 function! <SID>ShowHideWord(mode, show, ...)
    if (a:mode == 'z')
@@ -749,13 +745,13 @@ function! <SID>ShowHideWord(mode, show, ...)
       let cur_word = cur_word . '\\)\\>'
    endif
 
-   let myfoldexpr = "set foldexpr=getline(v:lnum)" .
+   let myfoldexpr = "setlocal foldexpr=getline(v:lnum)" .
       \ (a:show == 's' ? "!" : "=") . "~\'\^.*" . cur_word . ".*\$\'"
 
-   set foldenable
-   set foldlevel=0
-   set foldminlines=0
-   set foldmethod=expr
+   setlocal foldenable
+   setlocal foldlevel=0
+   setlocal foldminlines=0
+   setlocal foldmethod=expr
    exec myfoldexpr
 endfunction
 
@@ -971,22 +967,22 @@ if exists('g:HLDisableMapping') && g:HLDisableMapping
     finish
 endif
 
-noremap <leader>0         :set foldlevel=0<CR>
-noremap <leader>1         :set foldlevel=1<CR>
-noremap <leader>2         :set foldlevel=2<CR>
-noremap <leader>3         :set foldlevel=3<CR>
-noremap <leader>4         :set foldlevel=4<CR>
-noremap <leader>5         :set foldlevel=5<CR>
-noremap <leader>6         :set foldlevel=6<CR>
-noremap <leader>7         :set foldlevel=7<CR>
-noremap <leader>8         :set foldlevel=8<CR>
-noremap <leader>9         :set foldlevel=9<CR>
-noremap <leader>a         :set foldlevel=10<CR>
-noremap <leader>b         :set foldlevel=11<CR>
-noremap <leader>c         :set foldlevel=12<CR>
-noremap <leader>d         :set foldlevel=13<CR>
-noremap <leader>e         :set foldlevel=14<CR>
-noremap <leader>f         :set foldlevel=15<CR>
+noremap <leader>0         :setlocal foldlevel=0<CR>
+noremap <leader>1         :setlocal foldlevel=1<CR>
+noremap <leader>2         :setlocal foldlevel=2<CR>
+noremap <leader>3         :setlocal foldlevel=3<CR>
+noremap <leader>4         :setlocal foldlevel=4<CR>
+noremap <leader>5         :setlocal foldlevel=5<CR>
+noremap <leader>6         :setlocal foldlevel=6<CR>
+noremap <leader>7         :setlocal foldlevel=7<CR>
+noremap <leader>8         :setlocal foldlevel=8<CR>
+noremap <leader>9         :setlocal foldlevel=9<CR>
+noremap <leader>a         :setlocal foldlevel=10<CR>
+noremap <leader>b         :setlocal foldlevel=11<CR>
+noremap <leader>c         :setlocal foldlevel=12<CR>
+noremap <leader>d         :setlocal foldlevel=13<CR>
+noremap <leader>e         :setlocal foldlevel=14<CR>
+noremap <leader>f         :setlocal foldlevel=15<CR>
 noremap <NUL>             zA
 noremap <SPACE>           za
 nnoremap zx               i<esc>
@@ -1027,7 +1023,7 @@ vnoremap <leader>R        :call Renumber()<CR>
 
 noremap  <silent> zs      :call <SID>ShowHideWord('z', 's', '')<CR>
 noremap  <silent> zh      :call <SID>ShowHideWord('z', 'h', '')<CR>
-noremap  <silent> z0      :set foldmethod=syntax<CR><bar>:echo "ShowHide Remove"<CR>
+noremap  <silent> z0      :setlocal foldmethod=syntax<CR><bar>:echo "ShowHide Remove"<CR>
 
 nnoremap <leader>G        :call CalendarAdd()<CR>
 
@@ -1042,22 +1038,22 @@ let s:HL_RootMenu  = 'HyperList.'
 exe 'menu '.s:HL_RootMenu.'HyperList <Nop>'
 exe 'menu '.s:HL_RootMenu.'-Sep00-  <Nop>'
 menu HyperList.Toggle\ fold<Tab>SPACE              za
-menu HyperList.Set\ fold\ level.0<Tab>\\0          :set foldlevel=0<CR>
-menu HyperList.Set\ fold\ level.1<Tab>\\1          :set foldlevel=1<CR>
-menu HyperList.Set\ fold\ level.2<Tab>\\2          :set foldlevel=2<CR>
-menu HyperList.Set\ fold\ level.3<Tab>\\3          :set foldlevel=3<CR>
-menu HyperList.Set\ fold\ level.4<Tab>\\4          :set foldlevel=4<CR>
-menu HyperList.Set\ fold\ level.5<Tab>\\5          :set foldlevel=5<CR>
-menu HyperList.Set\ fold\ level.6<Tab>\\6          :set foldlevel=6<CR>
-menu HyperList.Set\ fold\ level.7<Tab>\\7          :set foldlevel=7<CR>
-menu HyperList.Set\ fold\ level.8<Tab>\\8          :set foldlevel=8<CR>
-menu HyperList.Set\ fold\ level.9<Tab>\\9          :set foldlevel=9<CR>
-menu HyperList.Set\ fold\ level.10<Tab>\\a         :set foldlevel=10<CR>
-menu HyperList.Set\ fold\ level.11<Tab>\\b         :set foldlevel=11<CR>
-menu HyperList.Set\ fold\ level.12<Tab>\\c         :set foldlevel=12<CR>
-menu HyperList.Set\ fold\ level.13<Tab>\\d         :set foldlevel=13<CR>
-menu HyperList.Set\ fold\ level.14<Tab>\\e         :set foldlevel=14<CR>
-menu HyperList.Set\ fold\ level.15<Tab>\\f         :set foldlevel=15<CR>
+menu HyperList.Set\ fold\ level.0<Tab>\\0          :setlocal foldlevel=0<CR>
+menu HyperList.Set\ fold\ level.1<Tab>\\1          :setlocal foldlevel=1<CR>
+menu HyperList.Set\ fold\ level.2<Tab>\\2          :setlocal foldlevel=2<CR>
+menu HyperList.Set\ fold\ level.3<Tab>\\3          :setlocal foldlevel=3<CR>
+menu HyperList.Set\ fold\ level.4<Tab>\\4          :setlocal foldlevel=4<CR>
+menu HyperList.Set\ fold\ level.5<Tab>\\5          :setlocal foldlevel=5<CR>
+menu HyperList.Set\ fold\ level.6<Tab>\\6          :setlocal foldlevel=6<CR>
+menu HyperList.Set\ fold\ level.7<Tab>\\7          :setlocal foldlevel=7<CR>
+menu HyperList.Set\ fold\ level.8<Tab>\\8          :setlocal foldlevel=8<CR>
+menu HyperList.Set\ fold\ level.9<Tab>\\9          :setlocal foldlevel=9<CR>
+menu HyperList.Set\ fold\ level.10<Tab>\\a         :setlocal foldlevel=10<CR>
+menu HyperList.Set\ fold\ level.11<Tab>\\b         :setlocal foldlevel=11<CR>
+menu HyperList.Set\ fold\ level.12<Tab>\\c         :setlocal foldlevel=12<CR>
+menu HyperList.Set\ fold\ level.13<Tab>\\d         :setlocal foldlevel=13<CR>
+menu HyperList.Set\ fold\ level.14<Tab>\\e         :setlocal foldlevel=14<CR>
+menu HyperList.Set\ fold\ level.15<Tab>\\f         :setlocal foldlevel=15<CR>
 menu HyperList.Toggle\ State/Transition<Tab>\\u    :call STunderline()<CR>
 menu HyperList.Checklist.Toggle<Tab>\\v            :call CheckItem("")<CR>
 menu HyperList.Checklist.Timestamp<Tab>\\V         :call CheckItem("stamped")<CR>
@@ -1065,7 +1061,7 @@ menu HyperList.Goto\ reference<Tab>gr              :call GotoRef()<CR>
 menu HyperList.Open\ file\ under\ cursor<Tab>gf    :call OpenFile()<CR>
 menu HyperList.Show/Hide.Show\ Word\ under\ Cursor<Tab>zs :call <SID>ShowHideWord('z', 's', '')<CR>
 menu HyperList.Show/Hide.Hide\ Word\ under\ Cursor<Tab>zh :call <SID>ShowHideWord('z', 'h', '')<CR>
-menu HyperList.Show/Hide.Remove\ Show/Hide<Tab>z0  :set foldmethod=syntax<CR><bar>:echo "ShowHide Remove"<CR>
+menu HyperList.Show/Hide.Remove\ Show/Hide<Tab>z0  :setlocal foldmethod=syntax<CR><bar>:echo "ShowHide Remove"<CR>
 menu HyperList.Autonumber.Toggle<Tab>\\an          :call ToggleAutonum()<CR>
 vmenu HyperList.Autonumber.Renumber\ visual\ selection<Tab>\\R :call Renumber()<CR>
 menu HyperList.Next\ Template\ Item<Tab>\\SPACE    /=\s*$<CR>A<CR>
