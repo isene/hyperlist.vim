@@ -2,7 +2,8 @@
 UseVimball
 finish
 syntax/hyperlist.vim	[[[1
-1038
+1088
+" Script info {{{1
 " Vim syntax and filetype plugin for HyperList files (.hl)
 " Language:   Self defined markup and functions for HyperLists in Vim
 " Author:     Geir Isene <g@isene.com>
@@ -18,21 +19,15 @@ syntax/hyperlist.vim	[[[1
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.4.1 - compatible with the HyperList definition v. 2.4
-" Modified:   2019-10-06
-" Changes:    Updated to be compatible with HyperList definition v. 2.4
-"             Included full tutorial/test suite (thanks to Don Kelley).
-"             Improved LaTeX export.
-"             Improved GotoRef() (mapped to 'gr' and '<CR>')
-"               GotoRef() now also opens files if the format is <file:...>
-"               GotoRef() handles the new relative references like <+2> and <-5>
-"             Some other minor changes and clean-ups of the documentation.
+" Version:    2.4.5 - compatible with the HyperList definition v. 2.4
+" Modified:   2021-04-16
+" Changes:    Fixed compatability issues with neovim
 
-" INSTRUCTIONS {{{1
+" Instructions {{{1
 "
 " Use tabs/shifts or * for indentations
 "
-" Use <SPACE> to toggle one fold.
+" Use <SPACE> to toggle one fold. Use <c-SPACE> to toggle a fold recursively.
 " Use \0 to \9, \a, \b, \c, \d, \e, \f to show up to 15 levels expanded.
 "
 " <leader># or <leader>an toggles autonumbering of new items (the previous
@@ -86,25 +81,30 @@ syntax/hyperlist.vim	[[[1
 " Initializing {{{1
 if version < 600
     syntax clear
-elseif exists("b:current_syntax")
+elseif exists('b:current_syntax')
     finish
 endif
+let b:current_syntax = "HyperList"
 
-let s:UNIX  = has("unix")  || has("macunix") || has("win32unix")
-let s:MSWIN = has("win16") || has("win32")   || has("win64")     || has("win95")
+" OS specific settings
+let s:UNIX  = has("unix")  || has("win32unix")
+let s:MAC   = has("macunix")
+let s:MSWIN = has("win16") || has("win32") || has("win64") || has("win95")
+
 if s:MSWIN
   if mapcheck("\<c-a>","n") != ""
     nunmap <c-a>
   endif
 endif
 
-" USER DEFINED SETTINGS (change these as you wish) {{{1
-" Change this to add events as reminders to your Google calendar:
-let b:calendar      = "geir@a-circle.no"
-
-" Programs to handle opening of files with "gf" (programs must be in PATH)
-" Add more programs if you want and make additions to the function OpenFile()
-" If you are running Linux/Unix/MacOSX/win32unix
+" Settings {{{1
+"  File opening settings {{{2
+"  You can override all of these by setting global variables in your vimrc
+"  file, like this (note the "g" in front of the program type):
+"  let g:imageprogram          = "eog"
+"
+"  The following are the default programs for opening files in various OSes.
+"  If you are running Linux/Unix/win32unix
 if s:UNIX
   let b:wordprocessingprogram = "libreoffice"
   let b:spreadsheetprogram    = "libreoffice"
@@ -113,7 +113,16 @@ if s:UNIX
   let b:imageprogram          = "feh"
   let b:browserprogram        = "qutebrowser"
 endif
-" If you are running MS Windows:
+"  If you are running MacOSX
+if s:MAC
+  let b:wordprocessingprogram = "open"
+  let b:spreadsheetprogram    = "open"
+  let b:presentationprogram   = "open"
+  let b:pdfprogram            = "open"
+  let b:imageprogram          = "open"
+  let b:browserprogram        = "open"
+endif
+"  If you are running MS Windows:
 if s:MSWIN
   " Add the path to the programs if you don't want to mess around with a path variable
   " ...such as: '/Program^ Files^ (x86)/Microsoft^ Office/root/Office16/'
@@ -124,33 +133,39 @@ if s:MSWIN
   let b:imageprogram          = "i_view32"
   let b:browserprogram        = "firefox"
 endif
-" You can add programs to open other file types - and add the opener to the
-" function "OpenFile()" (see example there). Example::
-" let b:scadprogram           = "openscad"
+"  You can add programs to open other file types - and add the opener to the
+"  function "OpenFile()" (see example there). Example::
+"  let b:scadprogram           = "openscad"
 
-" Lower the next two values if you have a slow computer
+"  Calendar settings (in your .vimrc) {{{2
+"  To be able to post events to your Google calendar, you must add the
+"  global calendar variable to your vimrc file, like this:
+"  let g:calendar       = "youremail@provider.com"
+
+"  Sync settings {{{2
+"  Lower the next two values if you have a slow computer
 syn sync minlines=50
 syn sync maxlines=100
 
-" Settings {{{1
-let b:current_syntax="HyperList"
-let b:highlight="false"
-set autoindent
-set textwidth=0
-set shiftwidth=3
-set tabstop=3
-set softtabstop=3
-set noexpandtab
-set guioptions+=t
-set foldmethod=syntax
-set fillchars=fold:\ 
+"  General settings {{{2
+setlocal autoindent
+setlocal textwidth=0
+setlocal shiftwidth=3
+setlocal tabstop=3
+setlocal softtabstop=3
+setlocal noexpandtab
+setlocal guioptions+=t
+setlocal foldmethod=syntax
+setlocal fillchars=fold:\ 
 syn sync fromstart
 autocmd InsertLeave * :syntax sync fromstart
+"  Set off with no highlighting - toggled with <leader>h
+let b:highlight      = "false"
 
 " Functions {{{1
 "  Folding {{{2
 "  Mapped to <SPACE> and <leader>0 - <leader>f
-set foldtext=HLFoldText()
+setlocal foldtext=HLFoldText()
 function! HLFoldText()
   let line = getline(v:foldstart)
   let myindent = indent(v:foldstart)
@@ -169,7 +184,7 @@ function! HighLight()
   if b:highlight=="false"
     echo "Highlight ON"
     let b:fl=&fdl
-    set foldlevel=15
+    setlocal foldlevel=15
     let b:highlight="true"
     autocmd CursorMoved,CursorMovedI * call HighLightHL()
   else
@@ -261,8 +276,8 @@ endfunction
 "  Encryption {{{2
 "  Remove traces of secure info upon decrypting (part of) a HyperList
 function! HLdecrypt()
-  set viminfo=""
-  set noswapfile
+  setlocal viminfo=""
+  setlocal noswapfile
 endfunction
 
 "  Underlining States/Transitions {{{2
@@ -358,26 +373,57 @@ function! OpenFile()
   if expand('<cWORD>') =~ '<' && expand('<cWORD>') =~ '>'
     let gofl = expand('<cfile>')
     if gofl =~ '\(odt$\|doc$\|docx$\)'
-      exe '!' . b:wordprocessingprogram . ' "' . gofl . '"'
+      if exists('g:wordprocessingprogram')
+        exe '!' . g:wordprocessingprogram . ' "' . gofl . '"'
+      else
+        exe '!' . b:wordprocessingprogram . ' "' . gofl . '"'
+      endif
     elseif gofl =~ '\(odc$\|xls$\|xlsx$\)'
-      exe '!' . b:spreadsheetprogram . ' "' . gofl . '"'
+      if exists('g:spreadsheetprogram')
+        exe '!' . g:spreadsheetprogram . ' "' . gofl . '"'
+      else
+        exe '!' . b:spreadsheetprogram . ' "' . gofl . '"'
+      endif
     elseif gofl =~ '\(odp$\|ppt$\|pptx$\)'
-      exe '!' . b:presentationprogram . ' "' . gofl . '"'
+      if exists('g:presentationprogram')
+        exe '!' . g:presentationprogram . ' "' . gofl . '"'
+      else
+        exe '!' . b:presentationprogram . ' "' . gofl . '"'
+      endif
     elseif gofl =~ '\(jpg$\|jpeg$\|png$\|bmp$\|gif$\)'
-      exe '!' . b:imageprogram . ' "' . gofl . '"'
+      if exists('g:imageprogram')
+        exe '!' . g:imageprogram . ' "' . gofl . '"'
+      else
+        exe '!' . b:imageprogram . ' "' . gofl . '"'
+      endif
     elseif gofl =~ 'pdf$'
-      exe '!' . b:pdfprogram . ' "' . gofl . '"'
+      if exists('g:pdfprogram')
+        exe '!' . g:pdfprogram . ' "' . gofl . '"'
+      else
+        exe '!' . b:pdfprogram . ' "' . gofl . '"'
+      endif
     elseif gofl =~ '://'
-      exe '!' . b:browserprogram . ' "' . gofl . '"'
-  " You add more file openers here by using variables defined in the user
-  " settings at the start of this script. Example:
+      if exists('g:browserprogram')
+        exe '!' . g:browserprogram . ' "' . gofl . '"'
+      else
+        exe '!' . b:browserprogram . ' "' . gofl . '"'
+      endif
+  " You can add more file openers here by using global variables. Example:
+  " ---------------------------------------------------------------------------
   " elseif gofl =~ 'scad$'
-  "   exe '!' . b:scadprogram . ' "' . gofl . '"'
+  "   exe '!' . g:scadprogram . ' "' . gofl . '"'
+  " ---------------------------------------------------------------------------
+  " Just make sure to set the variable in your vimrc like this:
+  " let g:scadprogram = "autocad"
     else
       if has("gui_running")
         exe '!gvim '.gofl
       else
-        exe '!vim '.gofl
+        if $EDITOR == "nvim"
+          exe 'term nvim '.gofl
+        else
+          exe '!vim '.gofl
+        endif
       endif
     endif
   else
@@ -385,122 +431,11 @@ function! OpenFile()
   endif
 endfunction
 
-"  HTML conversion{{{2
-"  Mapped to '<leader>H'
-function! HTMLconversion ()
-    try
-        "Remove VIM tagline
-        execute '%s/^vim:.*//g'
-    catch
-    endtry
-    try
-        "first line of a HyperList is bold
-        execute '%s/^\(\S.*\)$/<strong>\1<\/strong>/g'
-    catch
-    endtry
-    try
-        "HLb
-        execute '%s/ \@<=\*\(.\{-}\)\* /<strong>\1<\/strong>/g'
-    catch
-    endtry
-    try
-        "HLi
-        execute '%s/ \@<=\/\(.\{-}\)\/ /<em>\1<\/em>/g'
-    catch
-    endtry
-    try
-        "HLu
-        execute '%s/ \@<=_\(.\{-}\)_ /<u>\1<\/u>/g'
-    catch
-    endtry
-    try
-        "HLquote
-        execute '%s/\(\".*\"\)/<em>\1<\/em>/g'
-    catch
-    endtry
-    try
-        "HLcomment
-        execute '%s/\((.*)\)/<em>\1<\/em>/g'
-    catch
-    endtry
-    try
-        "HLindent
-        execute "%s/\\(\\t\\|\\*\\)\\@<=\\(\\d.\\{-}\\)\\s/<font color=\"purple\">\\2<\\/font> /g"
-    catch
-    endtry
-    try
-        "HLmulti (+)
-        execute '%s/\(\t\|\*\)+/\t<font color="purple">+<\/font>/g'
-    catch
-    endtry
-    try
-        "HLhash
-        execute "%s/\\(#[a-zA-ZæøåÆØÅ0-9.:/_&?%=\\-\\*]\\+\\)/<font color=\"yellow\">\\1<\\/font>/g"
-    catch
-    endtry
-    try
-        "HLref
-        execute "%s/\\(<\\{1,2}\\[a-zA-ZæøåÆØÅ0-9.:/_&?%=\\-\\* ]\\+>\\{1,2}\\)/<font color=\"purple\">\\1<\\/font>/g"
-    catch
-    endtry
-    try
-        "HLmove
-        execute '%s/\(>>\|<<\|->\|<-\)/<font color="red"><strong>\1</strong><\/font>/g'
-    catch
-    endtry
-    try
-        "HLqual
-        execute '%s/\(\[.\{-}\]\)/<font color="green">\1<\/font>/g'
-    catch
-    endtry
-    try
-        "HLop
-        execute "%s/\\(\\s\\|\\*\\)\\@<=\\([A-ZÆØÅ_/]\\{-2,}:\\s\\)/<font color=\"blue\">\\2<\\/font>/g"
-    catch
-    endtry
-    try
-        "HLprop
-        execute "%s/\\(\\s\\|\\*\\)\\@<=\\([a-zA-ZæøåÆØÅ0-9,._&?%= \\-\\/+<>#']\\{-2,}:\\s\\)/<font color=\"red\">\\2<\\/font>/g"
-    catch
-    endtry
-    try
-        "HLsc
-        execute '%s/\(;\)/<font color="green">\1<\/font>/g'
-    catch
-    endtry
-    try
-        "Substitute space in second line of multi-item
-        execute '%s/\(^\|\t\|\*\)\@<=\(\t\|\*\) /\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;/g'
-    catch
-    endtry
-    try
-        "Substitute tabs
-        execute '%s/\(^\|\t\|\*\)\@<=\(\t\|\*\)/\&nbsp;\&nbsp;\&nbsp;\&nbsp;/g'
-    catch
-    endtry
-    try
-        "Substitute newlines with <br />
-        execute '%s/\n/<br \/>\r/g'
-    catch
-    endtry
-    "Document start
-    normal ggO<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-    normal o<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-    normal o<head>
-    normal o<title>HyperList</title>
-    normal o<meta name="creator" content="HyperList plugin for VIM: http://vim.sourceforge.net/scripts/script.php?script_id=2518" />
-    normal o<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-    normal o</head>
-    normal o<body>
-    "Document end
-    normal GO</body>
-    normal o</html>
-    set filetype=html
-endfunction
+
 "  LaTeX conversion{{{2
 "  Mapped to '<leader>L'
 function! LaTeXconversion ()
-    set expandtab
+    setlocal expandtab
     retab
     try
         "Remove VIM tagline
@@ -579,12 +514,12 @@ function! LaTeXconversion ()
     endtry
     try
         "HLop
-        execute "%s/\\(\\s\*\\|\\*\*\\)\\([A-ZÆØÅ_/]\\{-2,}:\\s\\)/\\1\\\\textcolor{b}{\\2}/g"
+        execute "%s/\\(\\s\\|\\*\\)\\{-1,}\\([A-ZÆØÅ_/]\\{-2,}:\\s\\)/\\1\\\\textcolor{b}{\\2}/g"
     catch
     endtry
     try
         "HLprop
-        execute "%s/\\(\\s\*\\|\\*\*\\)\\([a-zA-ZæøåÆØÅ0-9,._&?%= \\-\\/+<>#']\\{-2,}:\\s\\)/\\1\\\\textcolor{r}{\\\\emph{\\2}}/g"
+        execute "%s/\\(\\s\\{1,}\\|\\*\\{1,}\\)\\([a-zA-ZæøåÆØÅ0-9,._&?%= \\-\\/+<>#']\\{-2,}:\\s\\)/\\1\\\\textcolor{r}{\\\\emph{\\2}}/g"
     catch
     endtry
     try
@@ -625,7 +560,121 @@ function! LaTeXconversion ()
     "Document end
     normal Go\end{alltt}
     normal o\end{document}
-    set filetype=tex
+    setlocal filetype=tex
+endfunction
+
+"  HTML conversion{{{2
+"  Mapped to '<leader>H'
+function! HTMLconversion ()
+  try
+    "Remove VIM tagline
+    execute '%s/^vim:.*//g'
+  catch
+  endtry
+  try
+    "HLref
+    execute '%s/\(<.\{-}>\)/<font color=Ŀ>\1<\/font>/g'
+  catch
+  endtry
+  try
+    "HLquote
+    execute '%s/\(\".*\"\)/<font color="teal">\1<\/font>/g'
+    execute '%s/Ŀ/"purple"/g'
+  catch
+  endtry
+  try
+    "first line of a HyperList is bold
+    execute '%s/^\(\S.*\)$/<strong>\1<\/strong>/g'
+  catch
+  endtry
+  try
+    "HLb
+    execute '%s/ \@<=\*\(.\{-}\)\* / <strong>\1<\/strong> /g'
+  catch
+  endtry
+  try
+    "HLi
+    execute '%s/ \@<=\/\(.\{-}\)\/ /<em>\1<\/em>/g'
+  catch
+  endtry
+  try
+    "HLu
+    execute '%s/ \@<=_\(.\{-}\)_ / <u>\1<\/u> /g'
+  catch
+  endtry
+  try
+    "HLcomment
+    execute '%s/\((.*)\)/<font color="teal">\1<\/font>/g'
+  catch
+  endtry
+  try
+    "HLindent
+    execute "%s/\\(\\t\\|\\*\\)\\@<=\\(\\d.\\{-}\\)\\s/<font color=\"purple\">\\2<\\/font> /g"
+  catch
+  endtry
+  try
+    "HLmulti (+)
+    execute '%s/\(\t\|\*\)+/\t<font color="purple">+<\/font>/g'
+  catch
+  endtry
+  try
+    "HLhash
+    execute '%s/\(#.\{-} \)/<font color="yellow">\1<\/font>/g'
+  catch
+  endtry
+  try
+    "HLmove
+    execute '%s/\(>>\|<<\|->\|<-\)/<font color="red"><strong>\1</strong><\/font>/g'
+  catch
+  endtry
+  try
+    "HLqual
+    execute '%s/\(\[.\{-}\]\)/<font color="green">\1<\/font>/g'
+  catch
+  endtry
+  try
+    "HLop
+    execute "%s/\\(\\s\\|\\*\\)\\@<=\\([A-ZÆØÅ_/]\\{-2,}:\\s\\)/<font color=\"blue\">\\2<\\/font>/g"
+  catch
+  endtry
+  try
+    "HLprop
+    execute "%s/\\(\\s\\|\\*\\)\\@<=\\([a-zA-ZæøåÆØÅ0-9,._&?%= \\-\\/+<>#']\\{-2,}:\\s\\)/<font color=\"red\">\\2<\\/font>/g"
+  catch
+  endtry
+  try
+    "HLsc
+    execute '%s/\(;\)/<font color="green">\1<\/font>/g'
+  catch
+  endtry
+  try
+    "Substitute newlines with <br />
+    execute '%s/\n/<br \/>\r/g'
+  catch
+  endtry
+  try
+    "Substitute space in second line of multi-item
+    execute '%s/\(^\|\t\|\*\)\@<=\(\t\|\*\) /\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;/g'
+  catch
+  endtry
+  try
+    "Substitute tabs
+    execute '%s/\(^\|\t\|\*\)\@<=\(\t\|\*\)/\&nbsp;\&nbsp;\&nbsp;\&nbsp;/g'
+  catch
+  endtry
+  "Document start
+  normal ggO<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  normal o<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  normal o<head>
+  normal o<title>HyperList</title>
+  normal o<meta name="creator" content="HyperList plugin for VIM: http://vim.sourceforge.net/scripts/script.php?script_id=2518" />
+  normal o<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+  normal o</head>
+  normal o<body>
+  "Document end
+  normal GO</body>
+  normal o</html>
+  setlocal filetype=html
 endfunction
 
 "  TPP conversion{{{2
@@ -639,7 +688,7 @@ function! TPPconversion ()
     endtry
     try
         "first line of a HyperList is title
-        execute '%s/^\(\S.*\)$/\r--title \1/'
+        execute '1s/^\(\S.*\)$/\r--title \1/'
     catch
     endtry
     try
@@ -684,8 +733,8 @@ endfunction
 "        Hide lines containing either word or pattern
 "        Pattern can be any regular expression
 
-command! -nargs=+  SHOW  :call <SID>ShowHideWord('c', 's', <f-args>)
-command! -nargs=+  HIDE  :call <SID>ShowHideWord('c', 'h', <f-args>)
+command! -buffer -nargs=+  SHOW  :call <SID>ShowHideWord('c', 's', <f-args>)
+command! -buffer -nargs=+  HIDE  :call <SID>ShowHideWord('c', 'h', <f-args>)
 
 function! <SID>ShowHideWord(mode, show, ...)
    if (a:mode == 'z')
@@ -705,13 +754,13 @@ function! <SID>ShowHideWord(mode, show, ...)
       let cur_word = cur_word . '\\)\\>'
    endif
 
-   let myfoldexpr = "set foldexpr=getline(v:lnum)" .
+   let myfoldexpr = "setlocal foldexpr=getline(v:lnum)" .
       \ (a:show == 's' ? "!" : "=") . "~\'\^.*" . cur_word . ".*\$\'"
 
-   set foldenable
-   set foldlevel=0
-   set foldminlines=0
-   set foldmethod=expr
+   setlocal foldenable
+   setlocal foldlevel=0
+   setlocal foldminlines=0
+   setlocal foldmethod=expr
    exec myfoldexpr
 endfunction
 
@@ -721,11 +770,11 @@ endfunction
 "  is added from that time with duration of 30 minutes.
 "  This function requires gcalcli (https://github.com/insanum/gcalcli)
 "  The function is mapped to <leader>G to add events to the default
-"  calendar - defined as b:calendar at the start of this script.
+"  calendar - defined as g:calendar in your vimrc file.
 "  To add the events to another calendar, do :call CalendarAdd("yourcalendar")
 function! CalendarAdd(...)
   let l:count = 0
-  let l:cal = a:0 > 0 ? a:1 : b:calendar
+  let l:cal = a:0 > 0 ? a:1 : g:calendar
   let l:date = strftime("%Y-%m-%d")
   let l:tm = ""
   let l:linenr = 0 
@@ -844,7 +893,7 @@ syn match   HLsc	';'
 syn match   HLhash	'#[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9.:/_&?%=+\-\*]\+'
 
 " References
-syn match   HLref	'<\{1,2}[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,.:/ _~&@?%=\+\-\*]\+>\{1,2}' contains=HLcomment
+syn match   HLref	'<\{1,2}[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,.:/ _~&@?%=\+\-\*#]\+>\{1,2}' contains=HLcomment
 
 " Reserved key words
 syn keyword HLkey     END SKIP
@@ -927,36 +976,37 @@ if exists('g:HLDisableMapping') && g:HLDisableMapping
     finish
 endif
 
-map <leader>0         :set foldlevel=0<CR>
-map <leader>1         :set foldlevel=1<CR>
-map <leader>2         :set foldlevel=2<CR>
-map <leader>3         :set foldlevel=3<CR>
-map <leader>4         :set foldlevel=4<CR>
-map <leader>5         :set foldlevel=5<CR>
-map <leader>6         :set foldlevel=6<CR>
-map <leader>7         :set foldlevel=7<CR>
-map <leader>8         :set foldlevel=8<CR>
-map <leader>9         :set foldlevel=9<CR>
-map <leader>a         :set foldlevel=10<CR>
-map <leader>b         :set foldlevel=11<CR>
-map <leader>c         :set foldlevel=12<CR>
-map <leader>d         :set foldlevel=13<CR>
-map <leader>e         :set foldlevel=14<CR>
-map <leader>f         :set foldlevel=15<CR>
-map <SPACE>           za
-nmap zx               i<esc>
+noremap <leader>0         :setlocal foldlevel=0<CR>
+noremap <leader>1         :setlocal foldlevel=1<CR>
+noremap <leader>2         :setlocal foldlevel=2<CR>
+noremap <leader>3         :setlocal foldlevel=3<CR>
+noremap <leader>4         :setlocal foldlevel=4<CR>
+noremap <leader>5         :setlocal foldlevel=5<CR>
+noremap <leader>6         :setlocal foldlevel=6<CR>
+noremap <leader>7         :setlocal foldlevel=7<CR>
+noremap <leader>8         :setlocal foldlevel=8<CR>
+noremap <leader>9         :setlocal foldlevel=9<CR>
+noremap <leader>a         :setlocal foldlevel=10<CR>
+noremap <leader>b         :setlocal foldlevel=11<CR>
+noremap <leader>c         :setlocal foldlevel=12<CR>
+noremap <leader>d         :setlocal foldlevel=13<CR>
+noremap <leader>e         :setlocal foldlevel=14<CR>
+noremap <leader>f         :setlocal foldlevel=15<CR>
+noremap <NUL>             zA
+noremap <SPACE>           za
+nnoremap zx               i<esc>
 
-map <leader>u         :call STunderline()<CR>
+noremap <leader>u         :call STunderline()<CR>
 
-map <leader>v	        :call CheckItem("")<CR>
-map <leader>V         :call CheckItem("stamped")<CR>
+noremap <leader>v	        :call CheckItem("")<CR>
+noremap <leader>V         :call CheckItem("stamped")<CR>
 
-map <leader><SPACE>   /=\s*$<CR>A
+noremap <leader><SPACE>   /=\s*$<CR>A
 
-nmap gr		            :call GotoRef()<CR>
-nmap <CR>	            :call GotoRef()<CR>
+nnoremap gr		            :call GotoRef()<CR>
+nnoremap <CR>	            :call GotoRef()<CR>
 
-nmap gf               :call OpenFile()<CR>
+nnoremap gf               :call OpenFile()<CR>
 
 nmap g<DOWN>          <DOWN><leader>0zv
 nmap g<UP>            <leader>f<UP><leader>0zv
@@ -964,55 +1014,55 @@ nmap g<UP>            <leader>f<UP><leader>0zv
 nmap <leader><DOWN>   <DOWN><leader>0zv<SPACE>zO
 nmap <leader><UP>     <leader>f<UP><leader>0zv<SPACE>zO
 
-nmap <leader>z        :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
-vmap <leader>z        :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
-nmap <leader>Z        :call HLdecrypt()<CR>:%!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
-nmap <leader>x        :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
-vmap <leader>x        :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
-nmap <leader>X        :call HLdecrypt()<CR>:%!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
+nnoremap <leader>z        :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
+vnoremap <leader>z        :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
+nnoremap <leader>Z        :call HLdecrypt()<CR>:%!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
+nnoremap <leader>x        :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
+vnoremap <leader>x        :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
+nnoremap <leader>X        :call HLdecrypt()<CR>:%!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
 
-nmap <leader>H        :call HTMLconversion()<CR>
-nmap <leader>L        :call LaTeXconversion()<CR>
-nmap <leader>T        :call TPPconversion()<CR>
+nnoremap <leader>L        :call LaTeXconversion()<CR>
+nnoremap <leader>H        :call HTMLconversion()<CR>
+nnoremap <leader>T        :call TPPconversion()<CR>
 
-nmap <leader>h        :call HighLight()<CR>
-nmap <leader>an       :call ToggleAutonum()<CR>
-nmap <leader>#        :call ToggleAutonum()<CR>
-vmap <leader>R        :call Renumber()<CR>
+nnoremap <leader>h        :call HighLight()<CR>
+nnoremap <leader>an       :call ToggleAutonum()<CR>
+nnoremap <leader>#        :call ToggleAutonum()<CR>
+vnoremap <leader>R        :call Renumber()<CR>
 
-map  <silent> zs      :call <SID>ShowHideWord('z', 's', '')<CR>
-map  <silent> zh      :call <SID>ShowHideWord('z', 'h', '')<CR>
-map  <silent> z0      :set foldmethod=syntax<CR><bar>:echo "ShowHide Remove"<CR>
+noremap  <silent> zs      :call <SID>ShowHideWord('z', 's', '')<CR>
+noremap  <silent> zh      :call <SID>ShowHideWord('z', 'h', '')<CR>
+noremap  <silent> z0      :setlocal foldmethod=syntax<CR><bar>:echo "ShowHide Remove"<CR>
 
-nmap <leader>G        :call CalendarAdd()<CR>
+nnoremap <leader>G        :call CalendarAdd()<CR>
 
-nmap <leader>C        :call Complexity()<CR>
+nnoremap <leader>C        :call Complexity()<CR>
 
 " Sort hack (sort the visual selected lines by the top item's indentation
 " The last item in the visual selection cannot be the last line in the document.
-vmap <leader>s <esc>`<^"iy0gv:s/^<c-r>i\S\@=/<c-v><c-a>/<cr>gv:s/\t/<c-v><c-b>/g<cr>gv:s/\n<c-v><c-b>/<c-v><c-x>/<cr>gvk:!sort<cr>:%s/<c-v><c-a>/<c-r>i/<cr>:%s/<c-v><c-x>/\r<c-v><c-b>/g<cr>:%s/<c-v><c-b>/\t/g<cr>
+vnoremap <leader>s <esc>`<^"iy0gv:s/^<c-r>i\S\@=/<c-v><c-a>/<cr>gv:s/\t/<c-v><c-b>/g<cr>gv:s/\n<c-v><c-b>/<c-v><c-x>/<cr>gvk:!sort<cr>:%s/<c-v><c-a>/<c-r>i/<cr>:%s/<c-v><c-x>/\r<c-v><c-b>/g<cr>:%s/<c-v><c-b>/\t/g<cr>
 
 " GVIM menu {{{1
 let s:HL_RootMenu  = 'HyperList.'
 exe 'menu '.s:HL_RootMenu.'HyperList <Nop>'
 exe 'menu '.s:HL_RootMenu.'-Sep00-  <Nop>'
 menu HyperList.Toggle\ fold<Tab>SPACE              za
-menu HyperList.Set\ fold\ level.0<Tab>\\0          :set foldlevel=0<CR>
-menu HyperList.Set\ fold\ level.1<Tab>\\1          :set foldlevel=1<CR>
-menu HyperList.Set\ fold\ level.2<Tab>\\2          :set foldlevel=2<CR>
-menu HyperList.Set\ fold\ level.3<Tab>\\3          :set foldlevel=3<CR>
-menu HyperList.Set\ fold\ level.4<Tab>\\4          :set foldlevel=4<CR>
-menu HyperList.Set\ fold\ level.5<Tab>\\5          :set foldlevel=5<CR>
-menu HyperList.Set\ fold\ level.6<Tab>\\6          :set foldlevel=6<CR>
-menu HyperList.Set\ fold\ level.7<Tab>\\7          :set foldlevel=7<CR>
-menu HyperList.Set\ fold\ level.8<Tab>\\8          :set foldlevel=8<CR>
-menu HyperList.Set\ fold\ level.9<Tab>\\9          :set foldlevel=9<CR>
-menu HyperList.Set\ fold\ level.10<Tab>\\a         :set foldlevel=10<CR>
-menu HyperList.Set\ fold\ level.11<Tab>\\b         :set foldlevel=11<CR>
-menu HyperList.Set\ fold\ level.12<Tab>\\c         :set foldlevel=12<CR>
-menu HyperList.Set\ fold\ level.13<Tab>\\d         :set foldlevel=13<CR>
-menu HyperList.Set\ fold\ level.14<Tab>\\e         :set foldlevel=14<CR>
-menu HyperList.Set\ fold\ level.15<Tab>\\f         :set foldlevel=15<CR>
+menu HyperList.Set\ fold\ level.0<Tab>\\0          :setlocal foldlevel=0<CR>
+menu HyperList.Set\ fold\ level.1<Tab>\\1          :setlocal foldlevel=1<CR>
+menu HyperList.Set\ fold\ level.2<Tab>\\2          :setlocal foldlevel=2<CR>
+menu HyperList.Set\ fold\ level.3<Tab>\\3          :setlocal foldlevel=3<CR>
+menu HyperList.Set\ fold\ level.4<Tab>\\4          :setlocal foldlevel=4<CR>
+menu HyperList.Set\ fold\ level.5<Tab>\\5          :setlocal foldlevel=5<CR>
+menu HyperList.Set\ fold\ level.6<Tab>\\6          :setlocal foldlevel=6<CR>
+menu HyperList.Set\ fold\ level.7<Tab>\\7          :setlocal foldlevel=7<CR>
+menu HyperList.Set\ fold\ level.8<Tab>\\8          :setlocal foldlevel=8<CR>
+menu HyperList.Set\ fold\ level.9<Tab>\\9          :setlocal foldlevel=9<CR>
+menu HyperList.Set\ fold\ level.10<Tab>\\a         :setlocal foldlevel=10<CR>
+menu HyperList.Set\ fold\ level.11<Tab>\\b         :setlocal foldlevel=11<CR>
+menu HyperList.Set\ fold\ level.12<Tab>\\c         :setlocal foldlevel=12<CR>
+menu HyperList.Set\ fold\ level.13<Tab>\\d         :setlocal foldlevel=13<CR>
+menu HyperList.Set\ fold\ level.14<Tab>\\e         :setlocal foldlevel=14<CR>
+menu HyperList.Set\ fold\ level.15<Tab>\\f         :setlocal foldlevel=15<CR>
 menu HyperList.Toggle\ State/Transition<Tab>\\u    :call STunderline()<CR>
 menu HyperList.Checklist.Toggle<Tab>\\v            :call CheckItem("")<CR>
 menu HyperList.Checklist.Timestamp<Tab>\\V         :call CheckItem("stamped")<CR>
@@ -1020,7 +1070,7 @@ menu HyperList.Goto\ reference<Tab>gr              :call GotoRef()<CR>
 menu HyperList.Open\ file\ under\ cursor<Tab>gf    :call OpenFile()<CR>
 menu HyperList.Show/Hide.Show\ Word\ under\ Cursor<Tab>zs :call <SID>ShowHideWord('z', 's', '')<CR>
 menu HyperList.Show/Hide.Hide\ Word\ under\ Cursor<Tab>zh :call <SID>ShowHideWord('z', 'h', '')<CR>
-menu HyperList.Show/Hide.Remove\ Show/Hide<Tab>z0  :set foldmethod=syntax<CR><bar>:echo "ShowHide Remove"<CR>
+menu HyperList.Show/Hide.Remove\ Show/Hide<Tab>z0  :setlocal foldmethod=syntax<CR><bar>:echo "ShowHide Remove"<CR>
 menu HyperList.Autonumber.Toggle<Tab>\\an          :call ToggleAutonum()<CR>
 vmenu HyperList.Autonumber.Renumber\ visual\ selection<Tab>\\R :call Renumber()<CR>
 menu HyperList.Next\ Template\ Item<Tab>\\SPACE    /=\s*$<CR>A<CR>
@@ -1042,8 +1092,8 @@ menu HyperList.Show\ Complexity\ of\ List<Tab>:call\ Complexity() :call Complexi
 " vim modeline {{{1
 " vim: set sw=2 sts=2 et fdm=marker fillchars=fold\:\ :
 doc/hyperlist.txt	[[[1
-1445
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.4.1, 2019-10-06)
+1471
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.4.5, 2021-05-16)
 
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -1058,7 +1108,7 @@ with future events to a Google calendar... and many more sexy features.
 
 The VIM plugin version numbers correspond to the HyperList definition version
 numbers with the VIM plugin adding another increment of versioning, e.g VIM
-plugin version 2.4.1 would be compatible with HyperList definition version 2.4.
+plugin version 2.4.5 would be compatible with HyperList definition version 2.4.
 
 This documentation contains the full HyperList definition. For a more
 comprehensive manual that also includes plenty of examples, read the official
@@ -1124,7 +1174,7 @@ WHEN WORKING WITH HYPERLISTS IN VIM:
 
 Use tabs/shifts or * for indentations.
 
-Use <SPACE> to toggle one fold.
+Use <SPACE> to toggle one fold. Use <c-SPACE> to toggle a fold recursively.
 Use \0 to \9, \a, \b, \c, \d, \e, \f to show up to 15 levels expanded.
 
 <leader># or <leader>an toggles autonumbering of new items (the previous
@@ -1157,11 +1207,16 @@ mean "jump five lines up" or <+2> ("jump two lines down").
 Use "gf" to open the file under the cursor. Graphic files are opened in
 "feh", pdf files in "zathura" and MS/OOO docs in "LibreOffice". Other
 filetypes are opened in VIM for editing. All this can be changed by
-editing the function OpenFile() in the file "hyperlist.vim".
+setting these global variables in your vimrc:
+  let g:wordprocessingprogram = ""
+  let g:spreadsheetprogram    = ""
+  let g:presentationprogram   = ""
+  let g:imageprogram          = ""
+  let g:pdfprogram            = ""
+  let g:browserprogram        = ""
 
-Whenever you jump to a reference in this way, the mark "'" is set at the
-point you jumped from so that you may easily jump back by hitting "''"
-(single quoutes twice). 
+Whenever you jump to a reference, the mark "'" is set at the point you jumped
+from so that you may easily jump back by hitting "''" (single quoutes twice). 
 
 Use <leader><SPACE> to go to the next open template element
 (A template element is a HyperList item ending in an equal sign).
@@ -1221,12 +1276,12 @@ Syntax updated at start and every time you leave Insert mode, or you can press
 You may speed up larger HyperListS by setting the the global variable
 "disable_collapse" - add the following to your .vimrc:
 
-  let "g:disable_collapse" = 1
+  let g:disable_collapse = 1
 
 If you want to disable or override these keymaps with your own, simply add
 to your .vimrc file:
 
-  let "g:HLDisableMapping" = 1
+  let g:HLDisableMapping = 1
 
 To use HyperLists within other file types (other than ".hl"), you can use
 "nested syntax" by adding the following to those syntax files (like the syntax
@@ -2162,6 +2217,27 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.4.5			2021-05-16
+	Fixed compatability issues with neovim	
+
+VERSION 2.4.4			2020-08-06
+	Refactoring (thanks to Nick Jensen [nickspoons] for guidance)
+
+VERSION 2.4.3			2020-08-02
+   Several important upgrades under the hood
+   Programs for opening files in references can now be set by
+   the user by setting the global variables in vimrc:
+	  let g:wordprocessingprogram = ""
+     let g:spreadsheetprogram    = ""
+     let g:presentationprogram   = ""
+     let g:imageprogram          = ""
+     let g:pdfprogram            = ""
+     let g:browserprogram        = ""
+
+VERSION 2.4.2			2020-07-23
+	Quickfix: C-SPACE now maps to zA (toggles fold recursively)
+	Several bugfixes in the HTML conversion
 
 VERSION 2.4.1			2019-10-06
 	Updated to be compatible with HyperList definition v. 2.4
@@ -4200,18 +4276,22 @@ startxref
 291055
 %%EOF
 doc/HyperListTutorialAndTestSuite.hl	[[[1
-150
-HyperList Test Suite (V0.99); Press '\f' to uncollapse this whole HyperList
+157
+HyperList Test Suite (V1.0); Press '\f' to uncollapse this whole HyperList
 	This HyperList serves two purposes
 		A tutorial for all hyperlist.vim features 
 			Do each item and you will learn all the features of this VIM plugin
 		A fully fledged test suite
 			Doing each item will confirm the plugin version is working correctly
-	Requires the files <HyperListTestSuite.hl> and <~/.vim/syntax/hyperlist.vim>
-		Set the cursor on a file link and press 'gf' to open the file
+	Requires the files HyperListTestSuite.hl and hyperlist.vim
+		Set the cursor on a file link and press 'gf' to open the file; OR: 
+			vim: <~/.vim/doc/HyperList.hl>
+			nvim: <~/.local/share/nvim/site/doc/HyperList.hl>
 	Tests are broken into 3 major categories, "SYNTAX HIGHLIGHTING", "FUNCTIONALITY TEST" And "MENU TEST"
 	SYNTAX HIGHLIGHTING
-		Ensure that all HyperList elements are correctly highlighted in the <~/.vim/doc/HyperList.hl>
+		Ensure that all HyperList elements are correctly highlighted in the HyperList definition file; OR: 
+			vim: <~/.vim/doc/HyperList.hl>
+			nvim: <~/.local/share/nvim/site/doc/HyperList.hl>
 		Check: The Property should be in red
 		CHECK: The Operator should be in blue
 		[? OK] Qualifier in green
@@ -4248,6 +4328,7 @@ HyperList Test Suite (V0.99); Press '\f' to uncollapse this whole HyperList
 	FUNCTIONALITY TEST
 		Toggle folds; Press 'SPACE' twice to see the child of this line collapse and uncollapse
 			This is a child item
+		On the next item, press 'CONTROL+SPACE' twice to see that the fold toggles recursively
 		Do all these: '\3' '\4' '\5' '\6' '\7' '\8' '\9' '\a' '\b' '\c' '\d' '\e' '\f'
 			Observe that the children appear at the correct fold level
 			'\3'
@@ -4265,8 +4346,10 @@ HyperList Test Suite (V0.99); Press '\f' to uncollapse this whole HyperList
 															'\f'
 		By placing the cursor in the reference and press 'gr' you jump to the next item (<42>)
 		42. This is an item that you will jump to
-		By placing the cursor in the file reference and press 'gf' you open the file (<~/.vim/doc/HyperList.hl>)
-			Close that file to come back to this file
+		By placing the cursor in the file reference and press 'gf' you open the HyperList definition file; OR: 
+			vim: <~/.vim/doc/HyperList.hl>
+			nvim: <~/.local/share/nvim/site/doc/HyperList.hl>
+		Close that file to come back to this file
 		Toggle autonumbering of items
 			Press '\an' or '\#' to toggle autonumbering on/off; Press '\an' now and go to next line
 				You should see the message "Autonumber ON"
@@ -4353,64 +4436,64 @@ HyperList Test Suite (V0.99); Press '\f' to uncollapse this whole HyperList
 
 ftdetect/hyperlist.vim	[[[1
 50
-" WOIM files are included for backward compatability (HyperList was earlier WOIM)
-au BufRead,BufNewFile *.hl		set filetype=hyperlist
-au BufRead,BufNewFile *.woim            set filetype=hyperlist
+" Script info {{{1
+" Vim filetype detection for HyperList files (.hl)
+" Language:   Self defined file detection for HyperLists in Vim
+" Author:     Geir Isene <g@isene.com>
+" Web_site:   http://isene.com/
+" HyperList:  http://isene.org/hyperlist/
+" Github:     https://github.com/isene/hyperlist.vim
+" License:    I release all copyright claims. 
+"             This code is in the public domain.
+"             Permission is granted to use, copy modify, distribute, and
+"             sell this software for any purpose. I make no guarantee
+"             about the suitability of this software for any purpose and
+"             I am not liable for any damages resulting from its use.
+"             Further, I am under no obligation to maintain or extend
+"             this software. It is provided on an 'as is' basis without
+"             any expressed or implied warranty.
+" Version:    2.4.4 - compatible with the HyperList definition v. 2.4
+" Modified:   2020-08-06
+" Changes:    Refactoring (thanks to Nick Jensen [nickspoons] for guidance)
 
+" File detection {{{1
+" WOIM files are included for backward compatability (HyperList was earlier WOIM)
+au BufRead,BufNewFile *.hl,*.woim						 set filetype=hyperlist
+
+" Encryption autocommands {{{1
 " Using code from openssl.vim by Noah Spurrier <noah@noah.org>
 " dot-files (files starting with ".") gets auto en-/decryption
 augroup hl_autoencryption
     autocmd!
-    autocmd BufReadPre,FileReadPre			.*.hl set viminfo=
-    autocmd BufReadPre,FileReadPre			.*.hl set noswapfile
-    autocmd BufReadPre,FileReadPre			.*.hl set bin
-    autocmd BufReadPre,FileReadPre     	.*.hl set cmdheight=2
-    autocmd BufReadPre,FileReadPre     	.*.hl	set shell=/bin/sh
-    autocmd BufReadPost,FileReadPost    .*.hl %!openssl bf -d -a 2>/dev/null
-    autocmd BufReadPost,FileReadPost		.*.hl set nobin
-    autocmd BufReadPost,FileReadPost    .*.hl set cmdheight&
-    autocmd BufReadPost,FileReadPost		.*.hl set shell&
-    autocmd BufReadPost,FileReadPost		.*.hl execute ":doautocmd BufReadPost ".expand("%:r")
-    autocmd BufWritePre,FileWritePre		.*.hl set bin
-    autocmd BufWritePre,FileWritePre		.*.hl set cmdheight=2
-    autocmd BufWritePre,FileWritePre		.*.hl set shell=/bin/sh
-    autocmd BufWritePre,FileWritePre    .*.hl %!openssl bf -e -a -salt 2>/dev/null
-    autocmd BufWritePost,FileWritePost	.*.hl silent u
-    autocmd BufWritePost,FileWritePost	.*.hl set nobin
-    autocmd BufWritePost,FileWritePost	.*.hl set cmdheight&
-    autocmd BufWritePost,FileWritePost	.*.hl set shell&
+    autocmd BufReadPre,FileReadPre			.*.hl,.*.woim setlocal viminfo=
+    autocmd BufReadPre,FileReadPre			.*.hl,.*.woim setlocal noswapfile
+    autocmd BufReadPre,FileReadPre			.*.hl,.*.woim setlocal bin
+    autocmd BufReadPre,FileReadPre     	.*.hl,.*.woim setlocal cmdheight=2
+    autocmd BufReadPre,FileReadPre     	.*.hl,.*.woim setlocal shell=/bin/sh
+    autocmd BufReadPost,FileReadPost    .*.hl,.*.woim %!openssl bf -d -a 2>/dev/null
+    autocmd BufReadPost,FileReadPost		.*.hl,.*.woim setlocal nobin
+    autocmd BufReadPost,FileReadPost    .*.hl,.*.woim setlocal cmdheight&
+    autocmd BufReadPost,FileReadPost		.*.hl,.*.woim setlocal shell&
+    autocmd BufReadPost,FileReadPost		.*.hl,.*.woim execute ":doautocmd BufReadPost ".expand("%:r")
+    autocmd BufWritePre,FileWritePre		.*.hl,.*.woim setlocal bin
+    autocmd BufWritePre,FileWritePre		.*.hl,.*.woim setlocal cmdheight=2
+    autocmd BufWritePre,FileWritePre		.*.hl,.*.woim setlocal shell=/bin/sh
+    autocmd BufWritePre,FileWritePre    .*.hl,.*.woim %!openssl bf -e -a -salt 2>/dev/null
+    autocmd BufWritePost,FileWritePost	.*.hl,.*.woim silent u
+    autocmd BufWritePost,FileWritePost	.*.hl,.*.woim setlocal nobin
+    autocmd BufWritePost,FileWritePost	.*.hl,.*.woim setlocal cmdheight&
+    autocmd BufWritePost,FileWritePost	.*.hl,.*.woim setlocal shell&
 augroup END
-
-augroup woim_autoencryption
-    autocmd!
-    autocmd BufReadPre,FileReadPre			.*.woim set viminfo=
-    autocmd BufReadPre,FileReadPre			.*.woim set noswapfile
-    autocmd BufReadPre,FileReadPre			.*.woim set bin
-    autocmd BufReadPre,FileReadPre     	.*.woim set cmdheight=2
-    autocmd BufReadPre,FileReadPre     	.*.woim	set shell=/bin/sh
-    autocmd BufReadPost,FileReadPost    .*.woim %!openssl bf -d -a 2>/dev/null
-    autocmd BufReadPost,FileReadPost		.*.woim set nobin
-    autocmd BufReadPost,FileReadPost    .*.woim set cmdheight&
-    autocmd BufReadPost,FileReadPost		.*.woim set shell&
-    autocmd BufReadPost,FileReadPost		.*.woim execute ":doautocmd BufReadPost ".expand("%:r")
-    autocmd BufWritePre,FileWritePre		.*.woim set bin
-    autocmd BufWritePre,FileWritePre		.*.woim set cmdheight=2
-    autocmd BufWritePre,FileWritePre		.*.woim set shell=/bin/sh
-    autocmd BufWritePre,FileWritePre    .*.woim %!openssl bf -e -a -salt 2>/dev/null
-    autocmd BufWritePost,FileWritePost	.*.woim silent u
-    autocmd BufWritePost,FileWritePost	.*.woim set nobin
-    autocmd BufWritePost,FileWritePost	.*.woim set cmdheight&
-    autocmd BufWritePost,FileWritePost	.*.woim set shell&
-augroup END
-
+" vim modeline {{{1
+" vim: set sw=2 sts=2 et fdm=marker fillchars=fold\:\ :
 README.md	[[[1
-264
+282
 # hyperlist.vim
 This VIM plugin makes it easy to create and manage HyperLists using VIM
 
 ---------------------------------------------------------------------------
 
-## GENERAL INFORMATION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.4.1)
+## GENERAL INFORMATION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.4.3)
 
 HyperLists are used to describe anything - any state, item(s), pattern,
 action, process, transition, program, instruction set etc. So, you can use it
@@ -4441,7 +4524,7 @@ features:
 * "Presentation mode" that folds everything but the current item
 * Highlighting of the current item and its children
 * Encrypt and decrypt whole lists or parts of a list
-* Autoencrypt/decrypt files that has a file name starting with a doti
+* Autoencrypt/decrypt files that have a file name starting with a dot
 * Export a HyperList to HTML, LaTeX or TPP formats
 * Transfer all items tagged with future dates/times to a Google calendar
 * Show the complexity level of a HyperList
@@ -4454,7 +4537,7 @@ For a complete tutorial, go through the file HyperListTutorialAndTestSuite.hl in
 For a compact primer on HyperList, read this OnePageBook:
 
 ![HyperList OnePageBook cover](https://isene.org/assets/onepagebooks/7-hyperlist/cover.jpg)
-**[Downloadable PDF](/assets/onepagebooks/7-hyperlist/1PB_HyperList.pdf)**
+**[Downloadable PDF](https://isene.org/assets/onepagebooks/7-hyperlist/1PB_HyperList.pdf)**
 
 And for an introduction to the VIM plugin's most sexy features, watch the
 screencast:
@@ -4465,13 +4548,25 @@ GVIM users can enjoy the commands organized in a menu with submenus.
 
 ### Installation
 
-As you most certainly have already done, to install the HyperList plugin for
-VIM, dowmload woim.vba and do:
+The easiest way to install this VIM plugin is to use [Vizardry](https://github.com/ardagnir/vizardry). Simply do
 
 ```
-vim hyperlist.vba
+:Invoke hyperlist
+```
+
+Or use any other plugin manager like
+[vim-plug](https://github.com/junegunn/vim-plug) to install the HyperList
+plugin. With [minpac](https://github.com/k-takata/minpac) you would do:
+
+```
+call minpac#add('isene/hyperlist.vim')
+```
+
+Or download hyperlist.vmb and do:
+
+```
+vim hyperlist.vmb
 :so %
-:q
 ```
 
 You will then discover that this file (README_HyperList will appear in the VIM
@@ -4480,7 +4575,7 @@ the HyperList plugin will be placed in the "syntax" subdirectory. A HyperList
 filetype detection file is placed in the "ftdetect" subdirectory.
 
 From now on all files with the ".hl" file extension will be treated as a
-HyperList file, syntax highlighted corrrectly and you can use all the neat
+HyperList file, syntax highlighted correctly and you can use all the neat
 HyperList functionality for VIM.
 
 ### Include Hyperlists in other document types
@@ -4497,14 +4592,14 @@ hi link Snip SpecialComment
 The documentation file contains all of the HyperList definition and is part of
 the full specification for HyperList as found here:
 
-  http://isene.me/hyperlist/
+  https://isene.org/hyperlist/
 
 
 ## INSTRUCTIONS
 
 Use tabs for indentation.
 
-Use SPACE to toggle one fold.
+Use SPACE to toggle one fold. Use <c-SPACE> to toggle a fold recursively.
 Use \0 to \9, \a, \b, \c, \d, \e, \f to show up to 15 levels expanded.
 
 ### Autonumbering and renumbering
@@ -4551,8 +4646,16 @@ quoutes twice).
 
 Use "gf" to open the file under the cursor. Graphic files are opened in "feh",
 pdf files in "zathura" and MS/OOO docs in "LibreOffice". Other filetypes are
-opened in VIM for editing. All this can be changed by editing the file
-handlers at the top of the hyperlist.vim script in your VIM syntax folder.
+opened in VIM for editing. These can be changed by setting these global
+variables in your vimrc:
+```
+let g:wordprocessingprogram = ""
+let g:spreadsheetprogram    = ""
+let g:presentationprogram   = ""
+let g:imageprogram          = ""
+let g:pdfprogram            = ""
+let g:browserprogram        = ""
+```
 
 ### Simple tricks
 ```
@@ -4564,7 +4667,7 @@ Use \V to add/toggle a checkbox with a date stamp for completion.
 Use \SPACE to go to the next open template element
 (A template element is a HyperList item ending in an equal sign).
 
-Use \L to convert the entire document to LaTaX.
+Use \L to convert the entire document to LaTeX.
 Use \H to convert the entire document to HTML.
 Use \T to convert the entire document to a basic TPP presentation.
 ```
@@ -4598,12 +4701,12 @@ Syntax updated at start and every time you leave Insert mode, or you can press
 You may speed up larger HyperLists by setting the the global variable
 "disable_collapse" - add the following to your .vimrc:
 
-  `let "g:disable_collapse" = 1`
+  `let g:disable_collapse = 1`
 
 If you want to disable or override these keymaps with your own, simply add to
 your .vimrc file:
 
-  `let "g:HLDisableMapping" = 1`
+  `let g:HLDisableMapping = 1`
 
 ### Show/hide
 
@@ -4628,8 +4731,8 @@ To sort a set of items at a specific indentation, visually select (V) the
 items you want to sort (including all the children of those items) and press
 \s and the items in the range will be alphabetically sorted - but only the
 items on the same level/indentation as the first item selected. The sorted
-items will keep their children. This is useful if parts of a HyperList is
-numbered and you get the numbering out of sequence and wants to resort them.
+items will keep their children. This is useful if parts of a HyperList are
+numbered and you get the numbering out of sequence and want to resort them.
 One caveat, the last line in the selection cannot be the very last line in the
 document (there must be an item or an empty line below it).
 
@@ -4654,7 +4757,7 @@ the item and all its child items.
 
 ### More help
 
-For this help and more, including the full HyperList definition/description, type 
+For this help and more, including the full HyperList definition/description, type:
 
   `:help hyperlist`
 
@@ -4666,6 +4769,4 @@ Enjoy.
 
 ## Contact
 
-Geir Isene <g@isene.com>
-...explorer of free will
-   http://isene.org
+Geir Isene <g@isene.com> ...explorer of free will... http://isene.org
