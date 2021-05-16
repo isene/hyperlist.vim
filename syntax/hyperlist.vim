@@ -14,9 +14,9 @@
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.4.4 - compatible with the HyperList definition v. 2.4
-" Modified:   2020-08-06
-" Changes:    Refactoring (thanks to Nick Jensen [nickspoons] for guidance)
+" Version:    2.4.5 - compatible with the HyperList definition v. 2.4
+" Modified:   2021-04-16
+" Changes:    Fixed compatability issues with neovim
 
 " Instructions {{{1
 "
@@ -414,7 +414,11 @@ function! OpenFile()
       if has("gui_running")
         exe '!gvim '.gofl
       else
-        exe '!'.$EDITOR.' '.gofl
+        if $EDITOR == "nvim"
+          exe 'term nvim '.gofl
+        else
+          exe '!vim '.gofl
+        endif
       endif
     endif
   else
