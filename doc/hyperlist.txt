@@ -1,4 +1,4 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.4.5, 2021-05-16)
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.4.6, 2023-03-01)
 
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -13,7 +13,7 @@ with future events to a Google calendar... and many more sexy features.
 
 The VIM plugin version numbers correspond to the HyperList definition version
 numbers with the VIM plugin adding another increment of versioning, e.g VIM
-plugin version 2.4.5 would be compatible with HyperList definition version 2.4.
+plugin version 2.4.6 would be compatible with HyperList definition version 2.4.
 
 This documentation contains the full HyperList definition. For a more
 comprehensive manual that also includes plenty of examples, read the official
@@ -1122,6 +1122,10 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.4.6			2023-03-01
+	Added "/" to Operators to cater for "AND/OR:"
+	Fixed bug on autoencryption
 
 VERSION 2.4.5			2021-05-16
 	Fixed compatability issues with neovim	

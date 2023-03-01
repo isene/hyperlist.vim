@@ -2,7 +2,7 @@
 UseVimball
 finish
 syntax/hyperlist.vim	[[[1
-1088
+1089
 " Script info {{{1
 " Vim syntax and filetype plugin for HyperList files (.hl)
 " Language:   Self defined markup and functions for HyperLists in Vim
@@ -19,9 +19,10 @@ syntax/hyperlist.vim	[[[1
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.4.5 - compatible with the HyperList definition v. 2.4
-" Modified:   2021-04-16
-" Changes:    Fixed compatability issues with neovim
+" Version:    2.4.6 - compatible with the HyperList definition v. 2.4
+" Modified:   2023-03-01
+" Changes:    Added "/" to Operators to cater for "AND/OR:"
+"             Fixed bug on autoencryption
 
 " Instructions {{{1
 "
@@ -884,7 +885,7 @@ syn match   HLqual      '\[.\{-}\]' contains=HLtodo,HLref,HLcomment
 syn match   HLtag	'\(^\|\s\|\*\)\@<=[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,._&?!%= \-\/+<>#'"()\*:]\{-2,}:\s' contains=HLtodo,HLcomment,HLquote,HLref
 
 " HyperList operators
-syn match   HLop	'\(^\|\s\|\*\)\@<=[A-ZÆØÅÁÉÓÚÃÕÂÊÔÇÀ_\-()]\{-2,}:\s' contains=HLcomment,HLquote
+syn match   HLop	'\(^\|\s\|\*\)\@<=[A-ZÆØÅÁÉÓÚÃÕÂÊÔÇÀ_\-()/]\{-2,}:\s' contains=HLcomment,HLquote
 
 " Mark semicolon as stringing together lines
 syn match   HLsc	';'
@@ -1014,12 +1015,12 @@ nmap g<UP>            <leader>f<UP><leader>0zv
 nmap <leader><DOWN>   <DOWN><leader>0zv<SPACE>zO
 nmap <leader><UP>     <leader>f<UP><leader>0zv<SPACE>zO
 
-nnoremap <leader>z        :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
-vnoremap <leader>z        :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
-nnoremap <leader>Z        :call HLdecrypt()<CR>:%!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
-nnoremap <leader>x        :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
-vnoremap <leader>x        :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
-nnoremap <leader>X        :call HLdecrypt()<CR>:%!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
+nnoremap <leader>z        :call HLdecrypt()<CR>V:!openssl aes-256-cbc -e -pbkdf2 -a -salt 2>/dev/null<CR><C-L>
+vnoremap <leader>z        :call HLdecrypt()<CR>gv:!openssl aes-256-cbc -e -pbkdf2 -a -salt 2>/dev/null<CR><C-L>
+nnoremap <leader>Z        :call HLdecrypt()<CR>:%!openssl aes-256-cbc -e -pbkdf2 -a -salt 2>/dev/null<CR><C-L>
+nnoremap <leader>x        :call HLdecrypt()<CR>V:!openssl aes-256-cbc -d -pbkdf2 -a -salt 2>/dev/null<CR><C-L>
+vnoremap <leader>x        :call HLdecrypt()<CR>gv:!openssl aes-256-cbc -d -pbkdf2 -a -salt 2>/dev/null<CR><C-L>
+nnoremap <leader>X        :call HLdecrypt()<CR>:%!openssl aes-256-cbc -d -pbkdf2 -a -salt 2>/dev/null<CR><C-L>
 
 nnoremap <leader>L        :call LaTeXconversion()<CR>
 nnoremap <leader>H        :call HTMLconversion()<CR>
@@ -1092,8 +1093,8 @@ menu HyperList.Show\ Complexity\ of\ List<Tab>:call\ Complexity() :call Complexi
 " vim modeline {{{1
 " vim: set sw=2 sts=2 et fdm=marker fillchars=fold\:\ :
 doc/hyperlist.txt	[[[1
-1471
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.4.5, 2021-05-16)
+1475
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.4.6, 2023-03-01)
 
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -1108,7 +1109,7 @@ with future events to a Google calendar... and many more sexy features.
 
 The VIM plugin version numbers correspond to the HyperList definition version
 numbers with the VIM plugin adding another increment of versioning, e.g VIM
-plugin version 2.4.5 would be compatible with HyperList definition version 2.4.
+plugin version 2.4.6 would be compatible with HyperList definition version 2.4.
 
 This documentation contains the full HyperList definition. For a more
 comprehensive manual that also includes plenty of examples, read the official
@@ -2217,6 +2218,10 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.4.6			2023-03-01
+	Added "/" to Operators to cater for "AND/OR:"
+	Fixed bug on autoencryption
 
 VERSION 2.4.5			2021-05-16
 	Fixed compatability issues with neovim	
@@ -4470,7 +4475,7 @@ augroup hl_autoencryption
     autocmd BufReadPre,FileReadPre			.*.hl,.*.woim setlocal bin
     autocmd BufReadPre,FileReadPre     	.*.hl,.*.woim setlocal cmdheight=2
     autocmd BufReadPre,FileReadPre     	.*.hl,.*.woim setlocal shell=/bin/sh
-    autocmd BufReadPost,FileReadPost    .*.hl,.*.woim %!openssl bf -d -a 2>/dev/null
+    autocmd BufReadPost,FileReadPost    .*.hl,.*.woim %!openssl aes-256-cbc -d -pbkdf2 -a -salt 2>/dev/null
     autocmd BufReadPost,FileReadPost		.*.hl,.*.woim setlocal nobin
     autocmd BufReadPost,FileReadPost    .*.hl,.*.woim setlocal cmdheight&
     autocmd BufReadPost,FileReadPost		.*.hl,.*.woim setlocal shell&
@@ -4478,7 +4483,7 @@ augroup hl_autoencryption
     autocmd BufWritePre,FileWritePre		.*.hl,.*.woim setlocal bin
     autocmd BufWritePre,FileWritePre		.*.hl,.*.woim setlocal cmdheight=2
     autocmd BufWritePre,FileWritePre		.*.hl,.*.woim setlocal shell=/bin/sh
-    autocmd BufWritePre,FileWritePre    .*.hl,.*.woim %!openssl bf -e -a -salt 2>/dev/null
+    autocmd BufWritePre,FileWritePre    .*.hl,.*.woim %!openssl aes-256-cbc -e -pbkdf2 -a -salt 2>/dev/null
     autocmd BufWritePost,FileWritePost	.*.hl,.*.woim silent u
     autocmd BufWritePost,FileWritePost	.*.hl,.*.woim setlocal nobin
     autocmd BufWritePost,FileWritePost	.*.hl,.*.woim setlocal cmdheight&
@@ -4493,7 +4498,7 @@ This VIM plugin makes it easy to create and manage HyperLists using VIM
 
 ---------------------------------------------------------------------------
 
-## GENERAL INFORMATION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.4.3)
+## GENERAL INFORMATION ABOUT THE VIM PLUGIN FOR HYPERLISTS (version 2.4.5)
 
 HyperLists are used to describe anything - any state, item(s), pattern,
 action, process, transition, program, instruction set etc. So, you can use it
@@ -4542,7 +4547,7 @@ For a compact primer on HyperList, read this OnePageBook:
 And for an introduction to the VIM plugin's most sexy features, watch the
 screencast:
 
-[![HyperList screencast](https://isene.org/assets/videos/screencast.jpg)](https://isene.org/assets/videos/HyperListVIM.mp4)
+[![HyperList screencast](https://isene.org/assets/videos/screencast.jpg)](https://www.youtube.com/watch?v=xVUPJQhOBiU&t=1s)
 
 GVIM users can enjoy the commands organized in a menu with submenus.
 

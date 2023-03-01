@@ -14,9 +14,10 @@
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.4.5 - compatible with the HyperList definition v. 2.4
-" Modified:   2021-04-16
-" Changes:    Fixed compatability issues with neovim
+" Version:    2.4.6 - compatible with the HyperList definition v. 2.4
+" Modified:   2023-03-01
+" Changes:    Added "/" to Operators to cater for "AND/OR:"
+"             Fixed bug on autoencryption
 
 " Instructions {{{1
 "
@@ -879,7 +880,7 @@ syn match   HLqual      '\[.\{-}\]' contains=HLtodo,HLref,HLcomment
 syn match   HLtag	'\(^\|\s\|\*\)\@<=[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,._&?!%= \-\/+<>#'"()\*:]\{-2,}:\s' contains=HLtodo,HLcomment,HLquote,HLref
 
 " HyperList operators
-syn match   HLop	'\(^\|\s\|\*\)\@<=[A-ZÆØÅÁÉÓÚÃÕÂÊÔÇÀ_\-()]\{-2,}:\s' contains=HLcomment,HLquote
+syn match   HLop	'\(^\|\s\|\*\)\@<=[A-ZÆØÅÁÉÓÚÃÕÂÊÔÇÀ_\-()/]\{-2,}:\s' contains=HLcomment,HLquote
 
 " Mark semicolon as stringing together lines
 syn match   HLsc	';'
@@ -1009,12 +1010,12 @@ nmap g<UP>            <leader>f<UP><leader>0zv
 nmap <leader><DOWN>   <DOWN><leader>0zv<SPACE>zO
 nmap <leader><UP>     <leader>f<UP><leader>0zv<SPACE>zO
 
-nnoremap <leader>z        :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
-vnoremap <leader>z        :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
-nnoremap <leader>Z        :call HLdecrypt()<CR>:%!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
-nnoremap <leader>x        :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
-vnoremap <leader>x        :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
-nnoremap <leader>X        :call HLdecrypt()<CR>:%!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
+nnoremap <leader>z        :call HLdecrypt()<CR>V:!openssl aes-256-cbc -e -pbkdf2 -a -salt 2>/dev/null<CR><C-L>
+vnoremap <leader>z        :call HLdecrypt()<CR>gv:!openssl aes-256-cbc -e -pbkdf2 -a -salt 2>/dev/null<CR><C-L>
+nnoremap <leader>Z        :call HLdecrypt()<CR>:%!openssl aes-256-cbc -e -pbkdf2 -a -salt 2>/dev/null<CR><C-L>
+nnoremap <leader>x        :call HLdecrypt()<CR>V:!openssl aes-256-cbc -d -pbkdf2 -a -salt 2>/dev/null<CR><C-L>
+vnoremap <leader>x        :call HLdecrypt()<CR>gv:!openssl aes-256-cbc -d -pbkdf2 -a -salt 2>/dev/null<CR><C-L>
+nnoremap <leader>X        :call HLdecrypt()<CR>:%!openssl aes-256-cbc -d -pbkdf2 -a -salt 2>/dev/null<CR><C-L>
 
 nnoremap <leader>L        :call LaTeXconversion()<CR>
 nnoremap <leader>H        :call HTMLconversion()<CR>

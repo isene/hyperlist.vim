@@ -32,7 +32,7 @@ augroup hl_autoencryption
     autocmd BufReadPre,FileReadPre			.*.hl,.*.woim setlocal bin
     autocmd BufReadPre,FileReadPre     	.*.hl,.*.woim setlocal cmdheight=2
     autocmd BufReadPre,FileReadPre     	.*.hl,.*.woim setlocal shell=/bin/sh
-    autocmd BufReadPost,FileReadPost    .*.hl,.*.woim %!openssl bf -d -a 2>/dev/null
+    autocmd BufReadPost,FileReadPost    .*.hl,.*.woim %!openssl aes-256-cbc -d -pbkdf2 -a -salt 2>/dev/null
     autocmd BufReadPost,FileReadPost		.*.hl,.*.woim setlocal nobin
     autocmd BufReadPost,FileReadPost    .*.hl,.*.woim setlocal cmdheight&
     autocmd BufReadPost,FileReadPost		.*.hl,.*.woim setlocal shell&
@@ -40,7 +40,7 @@ augroup hl_autoencryption
     autocmd BufWritePre,FileWritePre		.*.hl,.*.woim setlocal bin
     autocmd BufWritePre,FileWritePre		.*.hl,.*.woim setlocal cmdheight=2
     autocmd BufWritePre,FileWritePre		.*.hl,.*.woim setlocal shell=/bin/sh
-    autocmd BufWritePre,FileWritePre    .*.hl,.*.woim %!openssl bf -e -a -salt 2>/dev/null
+    autocmd BufWritePre,FileWritePre    .*.hl,.*.woim %!openssl aes-256-cbc -e -pbkdf2 -a -salt 2>/dev/null
     autocmd BufWritePost,FileWritePost	.*.hl,.*.woim silent u
     autocmd BufWritePost,FileWritePost	.*.hl,.*.woim setlocal nobin
     autocmd BufWritePost,FileWritePost	.*.hl,.*.woim setlocal cmdheight&
