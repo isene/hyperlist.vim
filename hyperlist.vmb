@@ -2,7 +2,7 @@
 UseVimball
 finish
 syntax/hyperlist.vim	[[[1
-1089
+1088
 " Script info {{{1
 " Vim syntax and filetype plugin for HyperList files (.hl)
 " Language:   Self defined markup and functions for HyperLists in Vim
@@ -19,10 +19,9 @@ syntax/hyperlist.vim	[[[1
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.4.6 - compatible with the HyperList definition v. 2.4
-" Modified:   2023-03-01
-" Changes:    Added "/" to Operators to cater for "AND/OR:"
-"             Fixed bug on autoencryption
+" Version:    2.4.7 - compatible with the HyperList definition v. 2.4
+" Modified:   2023-08-23
+" Changes:    Fixed bugs in Latex conversion, other minor fixes
 
 " Instructions {{{1
 "
@@ -480,7 +479,7 @@ function! LaTeXconversion ()
     endtry
     try
         "HLmulti
-        execute '%s/\(\s\s\s\|\*\)+/\s\s\s\\textcolor{v}{+}/g'
+        execute '%s/\(\s\s\s\|\*\)+/\\s\\s\\s\\textcolor{v}{+}/g'
     catch
     endtry
     try
@@ -515,7 +514,7 @@ function! LaTeXconversion ()
     endtry
     try
         "HLop
-        execute "%s/\\(\\s\\|\\*\\)\\{-1,}\\([A-ZÆØÅ_/]\\{-2,}:\\s\\)/\\1\\\\textcolor{b}{\\2}/g"
+        execute "%s/\\(\\s\\{1,}\\|\\*\\{1,}\\)\\([A-ZÆØÅ_\\-() \\/]\\{-2,}:\\s\\)/\\1\\\\textcolor{b}{\\2}/g"
     catch
     endtry
     try
@@ -882,10 +881,10 @@ syn match   HLqual      '\[.\{-}\]' contains=HLtodo,HLref,HLcomment
 
 " Properties (formerly known as Tags) - anything that ends in a colon that is
 " not only uppercase letters (which would make it an Operator)
-syn match   HLtag	'\(^\|\s\|\*\)\@<=[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,._&?!%= \-\/+<>#'"()\*:]\{-2,}:\s' contains=HLtodo,HLcomment,HLquote,HLref
+syn match   HLtag	'\(^\|\s*\|\**\)\@<=[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,._&?!%= \-\/+<>#'"()\*:]\{-2,}:\s' contains=HLtodo,HLcomment,HLquote,HLref
 
 " HyperList operators
-syn match   HLop	'\(^\|\s\|\*\)\@<=[A-ZÆØÅÁÉÓÚÃÕÂÊÔÇÀ_\-()/]\{-2,}:\s' contains=HLcomment,HLquote
+syn match   HLop	'\(^\|\s*\|\**\)\@<=[A-ZÆØÅÁÉÓÚÃÕÂÊÔÇÀ_\-() /]\{-2,}:\s' contains=HLcomment,HLquote
 
 " Mark semicolon as stringing together lines
 syn match   HLsc	';'
