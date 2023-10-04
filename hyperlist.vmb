@@ -2,7 +2,7 @@
 UseVimball
 finish
 syntax/hyperlist.vim	[[[1
-1088
+1103
 " Script info {{{1
 " Vim syntax and filetype plugin for HyperList files (.hl)
 " Language:   Self defined markup and functions for HyperLists in Vim
@@ -19,9 +19,9 @@ syntax/hyperlist.vim	[[[1
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.4.7 - compatible with the HyperList definition v. 2.4
-" Modified:   2023-08-23
-" Changes:    Fixed bugs in Latex conversion, other minor fixes
+" Version:    2.5.1 - compatible with the HyperList definition v. 2.5
+" Modified:   2023-10-04
+" Changes:    Fixed bug in LaTeX conversion for Substitutions
 
 " Instructions {{{1
 "
@@ -448,6 +448,11 @@ function! LaTeXconversion ()
     catch
     endtry
     try
+        "HLsub
+        execute '%s/\({.\{-}}\)/\\textcolor{lg}{\1}/g'
+    catch
+    endtry
+    try
         "Escape "{"
         execute '%s/{/\\{/g'
     catch
@@ -540,6 +545,7 @@ function! LaTeXconversion ()
     normal o\usepackage[usenames]{color}
     normal o\definecolor{r}{rgb}{0.5,0,0}
     normal o\definecolor{g}{rgb}{0,0.5,0}
+    normal o\definecolor{lg}{rgb}{0,0.8,0}
     normal o\definecolor{b}{rgb}{0,0,0.5}
     normal o\definecolor{v}{rgb}{0.4,0,0.4}
     normal o\definecolor{t}{rgb}{0,0.4,0.4}
@@ -625,6 +631,11 @@ function! HTMLconversion ()
   try
     "HLmove
     execute '%s/\(>>\|<<\|->\|<-\)/<font color="red"><strong>\1</strong><\/font>/g'
+  catch
+  endtry
+  try
+    "HLsub
+    execute '%s/\({.\{-}}\)/<font color="MediumAquaMarine">\1<\/font>/g'
   catch
   endtry
   try
@@ -877,7 +888,10 @@ syn match   HLstate	'\(\(^\|\s\|\*\)\(S: \|| \)\)\@<=.*' contains=HLtodo,HLop,HL
 syn match   HLtrans	'\(\(^\|\s\|\*\)\(T: \|/ \)\)\@<=.*' contains=HLtodo,HLop,HLcomment,HLref,HLqual,HLsc,HLmove,HLtag,HLquote
 
 " Qualifiers are enclosed within [ ]
-syn match   HLqual      '\[.\{-}\]' contains=HLtodo,HLref,HLcomment
+syn match   HLqual '\[.\{-}\]' contains=HLtodo,HLref,HLcomment
+
+" Substitutions are enclosed within { }
+syn match   HLsub  '{.\{-}}' contains=HLtodo,HLref,HLcomment
 
 " Properties (formerly known as Tags) - anything that ends in a colon that is
 " not only uppercase letters (which would make it an Operator)
@@ -922,7 +936,7 @@ syn match   HLi	        '\(\t\| \)\@<=/.\{-}/\($\| \)\@='
 syn match   HLu	        '\(\t\| \)\@<=_.\{-}_\($\| \)\@='
 
 " Cluster the above
-syn cluster HLtxt contains=HLident,HLmulti,HLop,HLqual,HLtag,HLhash,HLref,HLkey,HLlit,HLlc,HLcomment,HLquote,HLsc,HLtodo,HLmove,HLb,HLi,HLu,HLstate,HLtrans,HLdim0,HLdim1
+syn cluster HLtxt contains=HLident,HLmulti,HLop,HLqual,HLsub,HLtag,HLhash,HLref,HLkey,HLlit,HLlc,HLcomment,HLquote,HLsc,HLtodo,HLmove,HLb,HLi,HLu,HLstate,HLtrans,HLdim0,HLdim1
 
 "  HyperList indentation (folding levels) {{{2
 if !exists("g:disable_collapse")
@@ -955,6 +969,7 @@ hi          HLmulti	  ctermfg=Red     guifg=Red
 hi          HLtag	    ctermfg=Red     guifg=Red
 hi          HLop	    ctermfg=Blue    guifg=Blue
 hi          HLqual	  ctermfg=Green   guifg=LimeGreen
+hi          HLsub 	  ctermfg=157     guifg=LightGreen
 hi          HLhash	  ctermfg=184     guifg=#aaa122
 hi          HLref	    ctermfg=Magenta guifg=Magenta
 hi          HLkey	    ctermfg=Magenta guifg=Magenta
@@ -1092,8 +1107,8 @@ menu HyperList.Show\ Complexity\ of\ List<Tab>:call\ Complexity() :call Complexi
 " vim modeline {{{1
 " vim: set sw=2 sts=2 et fdm=marker fillchars=fold\:\ :
 doc/hyperlist.txt	[[[1
-1475
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.4.6, 2023-03-01)
+1517
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.5.1, 2023-10-04)
 
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -1108,7 +1123,7 @@ with future events to a Google calendar... and many more sexy features.
 
 The VIM plugin version numbers correspond to the HyperList definition version
 numbers with the VIM plugin adding another increment of versioning, e.g VIM
-plugin version 2.4.6 would be compatible with HyperList definition version 2.4.
+plugin version 2.5.1 would be compatible with HyperList definition version 2.5.
 
 This documentation contains the full HyperList definition. For a more
 comprehensive manual that also includes plenty of examples, read the official
@@ -1136,8 +1151,9 @@ CONTENTS                                                  *HyperList-Contents*
 		4.3.1 Elements............................|HyperList-Elements|
 		4.3.1.1 Operator..........................|HyperList-Operator|
 		4.3.1.2 Qualifier.........................|HyperList-Qualifier|
-		4.3.1.2 Property..........................|HyperList-Property|
-		4.3.1.4 Description.......................|HyperList-Description|
+		4.3.1.3 Substitution......................|HyperList-Substitution|
+		4.3.1.4 Property..........................|HyperList-Property|
+		4.3.1.5 Description.......................|HyperList-Description|
 		4.3.2 Additives...........................|HyperList-Additives|
 		4.3.2.1 References........................|HyperList-References|
 		4.3.2.2 Tags..............................|HyperList-Tags|
@@ -1475,8 +1491,9 @@ as outlined here:
 		4.3.1 Element 
 			4.3.1.1 Operator
 			4.3.1.2 Qualifier
-			4.3.1.3 Property
-			4.3.1.4 Description 
+			4.3.1.3 Substitution
+			4.3.1.4 Property
+			4.3.1.5 Description 
 		4.3.2 Additive
 			4.3.2.1 Reference
 			4.3.2.2 Tag 
@@ -1547,8 +1564,8 @@ A HyperList Item must have some sort of Content. The Content can be an
 ------------------------------------------------------------------------------
 4.3.1 Elements                                            *HyperList-Elements*
 
-An Element is either an "Operator", a "Qualifier", a "Property" or a
-"Description". Let's treat each of these concepts.
+An Element is either an "Operator", a "Qualifier", substitution(s),
+a "Property" or a "Description". Let's treat each of these concepts.
 
 ------------------------------------------------------------------------------
 4.3.1.1 Operator                                          *HyperList-Operator*
@@ -1705,7 +1722,33 @@ Tag. The timestamp as a Tag does not limit when the Item is to be done. It
 supplies information about when it was done.
 
 ------------------------------------------------------------------------------
-4.3.1.2 Property                                          *HyperList-Property*
+4.3.1.2 Substitution                                  *HyperList-Substitution*
+
+You can use substitutions in curly brackets, like this:
+
+	[fruit = apples, oranges, bananas] Eat {fruit}
+							
+The above reads: Eat apples, then oranges, then bananas.
+
+	Ask which painting she likes the best; Buy {painting}
+
+The answer to the question "What painting do you like the most?" gives an
+answer which is then reused as a substitution in "Buy exactly that paining".
+
+The second example above is more general and shows how substitutions can be
+used in a multitude of ways. Here are a couple more:
+
+	Ask the candidate about each previous job
+		"What was your main measurable results in {job}?"
+		"Why did you quit {job}?"
+
+	Brainstorm for a great ideas
+		Give each idea a value score
+			Top idea: Fleash out and describe thoroughly
+			[idea = 2 to 4 on the list] Briefly describe the {idea}
+
+------------------------------------------------------------------------------
+4.3.1.3 Property                                          *HyperList-Property*
 
 A Property is any attribute describing the Content. It ends in a colon and a
 space.
@@ -1715,7 +1758,7 @@ Examples of Properties could be: "Location = Someplace:", "Color = Green:",
 information or description to the Content.
 
 ------------------------------------------------------------------------------
-4.3.1.3 Description                                    *HyperList-Description*
+4.3.1.4 Description                                    *HyperList-Description*
 
 The Description is the main body, the "meat" of the Item. Although an Item may
 not have a Description, such as a line containing only the Operator "OR:", most
@@ -2121,6 +2164,11 @@ HyperList
 							Unchecked Item = "[_]"
 							Checked Item = "[x]" 
 								[?] Timestamp Tag after ("[x] YYYY-MM-DD hh.mm:ss:")
+				Substitution
+					Any statement in curly brackets is a substitution; EXAMPLES: 
+						"[fruit = apples, oranges, bananas] Eat {fruit}"
+							Eat apples, then oranges, then bananas
+						"Ask which painting she likes the best; Buy {painting}"
 				Property
 					Any attribute to the <Content>, ending in a colon and a space
 						Gives additional information or description to the Item
@@ -2217,6 +2265,15 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.5.1  		2023-10-04
+	Fixed bug in LaTeX conversion for Substitutions
+
+VERSION 2.5   			2023-08-30
+	Included Substitutions (the reason for the HyperList 2.5 upgrade)
+
+VERSION 2.4.6			2023-08-23
+	Fixed bugs in LaTeX conversion & ogther minor glitches.
 
 VERSION 2.4.6			2023-03-01
 	Added "/" to Operators to cater for "AND/OR:"
@@ -2569,7 +2626,7 @@ purpose and I am not liable for any damages resulting from its use. Further, I
 am under no obligation to maintain or extend this software. It is provided on
 an 'as is' basis without any expressed or implied warranty.
 doc/HyperList.hl	[[[1
-181
+186
 HyperList
 	[1+] HyperList Item
 		[?] Starter; OR: 
@@ -2638,7 +2695,7 @@ HyperList
 						Length of time to wait before doing the Item = "[+YYYY-MM-DD]"
 						Less than a certain length of time after previous Item = "[<+YYYY-MM-DD]"
 						More than a certain length of time after previous Item = "[>+YYYY-MM-DD]"
-						Length of time to wait  before doing next Item = "[-YYYY-MM-DD]"
+						Length of time to wait before doing next Item = "[-YYYY-MM-DD]"
 						Less than a certain length of time before next Item = "[<-YYYY-MM-DD]"
 						More than a certain length of time before next Item = "[>-YYYY-MM-DD]"
 						Length of time to wait after doing referenced Item = "[+YYYY-MM-DD<Item]>"
@@ -2667,6 +2724,11 @@ HyperList
 							Unchecked Item = "[_]"
 							Checked Item = "[x]" 
 								[?] Timestamp Tag after ("[x] YYYY-MM-DD hh.mm:ss:")
+				Substitution
+					Any statement in curly brackets is a substitution; EXAMPLES: 
+						"[fruit = apples, oranges, bananas] Eat {fruit}"
+							Eat apples, then oranges, then bananas
+						"Ask which painting she likes the best; Buy {painting}"
 				Property
 					Any attribute to the <Content>, ending in a colon and a space
 						Gives additional information or description to the Item
