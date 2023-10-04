@@ -14,9 +14,9 @@
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.4.7 - compatible with the HyperList definition v. 2.4
-" Modified:   2023-08-23
-" Changes:    Fixed bugs in Latex conversion, other minor fixes
+" Version:    2.5.1 - compatible with the HyperList definition v. 2.5
+" Modified:   2023-10-04
+" Changes:    Fixed bug in LaTeX conversion for Substitutions
 
 " Instructions {{{1
 "
@@ -443,6 +443,11 @@ function! LaTeXconversion ()
     catch
     endtry
     try
+        "HLsub
+        execute '%s/\({.\{-}}\)/\\textcolor{lg}{\1}/g'
+    catch
+    endtry
+    try
         "Escape "{"
         execute '%s/{/\\{/g'
     catch
@@ -535,6 +540,7 @@ function! LaTeXconversion ()
     normal o\usepackage[usenames]{color}
     normal o\definecolor{r}{rgb}{0.5,0,0}
     normal o\definecolor{g}{rgb}{0,0.5,0}
+    normal o\definecolor{lg}{rgb}{0,0.8,0}
     normal o\definecolor{b}{rgb}{0,0,0.5}
     normal o\definecolor{v}{rgb}{0.4,0,0.4}
     normal o\definecolor{t}{rgb}{0,0.4,0.4}
@@ -620,6 +626,11 @@ function! HTMLconversion ()
   try
     "HLmove
     execute '%s/\(>>\|<<\|->\|<-\)/<font color="red"><strong>\1</strong><\/font>/g'
+  catch
+  endtry
+  try
+    "HLsub
+    execute '%s/\({.\{-}}\)/<font color="MediumAquaMarine">\1<\/font>/g'
   catch
   endtry
   try
@@ -872,7 +883,10 @@ syn match   HLstate	'\(\(^\|\s\|\*\)\(S: \|| \)\)\@<=.*' contains=HLtodo,HLop,HL
 syn match   HLtrans	'\(\(^\|\s\|\*\)\(T: \|/ \)\)\@<=.*' contains=HLtodo,HLop,HLcomment,HLref,HLqual,HLsc,HLmove,HLtag,HLquote
 
 " Qualifiers are enclosed within [ ]
-syn match   HLqual      '\[.\{-}\]' contains=HLtodo,HLref,HLcomment
+syn match   HLqual '\[.\{-}\]' contains=HLtodo,HLref,HLcomment
+
+" Substitutions are enclosed within { }
+syn match   HLsub  '{.\{-}}' contains=HLtodo,HLref,HLcomment
 
 " Properties (formerly known as Tags) - anything that ends in a colon that is
 " not only uppercase letters (which would make it an Operator)
@@ -917,7 +931,7 @@ syn match   HLi	        '\(\t\| \)\@<=/.\{-}/\($\| \)\@='
 syn match   HLu	        '\(\t\| \)\@<=_.\{-}_\($\| \)\@='
 
 " Cluster the above
-syn cluster HLtxt contains=HLident,HLmulti,HLop,HLqual,HLtag,HLhash,HLref,HLkey,HLlit,HLlc,HLcomment,HLquote,HLsc,HLtodo,HLmove,HLb,HLi,HLu,HLstate,HLtrans,HLdim0,HLdim1
+syn cluster HLtxt contains=HLident,HLmulti,HLop,HLqual,HLsub,HLtag,HLhash,HLref,HLkey,HLlit,HLlc,HLcomment,HLquote,HLsc,HLtodo,HLmove,HLb,HLi,HLu,HLstate,HLtrans,HLdim0,HLdim1
 
 "  HyperList indentation (folding levels) {{{2
 if !exists("g:disable_collapse")
@@ -950,6 +964,7 @@ hi          HLmulti	  ctermfg=Red     guifg=Red
 hi          HLtag	    ctermfg=Red     guifg=Red
 hi          HLop	    ctermfg=Blue    guifg=Blue
 hi          HLqual	  ctermfg=Green   guifg=LimeGreen
+hi          HLsub 	  ctermfg=157     guifg=LightGreen
 hi          HLhash	  ctermfg=184     guifg=#aaa122
 hi          HLref	    ctermfg=Magenta guifg=Magenta
 hi          HLkey	    ctermfg=Magenta guifg=Magenta

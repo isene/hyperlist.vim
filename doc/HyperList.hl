@@ -66,7 +66,7 @@ HyperList
 						Length of time to wait before doing the Item = "[+YYYY-MM-DD]"
 						Less than a certain length of time after previous Item = "[<+YYYY-MM-DD]"
 						More than a certain length of time after previous Item = "[>+YYYY-MM-DD]"
-						Length of time to wait  before doing next Item = "[-YYYY-MM-DD]"
+						Length of time to wait before doing next Item = "[-YYYY-MM-DD]"
 						Less than a certain length of time before next Item = "[<-YYYY-MM-DD]"
 						More than a certain length of time before next Item = "[>-YYYY-MM-DD]"
 						Length of time to wait after doing referenced Item = "[+YYYY-MM-DD<Item]>"
@@ -95,6 +95,11 @@ HyperList
 							Unchecked Item = "[_]"
 							Checked Item = "[x]" 
 								[?] Timestamp Tag after ("[x] YYYY-MM-DD hh.mm:ss:")
+				Substitution
+					Any statement in curly brackets is a substitution; EXAMPLES: 
+						"[fruit = apples, oranges, bananas] Eat {fruit}"
+							Eat apples, then oranges, then bananas
+						"Ask which painting she likes the best; Buy {painting}"
 				Property
 					Any attribute to the <Content>, ending in a colon and a space
 						Gives additional information or description to the Item
