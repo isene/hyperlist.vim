@@ -444,19 +444,19 @@ function! LaTeXconversion ()
     endtry
     try
         "HLsub
-        execute '%s/\({.\{-}}\)/\\textcolor{lg}{\1}/g'
+        execute '%s/\({.\{-}}\)/\\textcolor{lg}{\\{\1\\}}/g'
     catch
     endtry
-    try
-        "Escape "{"
-        execute '%s/{/\\{/g'
-    catch
-    endtry
-    try
-        "Escape "}"
-        execute '%s/}/\\}/g'
-    catch
-    endtry
+"   try
+"       "Escape "{"
+"       execute '%s/{/\\{/g'
+"   catch
+"   endtry
+"   try
+"       "Escape "}"
+"       execute '%s/}/\\}/g'
+"   catch
+"   endtry
     try
         "HLb
         execute '%s/ \@<=\*\(.\{-}\)\* /\\textbf{ \1 }/g'
@@ -514,12 +514,12 @@ function! LaTeXconversion ()
     endtry
     try
         "HLop
-        execute "%s/\\(\\s\\{1,}\\|\\*\\{1,}\\)\\([A-ZÆØÅ_\\-() \\/]\\{-2,}:\\s\\)/\\1\\\\textcolor{b}{\\2}/g"
+        execute "%s/\\(\\s\\{2,}\\|\\*\\{1,}\\)\\([A-ZÆØÅ_ \\-() \\/]\\{-2,}:\\s\\)/\\1\\\\textcolor{b}{\\2}/g"
     catch
     endtry
     try
         "HLprop
-        execute "%s/\\(\\s\\{1,}\\|\\*\\{1,}\\)\\([a-zA-ZæøåÆØÅ0-9,._&?%= \\-\\/+<>#']\\{-2,}:\\s\\)/\\1\\\\textcolor{r}{\\\\emph{\\2}}/g"
+        execute "%s/\\(\\s\\{2,}\\|\\*\\{1,}\\)\\([a-zA-ZæøåÆØÅ0-9,._&?%= \\-\\/+<>#']\\{-2,}:\\s\\)/\\1\\\\textcolor{r}{\\\\emph{\\2}}/g"
     catch
     endtry
     try
