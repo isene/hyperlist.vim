@@ -14,9 +14,9 @@
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.5.1 - compatible with the HyperList definition v. 2.5
-" Modified:   2023-10-04
-" Changes:    Fixed bug in LaTeX conversion for Substitutions
+" Version:    2.5.2 - compatible with the HyperList definition v. 2.5
+" Modified:   2024-05-23
+" Changes:    Modified CalendarAdd() to be able to export to iCalendar files
 
 " Instructions {{{1
 "
@@ -67,7 +67,9 @@
 "
 " You can add item tagged with future dates as items in your Google calendar.
 " Use <leader>G to automatically add all items with future dates to your
-" default calendar. Change your default under USER DEFINED SETTINGS below.
+" default calendar. Your default calendar is set in your .vimrc file with
+" g:calendar = "yourcalendar". If not set in your .vimrc, a set of icalendar
+" files will be written to your working directory.
 "
 " Syntax is updated at start and every time you leave Insert mode.
 "
@@ -474,12 +476,12 @@ function! LaTeXconversion ()
     endtry
     try
         "HLindent
-        execute '%s/\(\s\s\s\|\*\|^\)\([0-9.]\+\s\)/\1\\textcolor{v}{\2}/g'
+        execute '%s/\(   \|\*\|^\)\([0-9.]\+\)\s/\1\\textcolor{v}{\2} /g'
     catch
     endtry
     try
         "HLmulti
-        execute '%s/\(\s\s\s\|\*\)+/\\s\\s\\s\\textcolor{v}{+}/g'
+        execute '%s/\(   \|\*\)+/\\s\\s\\s\\textcolor{v}{+}/g'
     catch
     endtry
     try
@@ -490,16 +492,6 @@ function! LaTeXconversion ()
     try
         "HLref
         execute "%s/\\(<\\{1,2}[a-zA-ZæøåÆØÅ0-9.:/_&?%=\\-\\* ]\\+>\\{1,2}\\)/\\\\textcolor{v}{\\1}/g"
-    catch
-    endtry
-    try
-        "HLquote
-        execute '%s/\(\".*\"\)/\\textcolor{t}{\1}/g'
-    catch
-    endtry
-    try
-        "HLcomment
-        execute '%s/\((.*)\)/\\textcolor{t}{\1}/g'
     catch
     endtry
     try
@@ -514,12 +506,22 @@ function! LaTeXconversion ()
     endtry
     try
         "HLop
-        execute "%s/\\(\\s\\{2,}\\|\\*\\{1,}\\)\\([A-ZÆØÅ_ \\-() \\/]\\{-2,}:\\s\\)/\\1\\\\textcolor{b}{\\2}/g"
+        execute "%s/\\(^\\| \\+\\|\\*\\{3,}\\)\\([A-ZÆØÅ_ -()/]\\{-2,}:\\) /\\1\\\\textcolor{b}{\\2} /g"
     catch
     endtry
     try
         "HLprop
-        execute "%s/\\(\\s\\{2,}\\|\\*\\{1,}\\)\\([a-zA-ZæøåÆØÅ0-9,._&?%= \\-\\/+<>#']\\{-2,}:\\s\\)/\\1\\\\textcolor{r}{\\\\emph{\\2}}/g"
+        execute "%s/\\(^\\| \\+\\|\\*\\{3,}\\)\\([a-zA-ZæøåÆØÅ0-9,._&?%= -/+']\\+:\\) /\\1\\\\textcolor{r}{\\\\emph{\\2}} /g"
+    catch
+    endtry
+    try
+        "HLquote
+        execute '%s/\(\".*\"\)/\\textcolor{t}{\1}/g'
+    catch
+    endtry
+    try
+        "HLcomment
+        execute '%s/\((.*)\)/\\textcolor{t}{\1}/g'
     catch
     endtry
     try
@@ -544,7 +546,7 @@ function! LaTeXconversion ()
     normal o\definecolor{b}{rgb}{0,0,0.5}
     normal o\definecolor{v}{rgb}{0.4,0,0.4}
     normal o\definecolor{t}{rgb}{0,0.4,0.4}
-    normal o\definecolor{0}{rgb}{0.6,0.6,0}
+    normal o\definecolor{o}{rgb}{0.6,0.6,0}
     normal o\usepackage[margin=2cm]{geometry}
     normal o\usepackage[utf8]{inputenc}
     normal o\usepackage[english]{babel}
@@ -779,10 +781,16 @@ endfunction
 "  calendar - defined as g:calendar in your vimrc file.
 "  To add the events to another calendar, do :call CalendarAdd("yourcalendar")
 function! CalendarAdd(...)
-  let l:count = 0
-  let l:cal = a:0 > 0 ? a:1 : g:calendar
-  let l:date = strftime("%Y-%m-%d")
-  let l:tm = ""
+  let l:count  = 0
+  if exists("g:calendar")
+    let l:ical = 0
+    let l:cal  = a:0 > 0 ? a:1 : g:calendar
+  else
+    let l:ical = 1
+    let l:cal  = ""
+  endif
+  let l:date   = strftime("%Y-%m-%d")
+  let l:tm     = ""
   let l:linenr = 0 
   while l:linenr < line("$") 
     let l:linenr += 1
@@ -802,9 +810,9 @@ function! CalendarAdd(...)
           let l:filename = " <" . @% . ">)"
         endif
         let l:title = substitute(l:line, '.*\d\d\d\d-\d\d-\d\d\( \d\d.\d\d\)*: ', '', '')
-        let l:start_line_number = l:linenr
-        let l:end_line_number   = l:start_line_number + 1
-        let l:start_line_indent = indent(l:start_line_number)
+        let l:start_line_number  = l:linenr
+        let l:end_line_number    = l:start_line_number + 1
+        let l:start_line_indent  = indent(l:start_line_number)
         let l:tabs = repeat("\t", l:start_line_indent/&tabstop)
         while indent(l:end_line_number) > l:start_line_indent
           let l:end_line_number += 1
@@ -816,18 +824,45 @@ function! CalendarAdd(...)
         for i in l:dlist
           let l:g_desc = l:g_desc . substitute(i, l:tabs, '', '') . "\n"
         endfor
-        let l:g_cal    = " --calendar '" . l:cal . "'"
-        let l:g_title  = " --title '" . l:title
-        if @% == ""
-          let l:filename = ""
+        if ical == 1
+          let l:icaltext  = "BEGIN:VCALENDAR\n"
+          let l:icaltext .= "PRODID:-//HyperList//VIM HyperList plugin//EN\n"
+          let l:icaltext .= "VERSION:2.0\n"
+          let l:icaltext .= "BEGIN:VEVENT\n"
+          let l:icaltime  = strftime("%Y%m%dT%H%M%SZ")
+          let l:icaltext .= "DTSTAMP:"     . l:icaltime . "\n"
+          let l:icaltext .= "UID:"         . l:icaltime . "@HyperList\n"
+          let l:icaltext .= "SUMMARY:"     . l:title   . "\n"
+          let l:icaltext .= "DESCRIPTION:" . l:g_desc   . "\n"
+          let l:icaldt    = substitute(l:dt, '-', "", "g")
+          let l:tmh       = l:tm[1:2]
+          let l:tmm       = l:tm[4:5]
+          let l:icaltext .= "DTSTART:"     . l:icaldt . "T" . l:tmh . l:tmm . "00Z\n"
+          let l:tmm  += 30
+          if l:tmm > 60
+            let l:tmm -= 60
+            let l:tmh += 1
+          endif
+          let l:icaltext .= "DTEND:"       . l:icaldt . "T" . l:tmh . l:tmm . "00Z\n"
+          let l:icaltext .= "END:VEVENT\n"
+          let l:icaltext .= "END:VCALENDAR\n"
+          let l:icalfile  = strftime("%Y-%m-%d_%H%M_") . l:count . ".ics"
+          call writefile(split(l:icaltext, "\n"), l:icalfile)
         else
-          let l:filename = " <" . @% . ">"
+          let l:g_cal    = " --calendar '" . l:cal . "'"
+          let l:g_title  = " --title '" . l:title
+          if @% == ""
+            let l:filename = ""
+          else
+            let l:filename = " <" . @% . ">"
+          endif
+          let l:created  = " (created by HyperList.vim" . l:filename . ")' "
+          let l:g_when   = " --when '" . l:dt . l:tm . "'"
+          let l:g_desc   = " --description '" . l:g_desc . "'"
+          let l:gcalcli   = "gcalcli add --where '' --duration 30 --reminder 0" . l:g_cal . l:g_title . l:created . l:g_when . l:g_desc
+          echo l:gcalcli
+          call system(l:gcalcli)
         endif
-        let l:created  = " (created by HyperList.vim" . l:filename . ")' "
-        let l:g_when   = " --when '" . l:dt . l:tm . "'"
-        let l:g_desc   = " --description '" . l:g_desc . "'"
-        let l:gcalcli  = "gcalcli add --where '' --duration 30 --reminder 0" . l:g_cal . l:g_title . l:created . l:g_when . l:g_desc
-        call system(l:gcalcli)
         let l:count += 1
       endif
     endif

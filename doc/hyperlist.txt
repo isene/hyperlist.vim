@@ -1,4 +1,4 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.5.1, 2023-10-04)
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.5.2, 2024-05-23)
 
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -13,7 +13,7 @@ with future events to a Google calendar... and many more sexy features.
 
 The VIM plugin version numbers correspond to the HyperList definition version
 numbers with the VIM plugin adding another increment of versioning, e.g VIM
-plugin version 2.5.1 would be compatible with HyperList definition version 2.5.
+plugin version 2.5.2 would be compatible with HyperList definition version 2.5.
 
 This documentation contains the full HyperList definition. For a more
 comprehensive manual that also includes plenty of examples, read the official
@@ -237,15 +237,15 @@ numbered and you get the numbering out of sequence and wants to resort them.
 One caveat, the last line in the selection cannot be the very last line in
 the document (there must be an item or an empty line below it).
 
-By doing :call CalendarAdd() all items containing a future date will be added
-as reminders to your Google Calendar. If an item includes a time, the event is
-added from that time with duration of 30 minutes.
+You can add item tagged with future dates as items in your Google calendar.
+Use <leader>G to automatically add all items with future dates to your default
+calendar. This requires gcalcli (https://github.com/insanum/gcalcli). Your
+default calendar is set in your .vimrc file with g:calendar = "yourcalendar".
+If this variable is not found in your .vimrc, a set of icalendar files will be
+written to your working directory.
 
-This function requires gcalcli (https://github.com/insanum/gcalcli)
+To add the events to another calendar, do :call CalendarAdd("yourcalendar").
 
-The function is mapped to <leader>G to add events to the default calendar. The
-default calendar is defined as b:calendar at the start of the HyperList.vim
-script. To add the events to another calendar, do :call CalendarAdd("yourcalendar")
 The title of the calendar is the item in the HyperList without the date/time tag.
 If there is no time tag for the item, an event is created at the start of the date.
 If there is a time tag for the item, the event is created at that time with the
@@ -1155,6 +1155,9 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.5.2  		2024-05-23
+	Added iCalendar export (thanks to Rich Traube for suggestion)
 
 VERSION 2.5.1  		2023-10-04
 	Fixed bug in LaTeX conversion for Substitutions

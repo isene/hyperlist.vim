@@ -132,8 +132,8 @@ HyperList Test Suite (V1.0); Press '\f' to uncollapse this whole HyperList
 		Export lines to your Google calendar
 			To use this feature, you need to have the program 'gcalcli' installed and properly set up
 				gcalcli: <https://github.com/insanum/gcalcli>
-				Now press '\G' to see that the below item appears in your Google calendar at the correct time
-				2020-01-01 08:00: Item from the HyperList Test Suite
+				Now press '\G' to see that the below item appears in your Google calendar or an .ics file appear
+				2040-01-01 08.00: Item from the HyperList Test Suite
 		Show the complexity level of this HyperList
 			Using ':call Complexity()' you should see the number "157" displayed
 	MENU TEST
