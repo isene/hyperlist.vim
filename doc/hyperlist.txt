@@ -1,5 +1,5 @@
 *hyperlist.txt*   The VIM plugin for HyperList (version 2.5.2, 2024-05-23)
-
+ 
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
 outliner, a ToDo list handler, a process design tool, a data modeler, or any
