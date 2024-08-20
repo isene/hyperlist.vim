@@ -1,5 +1,5 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.5.2, 2024-05-23)
-
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.5.3, 2024-08-20)
+ 
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
 outliner, a ToDo list handler, a process design tool, a data modeler, or any
@@ -13,7 +13,7 @@ with future events to a Google calendar... and many more sexy features.
 
 The VIM plugin version numbers correspond to the HyperList definition version
 numbers with the VIM plugin adding another increment of versioning, e.g VIM
-plugin version 2.5.2 would be compatible with HyperList definition version 2.5.
+plugin version 2.5.3 would be compatible with HyperList definition version 2.5.
 
 This documentation contains the full HyperList definition. For a more
 comprehensive manual that also includes plenty of examples, read the official
@@ -240,11 +240,12 @@ the document (there must be an item or an empty line below it).
 You can add item tagged with future dates as items in your Google calendar.
 Use <leader>G to automatically add all items with future dates to your default
 calendar. This requires gcalcli (https://github.com/insanum/gcalcli). Your
-default calendar is set in your .vimrc file with g:calendar = "yourcalendar".
+default calendar is set in your .vimrc: let g:calendar = "yourcalendar"
 If this variable is not found in your .vimrc, a set of icalendar files will be
-written to your working directory.
+written to your working directory. If you also want past events added to your 
+calendar, add this to your .vimrc: let g:alldates = 1
 
-To add the events to another calendar, do :call CalendarAdd("yourcalendar").
+To add the events to another calendar, do :call CalendarAdd("yourothercalendar").
 
 The title of the calendar is the item in the HyperList without the date/time tag.
 If there is no time tag for the item, an event is created at the start of the date.
@@ -1155,6 +1156,12 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.5.3  		2024-08-20
+	Fixed CalendarAdd ('\G') so that it includes events for the current date.
+	It's now possible for the user to also include past date events by adding
+	this to .vimrc; let g:alldates = 1
+	Thanks to SenkiJun (https://github.com/SenkiJun) for suggestions.
 
 VERSION 2.5.2  		2024-05-23
 	Added iCalendar export (thanks to Rich Traube for suggestion)

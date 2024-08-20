@@ -14,9 +14,11 @@
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.5.2 - compatible with the HyperList definition v. 2.5
-" Modified:   2024-05-23
-" Changes:    Modified CalendarAdd() to be able to export to iCalendar files
+" Version:    2.5.3 - compatible with the HyperList definition v. 2.5
+" Modified:   2024-08-20
+" Changes:    Modified CalendarAdd() to include today's events and also
+"             let the user also get past events imported by adding to .vimrc:
+"             let g:alldates=1 
 
 " Instructions {{{1
 "
@@ -69,7 +71,8 @@
 " Use <leader>G to automatically add all items with future dates to your
 " default calendar. Your default calendar is set in your .vimrc file with
 " g:calendar = "yourcalendar". If not set in your .vimrc, a set of icalendar
-" files will be written to your working directory.
+" files will be written to your working directory. If you also want past events
+" added to your calendar, add this to your .vimrc: g:alldates = 1
 "
 " Syntax is updated at start and every time you leave Insert mode.
 "
@@ -92,6 +95,10 @@ if s:MSWIN
   if mapcheck("\<c-a>","n") != ""
     nunmap <c-a>
   endif
+endif
+
+if !exists("g:alldates")
+  let g:alldates=0
 endif
 
 " Settings {{{1
@@ -798,7 +805,7 @@ function! CalendarAdd(...)
     let l:line = substitute(l:line, "\t", "", "g")
     if match(l:line,'\d\d\d\d-\d\d-\d\d') >= 0
       let l:dt = matchstr(l:line,'\d\d\d\d-\d\d-\d\d')
-      if l:dt > l:date
+      if l:dt >= l:date || g:alldates == 1
         if match(l:line,' \d\d\.\d\d') >= 0
           let l:tm = matchstr(l:line,'\d\d\.\d\d')
           let l:tm = substitute(l:tm, '\.', ":", "")
