@@ -1142,4 +1142,4 @@ menu HyperList.Add\ Calendar\ Events\ (Requires\ gcalcli)<Tab>\\G :call Calendar
 menu HyperList.Show\ Complexity\ of\ List<Tab>:call\ Complexity() :call Complexity()<CR>
 
 " vim modeline {{{1
-" vim: set sw=2 sts=2 et fdm=marker fillchars=fold\:\ :
+" vim: set sw=2 sts=2 et fdm=marker fcs=fold\:\ :
