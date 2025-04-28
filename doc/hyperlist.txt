@@ -1,4 +1,4 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.5.3, 2024-08-20)
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.6.0, 2025-04-28)
  
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -13,7 +13,7 @@ with future events to a Google calendar... and many more sexy features.
 
 The VIM plugin version numbers correspond to the HyperList definition version
 numbers with the VIM plugin adding another increment of versioning, e.g VIM
-plugin version 2.5.3 would be compatible with HyperList definition version 2.5.
+plugin version 2.6.0 would be compatible with HyperList definition version 2.6.
 
 This documentation contains the full HyperList definition. For a more
 comprehensive manual that also includes plenty of examples, read the official
@@ -101,6 +101,7 @@ Transitions (prefixed with "T: " or "/ ") or underline nothing.
 
 Use <leader>v to add a checkbox at start of item or to toggle a checkbox
 Use <leader>V to add/toggle a checkbox with a date stamp for completion
+Use <leader>o to mark an item as 'in progress' (seen as '[O] My Item')
 
 Use "gr" (without the quotation marks, signifies "Goto Ref") or simply press
 the "Enter" ("<CR>") key while the cursor is on a HyperList reference to jump
@@ -606,6 +607,7 @@ is a nifty way of showing Items to be done and Items done; simply add "[_]" at
 the beginning of the line for an "unchecked" Item and "[x]" for a "checked"
 Item. An unchecked Item is to be done and is indicated by this "placeholder"
 Qualifier, while a checked item indicates the Item is not to be done anymore.
+Use "[O]" to mark an item as "in progress".
 
 You may add a timestamp for the completion after a checked Item ("[x]
 YYYY-MM-DD hh.mm:"). In this way, you combine the Qualifier with a timestamp
@@ -1053,6 +1055,7 @@ HyperList
 									"[2011-05-01 Fri,Sat - 2011-10-01]" = Every Fri & Sat in time interval
 						Checking off Items
 							Unchecked Item = "[_]"
+							Item in progress = "[O]"
 							Checked Item = "[x]" 
 								[?] Timestamp Tag after ("[x] YYYY-MM-DD hh.mm:ss:")
 				Substitution
@@ -1156,6 +1159,9 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.6.0  		2025-04-28
+	Added support for marking items as "in progress".
 
 VERSION 2.5.3  		2024-08-20
 	Fixed CalendarAdd ('\G') so that it includes events for the current date.

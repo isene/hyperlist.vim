@@ -173,6 +173,7 @@ Use \u to toggle underlining of Transitions, States or no underlining.
 
 Use \v to add a checkbox at start of item or to toggle a checkbox.
 Use \V to add/toggle a checkbox with a date stamp for completion.
+Use \o to mark an item as 'in progress' (seen as '[O] My Item')
 
 Use \SPACE to go to the next open template element
 (A template element is a HyperList item ending in an equal sign).
