@@ -92,6 +92,7 @@ HyperList Test Suite (V1.0); Press '\f' to uncollapse this whole HyperList
 		Create and use checkboxes for items
 			With the cursor on this line, press '\v' to see a checkbox appear
 				With the cursor on the above line, press '\v' again to see an "x" appear in the checkbox
+			[_] With the cursor on this line, press '\o' to see the item marked as "in progress" = "[O]"
 			[_] With the cursor on this line, press '\V' to mark the checkbox with a time stamp
 		Show/hide items with specific words
 			This is an item with the word "simple"

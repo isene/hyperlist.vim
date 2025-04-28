@@ -14,11 +14,9 @@
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.5.3 - compatible with the HyperList definition v. 2.5
-" Modified:   2024-08-20
-" Changes:    Modified CalendarAdd() to include today's events and also
-"             let the user also get past events imported by adding to .vimrc:
-"             let g:alldates=1 
+" Version:    2.6.0 - compatible with the HyperList definition v. 2.6
+" Modified:   2025-04-28
+" Changes:    Added <leader>o to mark a checkbox item as 'in progress'
 
 " Instructions {{{1
 "
@@ -309,6 +307,21 @@ endfunction
 "  Mapped to <leader>v and <leader>V
 function! CheckItem (stamp)
   let current_line = getline('.')
+  if a:stamp ==# 'inprogress'
+    if current_line =~# '\[O\]'
+      exe 's/\[O\]/[_]/'
+    else
+      if current_line !~# '\[_\]'
+        exe "normal ^i[_] "
+      endif
+      exe 's/\[_\]/[O]/'
+    endif
+    return
+  endif
+  if current_line =~# '\[O\]'
+    exe 's/\[O\]/[x]/'
+    return
+  endif
   if match(current_line,'\V[_]') >= 0
     let time = strftime("%Y-%m-%d %H.%M")
     exe 's/\V[_]/[x]/'
@@ -1052,6 +1065,7 @@ noremap <leader>u         :call STunderline()<CR>
 
 noremap <leader>v	        :call CheckItem("")<CR>
 noremap <leader>V         :call CheckItem("stamped")<CR>
+nnoremap <leader>o        :call CheckItem("inprogress")<CR>
 
 noremap <leader><SPACE>   /=\s*$<CR>A
 

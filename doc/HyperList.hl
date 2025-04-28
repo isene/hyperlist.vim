@@ -93,6 +93,7 @@ HyperList
 									"[2011-05-01 Fri,Sat - 2011-10-01]" = Every Fri & Sat in time interval
 						Checking off Items
 							Unchecked Item = "[_]"
+							Item in progress = "[O]"
 							Checked Item = "[x]" 
 								[?] Timestamp Tag after ("[x] YYYY-MM-DD hh.mm:ss:")
 				Substitution
