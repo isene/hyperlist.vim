@@ -1,4 +1,4 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.6.0, 2025-04-28)
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.6.1, 2025-01-04)
  
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -32,6 +32,7 @@ treated as HyperList files.
 CONTENTS                                                  *HyperList-Contents*
 
     1 HyperList VIM Plugin....................|HyperList-Plugin|
+    1.1 Modern Vim/Neovim Features............|HyperList-Modern|
     2 Background and definition...............|HyperList-Background|
 		3 HyperLists..............................|HyperLists|
 		4 HyperList Items.........................|HyperList-Item|
@@ -258,6 +259,35 @@ If you want to know the overall complexity of a HyperList, use <leader>C
 The score shown is the total of Items and References in your HyperList.
 
 GVIM users can enjoy a menu with most of the commands organized in submenus.
+
+MODERN VIM/NEOVIM FEATURES (Version 2.6.1+)               *HyperList-Modern*
+
+For users with modern Vim/Neovim installations, additional features are available:
+
+Floating Window Reference Previews (Neovim 0.4+):
+When hovering over references, a floating window can show preview content.
+Enable with: let g:hyperlist_enable_floating_windows = 1
+
+LSP-style Completion:
+Context-aware completion for references, tags, and HyperList elements.
+Enabled by default, disable with: let g:hyperlist_enable_lsp_completion = 0
+
+Telescope Integration (if Telescope.nvim is available):
+Enhanced navigation through large HyperLists using fuzzy search.
+Access via :Telescope hyperlist_items
+
+Breadcrumb Navigation:
+Shows current position in nested structures.
+Use :call ShowHyperListBreadcrumb() or add to statusline.
+
+Enhanced Export Functions:
+- ExportToMarkdown() - GitHub-flavored Markdown export  
+- Enhanced HTML export with modern responsive CSS themes
+- Improved LaTeX export with modern packages
+- Better iCal export with metadata from hashtags
+
+All modern features are backward compatible and optional. Original functions
+and keybindings remain unchanged. See VERSION 2.6.1 changelog for details.
 
 ==============================================================================
 2 Background and definition                             *HyperList-Background*
@@ -1159,6 +1189,49 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.6.1  		2025-01-04
+	Major performance and feature enhancements:
+	
+	Bug Fixes:
+	- Fixed encryption menu commands to use AES-256-CBC consistently
+	- Fixed calendar function time parsing overflow for hours >= 24
+	- Fixed ambiguous encryption command prompts, now shows clean password prompts
+	- Fixed startup error with undefined functions in configuration section
+	
+	Performance Improvements:
+	- Added intelligent file size detection and performance mode for large files
+	- Dynamic folding levels: reduced from 15 to 6 for files >2000 lines
+	- Optimized syntax patterns with simplified regex for large files
+	- Improved syntax sync values based on file size (5-50 minlines)
+	- Added configurable performance thresholds via g:hyperlist_large_file_threshold
+	
+	Modern Vim/Neovim Features (Optional):
+	- Added floating window support for reference previews (Neovim 0.4+)
+	- Implemented LSP-style context-aware completion system
+	- Added Telescope.nvim integration for navigation
+	- Created breadcrumb navigation (ShowHyperListBreadcrumb)
+	- Added quick template insertion functions
+	- Enhanced reference preview with auto-close timers
+	
+	Export Enhancements:
+	- NEW: Markdown export with GitHub-flavored markdown support
+	- Enhanced HTML export with modern CSS and responsive design
+	- Improved LaTeX export with tcolorbox and fontawesome5 packages
+	- Better iCal export with proper metadata, categories from hashtags
+	- All exports now support configuration via g:hyperlist_export_* variables
+	
+	New Configuration Options:
+	- g:hyperlist_large_file_threshold (default: 2000)
+	- g:hyperlist_performance_mode (auto-detected)
+	- g:hyperlist_enable_floating_windows (auto-detected)
+	- g:hyperlist_enable_lsp_completion (default: 1)
+	- g:hyperlist_html_theme (modern/classic/minimal)
+	- g:hyperlist_markdown_checkbox_style (github/unicode)
+	- And many more export configuration options
+	
+	All changes are 100% backward compatible. Original functions and
+	keybindings remain unchanged. New features are opt-in via configuration.
 
 VERSION 2.6.0  		2025-04-28
 	Added support for marking items as "in progress".
