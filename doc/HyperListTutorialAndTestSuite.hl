@@ -6,13 +6,13 @@ HyperList Test Suite (V1.0); Press '\f' to uncollapse this whole HyperList
 			Doing each item will confirm the plugin version is working correctly
 	Requires the files HyperListTestSuite.hl and hyperlist.vim
 		Set the cursor on a file link and press 'gf' to open the file; OR: 
-			vim: <~/.vim/doc/HyperList.hl>
-			nvim: <~/.local/share/nvim/site/doc/HyperList.hl>
+			vim: <~/.vim/doc/hyperlist.txt>
+			nvim: <~/.local/share/nvim/site/doc/hyperlist.txt>
 	Tests are broken into 3 major categories, "SYNTAX HIGHLIGHTING", "FUNCTIONALITY TEST" And "MENU TEST"
 	SYNTAX HIGHLIGHTING
 		Ensure that all HyperList elements are correctly highlighted in the HyperList definition file; OR: 
-			vim: <~/.vim/doc/HyperList.hl>
-			nvim: <~/.local/share/nvim/site/doc/HyperList.hl>
+			vim: <~/.vim/doc/hyperlist.txt>
+			nvim: <~/.local/share/nvim/site/doc/hyperlist.txt>
 		Check: The Property should be in red
 		CHECK: The Operator should be in blue
 		[? OK] Qualifier in green
@@ -27,7 +27,7 @@ HyperList Test Suite (V1.0); Press '\f' to uncollapse this whole HyperList
 		Keywords END and SKIP should be in magenta
 		Keywords FIXME and TODO should be in black on yellow
 		Markup like *bold* /italics/ and _underline_ should appear correctly
-		Fold this item and child by pressing 'SPACE' and see that it appears in bold
+		Fold this item and child by pressing 'SPACE' and see that it goes from bold to normal text
 			This is a child item
 		Press '\h' and move the cursor one line down
 			This line should appear as normal while all other lines are dimmed
@@ -68,8 +68,8 @@ HyperList Test Suite (V1.0); Press '\f' to uncollapse this whole HyperList
 		By placing the cursor in the reference and press 'gr' you jump to the next item (<42>)
 		42. This is an item that you will jump to
 		By placing the cursor in the file reference and press 'gf' you open the HyperList definition file; OR: 
-			vim: <~/.vim/doc/HyperList.hl>
-			nvim: <~/.local/share/nvim/site/doc/HyperList.hl>
+			vim: <~/.vim/doc/hyperlist.txt>
+			nvim: <~/.local/share/nvim/site/doc/hyperlist.txt>
 		Close that file to come back to this file
 		Toggle autonumbering of items
 			Press '\an' or '\#' to toggle autonumbering on/off; Press '\an' now and go to next line
@@ -92,7 +92,7 @@ HyperList Test Suite (V1.0); Press '\f' to uncollapse this whole HyperList
 		Create and use checkboxes for items
 			With the cursor on this line, press '\v' to see a checkbox appear
 				With the cursor on the above line, press '\v' again to see an "x" appear in the checkbox
-			[_] With the cursor on this line, press '\o' to see the item marked as "in progress" = "[O]"
+			[_] With the cursor on this line, press '\o' to see the item marked as "in progress" = "[x]"
 			[_] With the cursor on this line, press '\V' to mark the checkbox with a time stamp
 		Show/hide items with specific words
 			This is an item with the word "simple"

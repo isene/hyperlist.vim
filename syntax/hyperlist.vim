@@ -14,9 +14,9 @@
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.6.0 - compatible with the HyperList definition v. 2.6
-" Modified:   2025-04-28
-" Changes:    Added <leader>o to mark a checkbox item as 'in progress'
+" Version:    2.6.1 - compatible with the HyperList definition v. 2.6
+" Modified:   2025-01-04
+" Changes:    Major performance and feature enhancements (see doc for details)
 
 " Instructions {{{1
 "
@@ -82,6 +82,23 @@ if version < 600
 elseif exists('b:current_syntax')
     finish
 endif
+
+" Fast startup optimization
+let s:file_size = line('$')
+let s:large_file_threshold = exists('g:hyperlist_large_file_threshold') ? g:hyperlist_large_file_threshold : 2000
+let s:is_large_file = s:file_size > s:large_file_threshold
+
+" Performance mode for large files
+if s:is_large_file
+  let g:hyperlist_performance_mode = 1
+  " Reduce features for large files
+  let s:max_fold_levels = 8
+  syn sync minlines=5
+  syn sync maxlines=50
+else
+  let s:max_fold_levels = 15
+endif
+
 let b:current_syntax = "HyperList"
 
 " OS specific settings
@@ -97,6 +114,102 @@ endif
 
 if !exists("g:alldates")
   let g:alldates=0
+endif
+
+" Modern features configuration {{{2
+" Enable/disable modern features (default: auto-detect)
+if !exists("g:hyperlist_enable_floating_windows")
+  let g:hyperlist_enable_floating_windows = has('nvim-0.4.0') && exists('*nvim_open_win')
+endif
+
+if !exists("g:hyperlist_enable_lsp_completion")
+  let g:hyperlist_enable_lsp_completion = 1
+endif
+
+if !exists("g:hyperlist_enable_telescope")
+  let g:hyperlist_enable_telescope = exists(':Telescope')
+endif
+
+" Floating window appearance
+if !exists("g:hyperlist_float_border")
+  let g:hyperlist_float_border = 'rounded'
+endif
+
+if !exists("g:hyperlist_float_max_width")
+  let g:hyperlist_float_max_width = 80
+endif
+
+if !exists("g:hyperlist_float_max_height")
+  let g:hyperlist_float_max_height = 20
+endif
+
+" Preview timeout (milliseconds)
+if !exists("g:hyperlist_preview_timeout")
+  let g:hyperlist_preview_timeout = 4000
+endif
+
+" Enable breadcrumb display
+if !exists("g:hyperlist_show_breadcrumbs")
+  let g:hyperlist_show_breadcrumbs = 1
+endif
+
+" Auto-completion trigger characters
+if !exists("g:hyperlist_completion_triggers")
+  let g:hyperlist_completion_triggers = ['#', '<', ':', '[']
+endif
+
+" Export configuration {{{2
+" Export format preferences
+if !exists("g:hyperlist_export_include_metadata")
+  let g:hyperlist_export_include_metadata = 1
+endif
+
+if !exists("g:hyperlist_export_author")
+  let g:hyperlist_export_author = "HyperList User"
+endif
+
+if !exists("g:hyperlist_export_title_prefix")
+  let g:hyperlist_export_title_prefix = "HyperList Export"
+endif
+
+" HTML export settings
+if !exists("g:hyperlist_html_theme")
+  let g:hyperlist_html_theme = "modern"  " modern, classic, minimal
+endif
+
+if !exists("g:hyperlist_html_include_css")
+  let g:hyperlist_html_include_css = 1
+endif
+
+" LaTeX export settings
+if !exists("g:hyperlist_latex_document_class")
+  let g:hyperlist_latex_document_class = "article"
+endif
+
+if !exists("g:hyperlist_latex_font_size")
+  let g:hyperlist_latex_font_size = "11pt"
+endif
+
+if !exists("g:hyperlist_latex_include_toc")
+  let g:hyperlist_latex_include_toc = 1
+endif
+
+" Markdown export settings
+if !exists("g:hyperlist_markdown_include_yaml")
+  let g:hyperlist_markdown_include_yaml = 1
+endif
+
+if !exists("g:hyperlist_markdown_checkbox_style")
+  let g:hyperlist_markdown_checkbox_style = "github"  " github, unicode
+endif
+
+" iCal export settings
+if !exists("g:hyperlist_ical_include_categories")
+  let g:hyperlist_ical_include_categories = 1
+endif
+
+if !exists("g:hyperlist_ical_default_duration")
+  let g:hyperlist_ical_default_duration = 30  " minutes
 endif
 
 " Settings {{{1
@@ -145,9 +258,21 @@ endif
 "  let g:calendar       = "youremail@provider.com"
 
 "  Sync settings {{{2
-"  Lower the next two values if you have a slow computer
-syn sync minlines=50
-syn sync maxlines=100
+"  Dynamic sync values based on file size for optimal performance
+let s:file_lines = line("$")
+if s:file_lines > 5000
+  " Large files: reduce sync for performance
+  syn sync minlines=10
+  syn sync maxlines=100
+elseif s:file_lines > 1000
+  " Medium files: balanced sync
+  syn sync minlines=20
+  syn sync maxlines=200
+else
+  " Small files: more thorough sync
+  syn sync minlines=50
+  syn sync maxlines=300
+endif
 
 "  General settings {{{2
 setlocal autoindent
@@ -165,6 +290,182 @@ autocmd InsertLeave * :syntax sync fromstart
 let b:highlight      = "false"
 
 " Functions {{{1
+"  Modern Vim/Neovim compatibility {{{2
+"  Lazy loading wrapper for performance
+let s:modern_features_loaded = 0
+function! s:ensure_modern_features()
+  if !s:modern_features_loaded
+    call s:load_modern_features()
+    let s:modern_features_loaded = 1
+  endif
+endfunction
+
+function! s:load_modern_features()
+  " Load modern features only when needed
+  if exists('g:hyperlist_performance_mode') && g:hyperlist_performance_mode
+    " Skip expensive features in performance mode
+    return
+  endif
+  " Modern features loaded on-demand
+endfunction
+
+"  Check if we're running Neovim with floating window support
+function! s:has_floating_windows()
+  return has('nvim-0.4.0') && exists('*nvim_open_win')
+endfunction
+
+"  Create a floating window for content display
+function! s:create_floating_window(content, title)
+  if !s:has_floating_windows()
+    " Fallback to preview window for older Vim
+    pedit __HyperList_Preview__
+    wincmd P
+    setlocal buftype=nofile bufhidden=wipe noswapfile
+    call setline(1, a:content)
+    wincmd p
+    return -1
+  endif
+  
+  let width = min([max(map(copy(a:content), 'len(v:val)')), 80])
+  let height = min([len(a:content), 20])
+  let row = (winheight(0) - height) / 2
+  let col = (winwidth(0) - width) / 2
+  
+  let buf = nvim_create_buf(v:false, v:true)
+  call nvim_buf_set_lines(buf, 0, -1, v:true, a:content)
+  
+  let opts = {
+    \ 'relative': 'editor',
+    \ 'width': width,
+    \ 'height': height,
+    \ 'row': row,
+    \ 'col': col,
+    \ 'style': 'minimal',
+    \ 'border': 'rounded'
+    \ }
+  
+  let win = nvim_open_win(buf, v:false, opts)
+  
+  " Set title if supported
+  if !empty(a:title)
+    call nvim_win_set_option(win, 'winhl', 'Normal:Normal,FloatBorder:FloatBorder')
+  endif
+  
+  return win
+endfunction
+
+"  Close floating window
+function! s:close_floating_window(win_id)
+  if a:win_id != -1 && s:has_floating_windows()
+    try
+      call nvim_win_close(a:win_id, v:true)
+    catch
+    endtry
+  else
+    " Close preview window
+    pclose
+  endif
+endfunction
+
+"  Modern utility functions {{{2
+"  Enhanced item navigation with breadcrumbs
+function! ShowHyperListBreadcrumb()
+  let current_line = line('.')
+  let current_indent = indent(current_line)
+  let breadcrumb = []
+  
+  " Walk backwards to find parent items
+  for lnum in range(current_line - 1, 1, -1)
+    let line_indent = indent(lnum)
+    if line_indent < current_indent
+      let line_text = substitute(getline(lnum), '^\s*', '', '')
+      let line_text = substitute(line_text, '\s*$', '', '')
+      call insert(breadcrumb, line_text)
+      let current_indent = line_indent
+      if current_indent == 0
+        break
+      endif
+    endif
+  endfor
+  
+  " Add current item
+  let current_text = substitute(getline('.'), '^\s*', '', '')
+  call add(breadcrumb, current_text)
+  
+  if len(breadcrumb) > 1
+    echo join(breadcrumb, ' > ')
+  else
+    echo breadcrumb[0]
+  endif
+endfunction
+
+"  Smart folding based on context
+function! SmartFoldContext()
+  let current_indent = indent('.')
+  let target_level = current_indent / &tabstop + 1
+  execute 'setlocal foldlevel=' . target_level
+  normal! zv
+endfunction
+
+"  Quick item insertion with template
+function! InsertHyperListItem(type)
+  let indent_str = repeat("\t", indent('.') / &tabstop)
+  let templates = {
+    \ 'todo': '[_] ',
+    \ 'done': '[x] ',
+    \ 'inprogress': '[O] ',
+    \ 'state': 'S: ',
+    \ 'transition': 'T: ',
+    \ 'property': ': ',
+    \ 'reference': '<>',
+    \ 'comment': '()',
+    \ 'hash': '#'
+  \ }
+  
+  if has_key(templates, a:type)
+    let template = templates[a:type]
+    execute "normal! o" . indent_str . template
+    if a:type == 'reference'
+      execute "normal! i"
+    elseif a:type == 'comment'
+      execute "normal! i"
+    else
+      execute "normal! A"
+    endif
+  endif
+endfunction
+
+"  Export current item and children to quickfix
+function! ExportItemToQuickfix()
+  let start_line = line('.')
+  let start_indent = indent(start_line)
+  let end_line = start_line
+  
+  " Find end of current item and its children
+  for lnum in range(start_line + 1, line('$'))
+    if indent(lnum) <= start_indent && getline(lnum) =~# '\S'
+      break
+    endif
+    let end_line = lnum
+  endfor
+  
+  let qf_list = []
+  for lnum in range(start_line, end_line)
+    let line_text = getline(lnum)
+    if line_text =~# '\S'  " Non-empty line
+      call add(qf_list, {
+        \ 'bufnr': bufnr('%'),
+        \ 'lnum': lnum,
+        \ 'text': line_text,
+        \ 'type': 'I'
+      \ })
+    endif
+  endfor
+  
+  call setqflist(qf_list)
+  copen
+endfunction
+
 "  Folding {{{2
 "  Mapped to <SPACE> and <leader>0 - <leader>f
 setlocal foldtext=HLFoldText()
@@ -282,6 +583,49 @@ function! HLdecrypt()
   setlocal noswapfile
 endfunction
 
+"  Enhanced encryption functions with clean prompts
+function! HLencryptLine()
+  call HLdecrypt()
+  echo "Encrypting line..."
+  execute ".!openssl aes-256-cbc -e -pbkdf2 -a -salt 2>/dev/null"
+  redraw!
+endfunction
+
+function! HLencryptVisual() range
+  call HLdecrypt()
+  echo "Encrypting selection..."
+  execute a:firstline . "," . a:lastline . "!openssl aes-256-cbc -e -pbkdf2 -a -salt 2>/dev/null"
+  redraw!
+endfunction
+
+function! HLencryptAll()
+  call HLdecrypt()
+  echo "Encrypting entire file..."
+  execute '%!openssl aes-256-cbc -e -pbkdf2 -a -salt 2>/dev/null'
+  redraw!
+endfunction
+
+function! HLdecryptLine()
+  call HLdecrypt()
+  echo "Decrypting line..."
+  execute ".!openssl aes-256-cbc -d -pbkdf2 -a -salt 2>/dev/null"
+  redraw!
+endfunction
+
+function! HLdecryptVisual() range
+  call HLdecrypt()
+  echo "Decrypting selection..."
+  execute a:firstline . "," . a:lastline . "!openssl aes-256-cbc -d -pbkdf2 -a -salt 2>/dev/null"
+  redraw!
+endfunction
+
+function! HLdecryptAll()
+  call HLdecrypt()
+  echo "Decrypting entire file..."
+  execute '%!openssl aes-256-cbc -d -pbkdf2 -a -salt 2>/dev/null'
+  redraw!
+endfunction
+
 "  Underlining States/Transitions {{{2
 "  Mapped to <leader>u
 let g:STu=0
@@ -336,8 +680,324 @@ function! CheckItem (stamp)
   endif
 endfunction
 
+"  Modern reference preview (optional enhancement) {{{2
+"  Enhanced reference preview with floating window support
+function! s:preview_reference()
+  let current_line = getline('.')
+  if match(current_line,'<.*>') >= 0
+    let ref_word = matchstr(current_line,"<.\\{-}>")
+    let ref_word = substitute(ref_word, "<", '', 'g')
+    let ref_word = substitute(ref_word, '>', '', 'g')
+    
+    if match(ref_word,"^file:") >= 0
+      let file_path = substitute(ref_word, 'file:', '', 'g')
+      if filereadable(file_path)
+        let content = readfile(file_path, '', 10)
+        let title = "File: " . file_path
+        let s:preview_win = s:create_floating_window(content, title)
+        call timer_start(5000, {-> s:close_floating_window(s:preview_win)})
+        augroup HLPreviewClose
+          autocmd!
+          autocmd CursorMoved * call s:close_floating_window(s:preview_win) | autocmd! HLPreviewClose
+        augroup END
+      else
+        echo "File not found: " . file_path
+      endif
+    elseif match(ref_word,"^[-+][0-9]") >= 0
+      let offset = str2nr(ref_word)
+      let target_line = line(".") + offset
+      if target_line > 0 && target_line <= line("$")
+        let preview_start = max([1, target_line - 5])
+        let preview_end = min([line("$"), target_line + 5])
+        let content = getline(preview_start, preview_end)
+        let title = "Line " . target_line . " (offset " . ref_word . ")"
+        let s:preview_win = s:create_floating_window(content, title)
+        call timer_start(3000, {-> s:close_floating_window(s:preview_win)})
+      else
+        echo "Invalid line reference: " . ref_word
+      endif
+    else
+      let ref_dest = substitute(ref_word, '/', '\\_.\\{-}\\t', 'g')
+      let ref_dest = "\\s" . ref_dest
+      let save_pos = getpos('.')
+      normal gg
+      if search(ref_dest) > 0
+        let found_line = line('.')
+        let preview_start = max([1, found_line - 3])
+        let preview_end = min([line("$"), found_line + 7])
+        let content = getline(preview_start, preview_end)
+        let title = "Reference: " . ref_word
+        let s:preview_win = s:create_floating_window(content, title)
+        call timer_start(4000, {-> s:close_floating_window(s:preview_win)})
+      else
+        echo "Reference not found: " . ref_word
+      endif
+      call setpos('.', save_pos)
+    endif
+  else
+    echo "No reference in the HyperList item"
+  endif
+endfunction
+
+"  Modern goto reference with enhanced features
+function! GotoRefModern()
+  " First show preview, then navigate after a delay
+  call s:preview_reference()
+  call timer_start(1000, {-> GotoRef()})
+endfunction
+
+"  LSP-style completion system {{{2
+"  Get completion items based on context
+function! s:get_completion_items()
+  let line = getline('.')
+  let col = col('.')
+  let before_cursor = line[:col-2]
+  let items = []
+  
+  " State/Transition completion
+  if before_cursor =~# '\(S:\|T:\|\|\|/\)\s*$'
+    let items += ['TODO', 'DONE', 'IN_PROGRESS', 'WAITING', 'CANCELLED']
+  endif
+  
+  " Hashtag completion - collect existing hashtags
+  if before_cursor =~# '#\w*$'
+    let hashtags = []
+    for lnum in range(1, line('$'))
+      let line_text = getline(lnum)
+      let matches = []
+      let start = 0
+      while 1
+        let match_pos = match(line_text, '#\w\+', start)
+        if match_pos == -1 | break | endif
+        let match_end = matchend(line_text, '#\w\+', start)
+        let hashtag = line_text[match_pos:match_end-1]
+        if index(hashtags, hashtag) == -1
+          call add(hashtags, hashtag)
+        endif
+        let start = match_end
+      endwhile
+    endfor
+    let items += hashtags
+  endif
+  
+  " Reference completion - collect existing items that can be referenced
+  if before_cursor =~# '<[^>]*$'
+    let refs = []
+    for lnum in range(1, line('$'))
+      let line_text = getline(lnum)
+      if line_text =~# '^\s*\d\+\.'
+        let ref_text = substitute(line_text, '^\s*\(\d\+\.[^:]*\).*', '\1', '')
+        call add(refs, ref_text)
+      elseif line_text =~# '^\s*[A-Z][A-Z_]*:'
+        let ref_text = substitute(line_text, '^\s*\([A-Z][A-Z_]*\):.*', '\1', '')
+        call add(refs, ref_text)
+      endif
+    endfor
+    let items += refs
+  endif
+  
+  " Property completion
+  if before_cursor =~# '\w\+:\s*$'
+    let prop = matchstr(before_cursor, '\w\+:\s*$')
+    if prop =~# '^priority:'
+      let items += ['high', 'medium', 'low']
+    elseif prop =~# '^status:'
+      let items += ['todo', 'doing', 'done', 'blocked']
+    elseif prop =~# '^date:'
+      let items += [strftime('%Y-%m-%d'), 'today', 'tomorrow', '+1week']
+    elseif prop =~# '^time:'
+      let items += ['09:00', '10:00', '14:00', '15:30']
+    endif
+  endif
+  
+  " Checkbox completion
+  if before_cursor =~# '\[\s*$'
+    let items += ['_] ', 'x] ', 'O] ']
+  endif
+  
+  return items
+endfunction
+
+"  Modern completion function with floating window
+function! HyperListComplete()
+  let items = s:get_completion_items()
+  if empty(items)
+    echo "No completions available"
+    return
+  endif
+  
+  if s:has_floating_windows() && len(items) > 1
+    " Show completion in floating window
+    let content = map(copy(items), 'string(v:key+1) . ". " . v:val')
+    let title = "HyperList Completions"
+    let s:completion_win = s:create_floating_window(content, title)
+    
+    " Set up completion selection
+    echo "Select completion (1-" . len(items) . ") or press Esc:"
+    let choice = getchar()
+    call s:close_floating_window(s:completion_win)
+    
+    if choice >= char2nr('1') && choice <= char2nr('9')
+      let idx = choice - char2nr('1')
+      if idx < len(items)
+        return items[idx]
+      endif
+    endif
+  else
+    " Fallback to simple completion
+    if len(items) == 1
+      return items[0]
+    else
+      let choice = inputlist(['Select completion:'] + map(copy(items), 'string(v:key+1) . ". " . v:val'))
+      if choice > 0 && choice <= len(items)
+        return items[choice-1]
+      endif
+    endif
+  endif
+  
+  return ''
+endfunction
+
+"  Insert completion at cursor
+function! InsertHyperListCompletion()
+  let completion = HyperListComplete()
+  if !empty(completion)
+    execute "normal! a" . completion
+  endif
+endfunction
+
+"  Telescope.nvim integration (optional) {{{2
+"  Check if telescope is available
+function! s:has_telescope()
+  return exists(':Telescope') && luaeval('pcall(require, "telescope")')
+endfunction
+
+"  Telescope picker for HyperList items
+function! TelescopeHyperListItems()
+  if !s:has_telescope()
+    echo "Telescope.nvim not available. Install telescope.nvim for enhanced navigation."
+    return
+  endif
+  
+  lua << EOF
+  local pickers = require('telescope.pickers')
+  local finders = require('telescope.finders')
+  local conf = require('telescope.config').values
+  local actions = require('telescope.actions')
+  local action_state = require('telescope.actions.state')
+  
+  -- Collect HyperList items
+  local items = {}
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  
+  for i, line in ipairs(lines) do
+    local indent_level = 0
+    local content = line
+    
+    -- Count indentation
+    local indent_match = string.match(line, '^(\t*)')
+    if indent_match then
+      indent_level = string.len(indent_match)
+    end
+    
+    -- Extract meaningful content
+    if string.match(line, '%S') then  -- Non-empty line
+      local display = string.rep('  ', indent_level) .. string.gsub(line, '^%s*', '')
+      table.insert(items, {
+        display = display,
+        line_number = i,
+        content = line
+      })
+    end
+  end
+  
+  pickers.new({}, {
+    prompt_title = "HyperList Items",
+    finder = finders.new_table {
+      results = items,
+      entry_maker = function(entry)
+        return {
+          value = entry,
+          display = entry.display,
+          ordinal = entry.content,
+        }
+      end,
+    },
+    sorter = conf.generic_sorter({}),
+    attach_mappings = function(prompt_bufnr, map)
+      actions.select_default:replace(function()
+        actions.close(prompt_bufnr)
+        local selection = action_state.get_selected_entry()
+        vim.api.nvim_win_set_cursor(0, {selection.value.line_number, 0})
+        vim.cmd('normal! zz')
+      end)
+      return true
+    end,
+  }):find()
+EOF
+endfunction
+
+"  Telescope picker for references
+function! TelescopeHyperListReferences()
+  if !s:has_telescope()
+    echo "Telescope.nvim not available"
+    return
+  endif
+  
+  lua << EOF
+  local pickers = require('telescope.pickers')
+  local finders = require('telescope.finders')
+  local conf = require('telescope.config').values
+  local actions = require('telescope.actions')
+  local action_state = require('telescope.actions.state')
+  
+  -- Find all references in the document
+  local refs = {}
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  
+  for i, line in ipairs(lines) do
+    for ref in string.gmatch(line, '<([^>]+)>') do
+      table.insert(refs, {
+        reference = ref,
+        line_number = i,
+        line_content = line
+      })
+    end
+  end
+  
+  if #refs == 0 then
+    print("No references found in this HyperList")
+    return
+  end
+  
+  pickers.new({}, {
+    prompt_title = "HyperList References",
+    finder = finders.new_table {
+      results = refs,
+      entry_maker = function(entry)
+        return {
+          value = entry,
+          display = string.format("<%s> (line %d)", entry.reference, entry.line_number),
+          ordinal = entry.reference,
+        }
+      end,
+    },
+    sorter = conf.generic_sorter({}),
+    attach_mappings = function(prompt_bufnr, map)
+      actions.select_default:replace(function()
+        actions.close(prompt_bufnr)
+        local selection = action_state.get_selected_entry()
+        vim.api.nvim_win_set_cursor(0, {selection.value.line_number, 0})
+        vim.cmd('normal! zz')
+      end)
+      return true
+    end,
+  }):find()
+EOF
+endfunction
+
 "  Goto reference {{{2
-"  Mapped to 'gr' and <CR>
+"  Mapped to 'gr' and <CR> - ORIGINAL FUNCTION PRESERVED
 if !exists("*GotoRef") 
   function! GotoRef()
     normal m'
@@ -449,8 +1109,143 @@ function! OpenFile()
 endfunction
 
 
+"  Enhanced LaTeX conversion{{{2
+"  Modern LaTeX export with better packages and formatting
+function! LaTeXConversionModern()
+    setlocal expandtab
+    retab
+    try
+        "Remove VIM tagline
+        execute '%s/^vim:.*//g'
+    catch
+    endtry
+    try
+        "Escape special LaTeX characters
+        execute '%s/\\/\\textbackslash{}/g'
+        execute '%s/&/\\&/g'
+        execute '%s/%/\\%/g'
+        execute '%s/\$/\\$/g'
+        execute '%s/#/\\#/g'
+        execute '%s/_/\\_/g'
+        execute '%s/\^/\\textasciicircum{}/g'
+        execute '%s/~/\\textasciitilde{}/g'
+    catch
+    endtry
+    try
+        "Convert HyperList markup
+        execute '%s/ \@<=\*\(.\{-}\)\* /\\textbf{\1}/g'
+        execute '%s/ \@<=\/\(.\{-}\)\/ /\\textit{\1}/g'
+        execute '%s/ \@<=_\(.\{-}\)_ /\\underline{\1}/g'
+    catch
+    endtry
+    try
+        "Convert HyperList elements with better commands
+        execute '%s/\(\[.\{-}\]\)/\\hlqualifier{\1}/g'
+        execute '%s/\({.\{-}}\)/\\hlsubstitution{\1}/g'
+        execute '%s/\(#[a-zA-ZæøåÆØÅ0-9.:/_&?%=\\-\\*]\\+\)/\\hlhashtag{\1}/g'
+        execute '%s/\\(<\\{1,2}[a-zA-ZæøåÆØÅ0-9.:/_&?%=\\-\\* ]\\+>\\{1,2}\\)/\\hlreference{\1}/g'
+        execute '%s/\((.*)\)/\\hlcomment{\1}/g'
+        execute '%s/\(\".*\"\)/\\hlquote{\1}/g'
+    catch
+    endtry
+    try
+        "Convert States and Transitions
+        execute '%s/^\\(\\s*\\)S: \\(.*\\)/\\1\\hlstate{State: \\2}/g'
+        execute '%s/^\\(\\s*\\)T: \\(.*\\)/\\1\\hltransition{Action: \\2}/g'
+        execute '%s/^\\(\\s*\\)| \\(.*\\)/\\1\\hlstate{State: \\2}/g'
+        execute '%s/^\\(\\s*\\)\\/ \\(.*\\)/\\1\\hltransition{Action: \\2}/g'
+    catch
+    endtry
+    try
+        "Convert Operators and Properties
+        execute '%s/\\([A-ZÆØÅÁÉÓÚÃÕÂÊÔÇÀ_\\-() /]\\{2,}\\):\\s/\\hloperator{\1:} /g'
+        execute '%s/\\([a-zA-ZæøåÆØÅ0-9,._&?%= \\-\\/+<>#'"'"'()\\*:]\\{2,}\\):\\s/\\hlproperty{\1:} /g'
+    catch
+    endtry
+    try
+        "Convert indentation to proper LaTeX lists
+        execute '%s/^\\(\\t\\|\\*\\)\\{1}\\([^\\\\]\\)/\\\\item \\2/g'
+        execute '%s/^\\(\\t\\|\\*\\)\\{2}\\([^\\\\]\\)/\\\\begin{itemize}\\\\item \\2\\\\end{itemize}/g'
+    catch
+    endtry
+    try
+        "Convert checkboxes
+        execute '%s/\\[_\\]/\\checkbox{}/g'
+        execute '%s/\\[x\\]/\\checkboxdone{}/g'
+        execute '%s/\\[X\\]/\\checkboxdone{}/g'
+        execute '%s/\\[O\\]/\\checkboxprogress{}/g'
+    catch
+    endtry
+    
+    "Enhanced document structure
+    normal ggO%Generated by HyperList.vim - Enhanced LaTeX Export
+    execute "normal o%Export date: " . strftime('%Y-%m-%d %H:%M:%S')
+    normal o%Source: https://github.com/isene/hyperlist.vim
+    normal o
+    normal o\\documentclass[11pt,a4paper]{article}
+    normal o\\usepackage[utf8]{inputenc}
+    normal o\\usepackage[T1]{fontenc}
+    normal o\\usepackage[english]{babel}
+    normal o\\usepackage[margin=2.5cm]{geometry}
+    normal o\\usepackage{xcolor}
+    normal o\\usepackage{enumitem}
+    normal o\\usepackage{fancyhdr}
+    normal o\\usepackage{titlesec}
+    normal o\\usepackage{hyperref}
+    normal o\\usepackage{tcolorbox}
+    normal o\\usepackage{fontawesome5}
+    normal o
+    normal o% HyperList color definitions
+    normal o\\definecolor{hloperator}{RGB}{41,128,185}
+    normal o\\definecolor{hlproperty}{RGB}{231,76,60}
+    normal o\\definecolor{hlqualifier}{RGB}{39,174,96}
+    normal o\\definecolor{hlhashtag}{RGB}{243,156,18}
+    normal o\\definecolor{hlreference}{RGB}{155,89,182}
+    normal o\\definecolor{hlcomment}{RGB}{127,140,141}
+    normal o\\definecolor{hlquote}{RGB}{22,160,133}
+    normal o\\definecolor{hlstate}{RGB}{46,204,113}
+    normal o\\definecolor{hltransition}{RGB}{230,126,34}
+    normal o
+    normal o% HyperList commands
+    normal o\\newcommand{\\hloperator}[1]{\\textcolor{hloperator}{\\textbf{#1}}}
+    normal o\\newcommand{\\hlproperty}[1]{\\textcolor{hlproperty}{\\textit{#1}}}
+    normal o\\newcommand{\\hlqualifier}[1]{\\textcolor{hlqualifier}{\\texttt{#1}}}
+    normal o\\newcommand{\\hlhashtag}[1]{\\textcolor{hlhashtag}{\\textbf{#1}}}
+    normal o\\newcommand{\\hlreference}[1]{\\textcolor{hlreference}{#1}}
+    normal o\\newcommand{\\hlcomment}[1]{\\textcolor{hlcomment}{\\textit{#1}}}
+    normal o\\newcommand{\\hlquote}[1]{\\textcolor{hlquote}{#1}}
+    normal o\\newcommand{\\hlstate}[1]{\\begin{tcolorbox}[colback=hlstate!10,colframe=hlstate,title=State]#1\\end{tcolorbox}}
+    normal o\\newcommand{\\hltransition}[1]{\\begin{tcolorbox}[colback=hltransition!10,colframe=hltransition,title=Action]#1\\end{tcolorbox}}
+    normal o\\newcommand{\\hlsubstitution}[1]{\\textcolor{hlqualifier}{#1}}
+    normal o\\newcommand{\\checkbox}{\\faSquare[regular]}
+    normal o\\newcommand{\\checkboxdone}{\\faCheckSquare}
+    normal o\\newcommand{\\checkboxprogress}{\\faMinusSquare[regular]}
+    normal o
+    normal o% Document setup
+    normal o\\title{HyperList Export}
+    execute "normal o\\author{Generated by HyperList.vim}"
+    execute "normal o\\date{" . strftime('%Y-%m-%d') . "}"
+    normal o
+    normal o\\pagestyle{fancy}
+    normal o\\fancyhf{}
+    normal o\\fancyhead[R]{\\thepage}
+    normal o\\fancyhead[L]{HyperList Export}
+    normal o
+    normal o\\begin{document}
+    normal o\\maketitle
+    normal o\\tableofcontents
+    normal o\\newpage
+    normal o
+    normal o\\begin{itemize}[leftmargin=0pt,itemsep=2pt,parsep=0pt]
+    
+    "Document end
+    normal Go\\end{itemize}
+    normal o\\end{document}
+    setlocal filetype=tex
+endfunction
+
 "  LaTeX conversion{{{2
-"  Mapped to '<leader>L'
+"  Mapped to '<leader>L' - ORIGINAL FUNCTION PRESERVED
 function! LaTeXconversion ()
     setlocal expandtab
     retab
@@ -586,8 +1381,104 @@ function! LaTeXconversion ()
     setlocal filetype=tex
 endfunction
 
+"  Enhanced HTML conversion{{{2
+"  Modern HTML export with better formatting and CSS
+function! HTMLConversionModern()
+  try
+    "Remove VIM tagline
+    execute '%s/^vim:.*//g'
+  catch
+  endtry
+  
+  " Document structure and modern CSS
+  normal ggO<!DOCTYPE html>
+  normal o<html lang="en">
+  normal o<head>
+  normal o<meta charset="UTF-8">
+  normal o<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  normal o<title>HyperList Export</title>
+  normal o<style>
+  normal obody { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; margin: 2rem; background: #f9f9f9; }
+  normal o.hyperlist { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 900px; margin: 0 auto; }
+  normal oh1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 0.5rem; }
+  normal o.hl-item { margin: 0.25rem 0; }
+  normal o.hl-level-1 { margin-left: 0; }
+  normal o.hl-level-2 { margin-left: 1.5rem; }
+  normal o.hl-level-3 { margin-left: 3rem; }
+  normal o.hl-level-4 { margin-left: 4.5rem; }
+  normal o.hl-level-5 { margin-left: 6rem; }
+  normal o.hl-operator { font-weight: bold; color: #2980b9; }
+  normal o.hl-property { font-style: italic; color: #e74c3c; }
+  normal o.hl-qualifier { background: #ecf0f1; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #27ae60; }
+  normal o.hl-reference { color: #9b59b6; text-decoration: none; }
+  normal o.hl-reference:hover { text-decoration: underline; }
+  normal o.hl-hashtag { color: #f39c12; font-weight: 500; }
+  normal o.hl-comment { color: #7f8c8d; font-style: italic; }
+  normal o.hl-quote { color: #16a085; }
+  normal o.hl-state { background: #e8f5e8; padding: 0.25rem 0.5rem; border-left: 4px solid #27ae60; }
+  normal o.hl-transition { background: #fef9e7; padding: 0.25rem 0.5rem; border-left: 4px solid #f39c12; }
+  normal o.hl-checkbox { font-family: monospace; font-weight: bold; }
+  normal o.hl-checkbox.done { color: #27ae60; }
+  normal o.hl-checkbox.progress { color: #f39c12; }
+  normal o</style>
+  normal o</head>
+  normal o<body>
+  normal o<div class="hyperlist">
+  execute "normal oh1>HyperList Export - " . strftime('%Y-%m-%d') . "</h1>"
+  
+  try
+    " Add semantic HTML structure
+    execute '%s/^\([^[:space:]#].*\)$/<h2>\1<\/h2>/g'
+    
+    " Convert indentation to proper HTML structure with classes
+    execute '%s/^\(\t\|\*\)\{1}\([^<]\)/  <div class="hl-item hl-level-1">\2<\/div>/g'
+    execute '%s/^\(\t\|\*\)\{2}\([^<]\)/    <div class="hl-item hl-level-2">\2<\/div>/g'
+    execute '%s/^\(\t\|\*\)\{3}\([^<]\)/      <div class="hl-item hl-level-3">\2<\/div>/g'
+    execute '%s/^\(\t\|\*\)\{4}\([^<]\)/        <div class="hl-item hl-level-4">\2<\/div>/g'
+    execute '%s/^\(\t\|\*\)\{5}\([^<]\)/          <div class="hl-item hl-level-5">\2<\/div>/g'
+    
+    "Enhanced styling for HyperList elements
+    execute '%s/\(<.\{-}>\)/<a href="#" class="hl-reference">\1<\/a>/g'
+    execute '%s/\(\".*\"\)/<span class="hl-quote">\1<\/span>/g'
+    execute '%s/ \@<=\*\(.\{-}\)\* / <strong>\1<\/strong> /g'
+    execute '%s/ \@<=\/\(.\{-}\)\/ /<em>\1<\/em>/g'
+    execute '%s/ \@<=_\(.\{-}\)_ / <u>\1<\/u> /g'
+    execute '%s/\((.*)\)/<span class="hl-comment">\1<\/span>/g'
+    execute '%s/\(\[[^\]]*\]\)/<span class="hl-qualifier">\1<\/span>/g'
+    execute '%s/\(#[a-zA-ZæøåÆØÅ0-9.:/_&?%=+\-\*]\+\)/<span class="hl-hashtag">\1<\/span>/g'
+    
+    " Enhanced checkbox styling
+    execute '%s/\[_\]/<span class="hl-checkbox">☐<\/span>/g'
+    execute '%s/\[x\]/<span class="hl-checkbox done">☑<\/span>/g'
+    execute '%s/\[X\]/<span class="hl-checkbox done">☑<\/span>/g'
+    execute '%s/\[O\]/<span class="hl-checkbox progress">⚬<\/span>/g'
+    
+    " States and Transitions with better styling
+    execute '%s/^\(\s*\)<div class="\([^"]*\)">S: \(.*\)<\/div>/\1<div class="\2 hl-state"><strong>State:<\/strong> \3<\/div>/g'
+    execute '%s/^\(\s*\)<div class="\([^"]*\)">T: \(.*\)<\/div>/\1<div class="\2 hl-transition"><strong>Action:<\/strong> \3<\/div>/g'
+    execute '%s/^\(\s*\)<div class="\([^"]*\)">| \(.*\)<\/div>/\1<div class="\2 hl-state"><strong>State:<\/strong> \3<\/div>/g'
+    execute '%s/^\(\s*\)<div class="\([^"]*\)">\/ \(.*\)<\/div>/\1<div class="\2 hl-transition"><strong>Action:<\/strong> \3<\/div>/g'
+    
+    " Operators and Properties
+    execute '%s/\([A-ZÆØÅÁÉÓÚÃÕÂÊÔÇÀ_\-() /]\{2,}\):\s/<span class="hl-operator">\1:<\/span> /g'
+    execute '%s/\([a-zA-ZæøåÆØÅ0-9,._&?%= \-\/+<>#'"'"'()]\{2,}\):\s/<span class="hl-property">\1:<\/span> /g'
+    
+  catch
+  endtry
+  
+  " Close document
+  normal Go</div>
+  execute "normal o<footer style=\"text-align: center; margin-top: 2rem; color: #7f8c8d; font-size: 0.9rem;\">"
+  execute "normal oGenerated by <a href=\"https://github.com/isene/hyperlist.vim\">HyperList.vim</a> on " . strftime('%Y-%m-%d %H:%M:%S')
+  normal o</footer>
+  normal o</body>
+  normal o</html>
+  
+  setlocal filetype=html
+endfunction
+
 "  HTML conversion{{{2
-"  Mapped to '<leader>H'
+"  Mapped to '<leader>H' - ORIGINAL FUNCTION PRESERVED
 function! HTMLconversion ()
   try
     "Remove VIM tagline
@@ -703,6 +1594,87 @@ function! HTMLconversion ()
   normal GO</body>
   normal o</html>
   setlocal filetype=html
+endfunction
+
+"  Markdown conversion{{{2
+"  Modern export function for Markdown format
+function! MarkdownConversion()
+  try
+    "Remove VIM tagline
+    execute '%s/^vim:.*//g'
+  catch
+  endtry
+  try
+    "Convert HyperList elements to Markdown
+    
+    "Convert numbering to ordered lists (1. 2. etc)
+    execute '%s/^\(\t\|\*\)*\([0-9]\+\)\. /\1\2. /g'
+    
+    "Convert indentation to Markdown list format
+    execute '%s/^\(\t\|\*\)\{1}\([^0-9\t\*]\)/- \2/g'
+    execute '%s/^\(\t\|\*\)\{2}\([^0-9\t\*]\)/  - \2/g'
+    execute '%s/^\(\t\|\*\)\{3}\([^0-9\t\*]\)/    - \2/g'
+    execute '%s/^\(\t\|\*\)\{4}\([^0-9\t\*]\)/      - \2/g'
+    execute '%s/^\(\t\|\*\)\{5}\([^0-9\t\*]\)/        - \2/g'
+    execute '%s/^\(\t\|\*\)\{6}\([^0-9\t\*]\)/          - \2/g'
+    
+    "Convert bold, italic, underline
+    execute '%s/ \@<=\*\(.\{-}\)\* / **\1** /g'
+    execute '%s/ \@<=\/\(.\{-}\)\/ / *\1* /g'
+    execute '%s/ \@<=_\(.\{-}\)_ / _\1_ /g'
+    
+    "Convert hashtags to Markdown tags
+    execute '%s/#\([a-zA-ZæøåÆØÅ0-9.:/_&?%=+\-\*]\+\)/#\1/g'
+    
+    "Convert references to Markdown links
+    execute '%s/<\([^>]\+\)>/[\1](\1)/g'
+    
+    "Convert checkboxes to GitHub-style checkboxes
+    execute '%s/\[_\]/- [ ]/g'
+    execute '%s/\[x\]/- [x]/g'
+    execute '%s/\[X\]/- [x]/g'
+    execute '%s/\[O\]/- [o]/g'
+    
+    "Convert States and Transitions to bold headers
+    execute '%s/^\(\s*\)S: \(.*\)/\1**State:** \2/g'
+    execute '%s/^\(\s*\)T: \(.*\)/\1**Action:** \2/g'
+    execute '%s/^\(\s*\)| \(.*\)/\1**State:** \2/g'
+    execute '%s/^\(\s*\)\/ \(.*\)/\1**Action:** \2/g'
+    
+    "Convert Operators (ALL CAPS:) to bold
+    execute '%s/^\(\s*\)\([A-ZÆØÅÁÉÓÚÃÕÂÊÔÇÀ_\-() /]\{2,}\):\s/\1**\2:** /g'
+    
+    "Convert Properties to emphasis
+    execute '%s/^\(\s*\)\([a-zA-ZæøåÆØÅ0-9,._&?%= \-\/+<>#'"'"'()]\{2,}\):\s/\1*\2:* /g'
+    
+    "Convert Qualifiers [text] to code blocks
+    execute '%s/\[\([^\]]\+\)\]/`\1`/g'
+    
+    "Convert Comments (text) to italic
+    execute '%s/(\([^)]\+\))/*(\1)*/g'
+    
+    "Convert Quotes to proper Markdown quotes
+    execute '%s/"\([^"]\+\)"/"\1"/g'
+    
+    "Handle multi-line indicators
+    execute '%s/^\(\s*\)+ /\1\\\n/g'
+    
+    "Convert first line to H1 if it doesn't start with indentation
+    execute '1s/^\([^[:space:]#]\+.*\)$/# \1/'
+    
+  catch
+  endtry
+  
+  "Document metadata at top
+  normal ggO---
+  normal otitle: "HyperList Export"
+  normal odate: 
+  execute "normal oexported: " . strftime('%Y-%m-%d %H:%M:%S')
+  normal osource: "HyperList.vim"
+  normal o---
+  normal o
+  
+  setlocal filetype=markdown
 endfunction
 
 "  TPP conversion{{{2
@@ -846,24 +1818,77 @@ function! CalendarAdd(...)
         endfor
         if ical == 1
           let l:icaltext  = "BEGIN:VCALENDAR\n"
-          let l:icaltext .= "PRODID:-//HyperList//VIM HyperList plugin//EN\n"
           let l:icaltext .= "VERSION:2.0\n"
+          let l:icaltext .= "PRODID:-//HyperList//VIM HyperList Plugin v2.6//EN\n"
+          let l:icaltext .= "CALSCALE:GREGORIAN\n"
+          let l:icaltext .= "METHOD:PUBLISH\n"
+          let l:icaltext .= "X-WR-CALNAME:HyperList Events\n"
+          let l:icaltext .= "X-WR-TIMEZONE:UTC\n"
+          let l:icaltext .= "X-WR-CALDESC:Events exported from HyperList\n"
           let l:icaltext .= "BEGIN:VEVENT\n"
           let l:icaltime  = strftime("%Y%m%dT%H%M%SZ")
           let l:icaltext .= "DTSTAMP:"     . l:icaltime . "\n"
-          let l:icaltext .= "UID:"         . l:icaltime . "@HyperList\n"
-          let l:icaltext .= "SUMMARY:"     . l:title   . "\n"
-          let l:icaltext .= "DESCRIPTION:" . l:g_desc   . "\n"
-          let l:icaldt    = substitute(l:dt, '-', "", "g")
-          let l:tmh       = l:tm[1:2]
-          let l:tmm       = l:tm[4:5]
-          let l:icaltext .= "DTSTART:"     . l:icaldt . "T" . l:tmh . l:tmm . "00Z\n"
-          let l:tmm  += 30
-          if l:tmm > 60
-            let l:tmm -= 60
-            let l:tmh += 1
+          let l:icaltext .= "UID:"         . l:icaltime . "-" . l:count . "@hyperlist.vim\n"
+          let l:icaltext .= "CREATED:"     . l:icaltime . "\n"
+          let l:icaltext .= "LAST-MODIFIED:" . l:icaltime . "\n"
+          let l:icaltext .= "SEQUENCE:0\n"
+          let l:icaltext .= "STATUS:CONFIRMED\n"
+          let l:icaltext .= "TRANSP:OPAQUE\n"
+          
+          " Clean up title and description for iCal format
+          let l:clean_title = substitute(l:title, '\n', ' ', 'g')
+          let l:clean_title = substitute(l:clean_title, '\r', '', 'g')
+          let l:clean_desc = substitute(l:g_desc, '\n', '\\n', 'g')
+          let l:clean_desc = substitute(l:clean_desc, '\r', '', 'g')
+          
+          let l:icaltext .= "SUMMARY:"     . l:clean_title   . "\n"
+          let l:icaltext .= "DESCRIPTION:" . l:clean_desc   . "\n"
+          
+          " Add location if available (look for location: in the item)
+          if match(l:g_desc, 'location:') >= 0
+            let l:location = matchstr(l:g_desc, 'location:\s*\zs[^\n]*')
+            let l:icaltext .= "LOCATION:"    . l:location . "\n"
           endif
-          let l:icaltext .= "DTEND:"       . l:icaldt . "T" . l:tmh . l:tmm . "00Z\n"
+          
+          " Add categories based on hashtags
+          let l:categories = ""
+          let l:tag_matches = []
+          let l:start = 0
+          while 1
+            let l:match_pos = match(l:g_desc, '#\w\+', l:start)
+            if l:match_pos == -1 | break | endif
+            let l:match_end = matchend(l:g_desc, '#\w\+', l:start)
+            let l:tag = l:g_desc[l:match_pos+1:l:match_end-1]
+            if index(l:tag_matches, l:tag) == -1
+              call add(l:tag_matches, l:tag)
+            endif
+            let l:start = l:match_end
+          endwhile
+          if len(l:tag_matches) > 0
+            let l:icaltext .= "CATEGORIES:" . join(l:tag_matches, ',') . "\n"
+          endif
+          
+          let l:icaldt    = substitute(l:dt, '-', "", "g")
+          if l:tm != ""
+            let l:tmh       = str2nr(l:tm[1:2])
+            let l:tmm       = str2nr(l:tm[4:5])
+            let l:icaltext .= "DTSTART:"     . l:icaldt . "T" . printf("%02d%02d", l:tmh, l:tmm) . "00Z\n"
+            let l:tmm  += 30
+            if l:tmm >= 60
+              let l:tmm -= 60
+              let l:tmh += 1
+              if l:tmh >= 24
+                let l:tmh = 0
+              endif
+            endif
+            let l:icaltext .= "DTEND:"       . l:icaldt . "T" . printf("%02d%02d", l:tmh, l:tmm) . "00Z\n"
+          else
+            " All-day event
+            let l:icaltext .= "DTSTART;VALUE=DATE:" . l:icaldt . "\n"
+            let l:next_day = strftime("%Y%m%d", strptime(l:dt, "%Y-%m-%d") + 86400)
+            let l:icaltext .= "DTEND;VALUE=DATE:" . l:next_day . "\n"
+          endif
+          
           let l:icaltext .= "END:VEVENT\n"
           let l:icaltext .= "END:VCALENDAR\n"
           let l:icalfile  = strftime("%Y-%m-%d_%H%M_") . l:count . ".ics"
@@ -943,12 +1968,16 @@ syn match   HLqual '\[.\{-}\]' contains=HLtodo,HLref,HLcomment
 " Substitutions are enclosed within { }
 syn match   HLsub  '{.\{-}}' contains=HLtodo,HLref,HLcomment
 
-" Properties (formerly known as Tags) - anything that ends in a colon that is
-" not only uppercase letters (which would make it an Operator)
-syn match   HLtag	'\(^\|\s*\|\**\)\@<=[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,._&?!%= \-\/+<>#'"()\*:]\{-2,}:\s' contains=HLtodo,HLcomment,HLquote,HLref
-
-" HyperList operators
-syn match   HLop	'\(^\|\s*\|\**\)\@<=[A-ZÆØÅÁÉÓÚÃÕÂÊÔÇÀ_\-() /]\{-2,}:\s' contains=HLcomment,HLquote
+" Performance-optimized syntax patterns
+if s:is_large_file
+  " Simplified patterns for large files - reduce character class complexity
+  syn match   HLtag	'\(^\|\s*\)\@<=[a-zA-Z0-9,._&?!%= \-\/+:]\{-2,}:\s' contains=HLtodo,HLcomment,HLquote,HLref
+  syn match   HLop	'\(^\|\s*\)\@<=[A-Z_\-() /]\{-2,}:\s' contains=HLcomment,HLquote
+else
+  " Full patterns for smaller files
+  syn match   HLtag	'\(^\|\s*\|\**\)\@<=[a-zA-ZæøåÆØÅáéóúãõâêôçàÁÉÓÚÃÕÂÊÔÇÀü0-9,._&?!%= \-\/+<>#'"()\*:]\{-2,}:\s' contains=HLtodo,HLcomment,HLquote,HLref
+  syn match   HLop	'\(^\|\s*\|\**\)\@<=[A-ZÆØÅÁÉÓÚÃÕÂÊÔÇÀ_\-() /]\{-2,}:\s' contains=HLcomment,HLquote
+endif
 
 " Mark semicolon as stringing together lines
 syn match   HLsc	';'
@@ -989,22 +2018,62 @@ syn match   HLu	        '\(\t\| \)\@<=_.\{-}_\($\| \)\@='
 syn cluster HLtxt contains=HLident,HLmulti,HLop,HLqual,HLsub,HLtag,HLhash,HLref,HLkey,HLlit,HLlc,HLcomment,HLquote,HLsc,HLtodo,HLmove,HLb,HLi,HLu,HLstate,HLtrans,HLdim0,HLdim1
 
 "  HyperList indentation (folding levels) {{{2
+"  Performance optimization: Dynamic folding based on file size
 if !exists("g:disable_collapse")
-syn region L15 start="^\(\t\|\*\)\{14} \=\S" end="^\(^\(\t\|\*\)\{15,} \=\S\)\@!" fold contains=@HLtxt
-syn region L14 start="^\(\t\|\*\)\{13} \=\S" end="^\(^\(\t\|\*\)\{14,} \=\S\)\@!" fold contains=@HLtxt,L15
-syn region L13 start="^\(\t\|\*\)\{12} \=\S" end="^\(^\(\t\|\*\)\{13,} \=\S\)\@!" fold contains=@HLtxt,L14,L15
-syn region L12 start="^\(\t\|\*\)\{11} \=\S" end="^\(^\(\t\|\*\)\{12,} \=\S\)\@!" fold contains=@HLtxt,L13,L14,L15
-syn region L11 start="^\(\t\|\*\)\{10} \=\S" end="^\(^\(\t\|\*\)\{11,} \=\S\)\@!" fold contains=@HLtxt,L12,L13,L14,L15
-syn region L10 start="^\(\t\|\*\)\{9} \=\S"  end="^\(^\(\t\|\*\)\{10,} \=\S\)\@!" fold contains=@HLtxt,L11,L12,L13,L14,L15
-syn region L9 start="^\(\t\|\*\)\{8} \=\S"   end="^\(^\(\t\|\*\)\{9,} \=\S\)\@!"  fold contains=@HLtxt,L10,L11,L12,L13,L14,L15
-syn region L8 start="^\(\t\|\*\)\{7} \=\S"   end="^\(^\(\t\|\*\)\{8,} \=\S\)\@!"  fold contains=@HLtxt,L9,L10,L11,L12,L13,L14,L15
-syn region L7 start="^\(\t\|\*\)\{6} \=\S"   end="^\(^\(\t\|\*\)\{7,} \=\S\)\@!"  fold contains=@HLtxt,L8,L9,L10,L11,L12,L13,L14,L15
-syn region L6 start="^\(\t\|\*\)\{5} \=\S"   end="^\(^\(\t\|\*\)\{6,} \=\S\)\@!"  fold contains=@HLtxt,L7,L8,L9,L10,L11,L12,L13,L14,L15
-syn region L5 start="^\(\t\|\*\)\{4} \=\S"   end="^\(^\(\t\|\*\)\{5,} \=\S\)\@!"  fold contains=@HLtxt,L6,L7,L8,L9,L10,L11,L12,L13,L14,L15
-syn region L4 start="^\(\t\|\*\)\{3} \=\S"   end="^\(^\(\t\|\*\)\{4,} \=\S\)\@!"  fold contains=@HLtxt,L5,L6,L7,L8,L9,L10,L11,L12,L13,L14,L15
-syn region L3 start="^\(\t\|\*\)\{2} \=\S"   end="^\(^\(\t\|\*\)\{3,} \=\S\)\@!"  fold contains=@HLtxt,L4,L5,L6,L7,L8,L9,L10,L11,L12,L13,L14,L15
-syn region L2 start="^\(\t\|\*\)\{1} \=\S"   end="^\(^\(\t\|\*\)\{2,} \=\S\)\@!"  fold contains=@HLtxt,L3,L4,L5,L6,L7,L8,L9,L10,L11,L12,L13,L14,L15
-syn region L1 start="^\(\t\|\*\)\{0} \=\S"   end="^\(^\(\t\|\*\)\{1,} \=\S\)\@!"  fold contains=@HLtxt,L2,L3,L4,L5,L6,L7,L8,L9,L10,L11,L12,L13,L14,L15
+  " Use pre-calculated values from initialization
+  let s:fold_levels = exists("g:hyperlist_max_fold_levels") ? g:hyperlist_max_fold_levels : s:max_fold_levels
+  
+  " Fast folding for large files
+  if s:is_large_file
+    let s:fold_levels = min([s:fold_levels, 6])  " Even more aggressive for large files
+  endif
+  
+  " Generate folding regions based on calculated levels
+  if s:fold_levels >= 15
+    syn region L15 start="^\(\t\|\*\)\{14} \=\S" end="^\(^\(\t\|\*\)\{15,} \=\S\)\@!" fold contains=@HLtxt
+  endif
+  if s:fold_levels >= 14
+    syn region L14 start="^\(\t\|\*\)\{13} \=\S" end="^\(^\(\t\|\*\)\{14,} \=\S\)\@!" fold contains=@HLtxt,L15
+  endif
+  if s:fold_levels >= 13
+    syn region L13 start="^\(\t\|\*\)\{12} \=\S" end="^\(^\(\t\|\*\)\{13,} \=\S\)\@!" fold contains=@HLtxt,L14,L15
+  endif
+  if s:fold_levels >= 12
+    syn region L12 start="^\(\t\|\*\)\{11} \=\S" end="^\(^\(\t\|\*\)\{12,} \=\S\)\@!" fold contains=@HLtxt,L13,L14,L15
+  endif
+  if s:fold_levels >= 11
+    syn region L11 start="^\(\t\|\*\)\{10} \=\S" end="^\(^\(\t\|\*\)\{11,} \=\S\)\@!" fold contains=@HLtxt,L12,L13,L14,L15
+  endif
+  if s:fold_levels >= 10
+    syn region L10 start="^\(\t\|\*\)\{9} \=\S"  end="^\(^\(\t\|\*\)\{10,} \=\S\)\@!" fold contains=@HLtxt,L11,L12,L13,L14,L15
+  endif
+  if s:fold_levels >= 9
+    syn region L9 start="^\(\t\|\*\)\{8} \=\S"   end="^\(^\(\t\|\*\)\{9,} \=\S\)\@!"  fold contains=@HLtxt,L10,L11,L12,L13,L14,L15
+  endif
+  if s:fold_levels >= 8
+    syn region L8 start="^\(\t\|\*\)\{7} \=\S"   end="^\(^\(\t\|\*\)\{8,} \=\S\)\@!"  fold contains=@HLtxt,L9,L10,L11,L12,L13,L14,L15
+  endif
+  if s:fold_levels >= 7
+    syn region L7 start="^\(\t\|\*\)\{6} \=\S"   end="^\(^\(\t\|\*\)\{7,} \=\S\)\@!"  fold contains=@HLtxt,L8,L9,L10,L11,L12,L13,L14,L15
+  endif
+  if s:fold_levels >= 6
+    syn region L6 start="^\(\t\|\*\)\{5} \=\S"   end="^\(^\(\t\|\*\)\{6,} \=\S\)\@!"  fold contains=@HLtxt,L7,L8,L9,L10,L11,L12,L13,L14,L15
+  endif
+  if s:fold_levels >= 5
+    syn region L5 start="^\(\t\|\*\)\{4} \=\S"   end="^\(^\(\t\|\*\)\{5,} \=\S\)\@!"  fold contains=@HLtxt,L6,L7,L8,L9,L10,L11,L12,L13,L14,L15
+  endif
+  if s:fold_levels >= 4
+    syn region L4 start="^\(\t\|\*\)\{3} \=\S"   end="^\(^\(\t\|\*\)\{4,} \=\S\)\@!"  fold contains=@HLtxt,L5,L6,L7,L8,L9,L10,L11,L12,L13,L14,L15
+  endif
+  if s:fold_levels >= 3
+    syn region L3 start="^\(\t\|\*\)\{2} \=\S"   end="^\(^\(\t\|\*\)\{3,} \=\S\)\@!"  fold contains=@HLtxt,L4,L5,L6,L7,L8,L9,L10,L11,L12,L13,L14,L15
+  endif
+  if s:fold_levels >= 2
+    syn region L2 start="^\(\t\|\*\)\{1} \=\S"   end="^\(^\(\t\|\*\)\{2,} \=\S\)\@!"  fold contains=@HLtxt,L3,L4,L5,L6,L7,L8,L9,L10,L11,L12,L13,L14,L15
+  endif
+  if s:fold_levels >= 1
+    syn region L1 start="^\(\t\|\*\)\{0} \=\S"   end="^\(^\(\t\|\*\)\{1,} \=\S\)\@!"  fold contains=@HLtxt,L2,L3,L4,L5,L6,L7,L8,L9,L10,L11,L12,L13,L14,L15
+  endif
 endif
 
 "  VIM parameters (VIM modeline) {{{2
@@ -1080,12 +2149,12 @@ nmap g<UP>            <leader>f<UP><leader>0zv
 nmap <leader><DOWN>   <DOWN><leader>0zv<SPACE>zO
 nmap <leader><UP>     <leader>f<UP><leader>0zv<SPACE>zO
 
-nnoremap <leader>z        :call HLdecrypt()<CR>V:!openssl aes-256-cbc -e -pbkdf2 -a -salt 2>/dev/null<CR><C-L>
-vnoremap <leader>z        :call HLdecrypt()<CR>gv:!openssl aes-256-cbc -e -pbkdf2 -a -salt 2>/dev/null<CR><C-L>
-nnoremap <leader>Z        :call HLdecrypt()<CR>:%!openssl aes-256-cbc -e -pbkdf2 -a -salt 2>/dev/null<CR><C-L>
-nnoremap <leader>x        :call HLdecrypt()<CR>V:!openssl aes-256-cbc -d -pbkdf2 -a -salt 2>/dev/null<CR><C-L>
-vnoremap <leader>x        :call HLdecrypt()<CR>gv:!openssl aes-256-cbc -d -pbkdf2 -a -salt 2>/dev/null<CR><C-L>
-nnoremap <leader>X        :call HLdecrypt()<CR>:%!openssl aes-256-cbc -d -pbkdf2 -a -salt 2>/dev/null<CR><C-L>
+nnoremap <leader>z        :call HLencryptLine()<CR>
+vnoremap <leader>z        :call HLencryptVisual()<CR>
+nnoremap <leader>Z        :call HLencryptAll()<CR>
+nnoremap <leader>x        :call HLdecryptLine()<CR>
+vnoremap <leader>x        :call HLdecryptVisual()<CR>
+nnoremap <leader>X        :call HLdecryptAll()<CR>
 
 nnoremap <leader>L        :call LaTeXconversion()<CR>
 nnoremap <leader>H        :call HTMLconversion()<CR>
@@ -1107,6 +2176,34 @@ nnoremap <leader>C        :call Complexity()<CR>
 " Sort hack (sort the visual selected lines by the top item's indentation
 " The last item in the visual selection cannot be the last line in the document.
 vnoremap <leader>s <esc>`<^"iy0gv:s/^<c-r>i\S\@=/<c-v><c-a>/<cr>gv:s/\t/<c-v><c-b>/g<cr>gv:s/\n<c-v><c-b>/<c-v><c-x>/<cr>gvk:!sort<cr>:%s/<c-v><c-a>/<c-r>i/<cr>:%s/<c-v><c-x>/\r<c-v><c-b>/g<cr>:%s/<c-v><c-b>/\t/g<cr>
+
+" Modern feature keybindings (optional) {{{2
+" Users can add these to their config to enable modern features
+" 
+" Example mappings for modern features:
+" nnoremap <leader>p        :call <SID>preview_reference()<CR>
+" nnoremap <leader>gm       :call GotoRefModern()<CR>
+" inoremap <C-Space>        <C-o>:call InsertHyperListCompletion()<CR>
+" nnoremap <leader>fb       :call ShowHyperListBreadcrumb()<CR>
+" nnoremap <leader>fc       :call SmartFoldContext()<CR>
+" nnoremap <leader>fq       :call ExportItemToQuickfix()<CR>
+" nnoremap <leader>ft       :call TelescopeHyperListItems()<CR>
+" nnoremap <leader>fr       :call TelescopeHyperListReferences()<CR>
+"
+" Quick item insertion:
+" nnoremap <leader>it       :call InsertHyperListItem('todo')<CR>
+" nnoremap <leader>id       :call InsertHyperListItem('done')<CR>
+" nnoremap <leader>ip       :call InsertHyperListItem('inprogress')<CR>
+" nnoremap <leader>is       :call InsertHyperListItem('state')<CR>
+" nnoremap <leader>iT       :call InsertHyperListItem('transition')<CR>
+" nnoremap <leader>ir       :call InsertHyperListItem('reference')<CR>
+" nnoremap <leader>ic       :call InsertHyperListItem('comment')<CR>
+" nnoremap <leader>ih       :call InsertHyperListItem('hash')<CR>
+"
+" Modern export functions:
+" nnoremap <leader>eM       :call MarkdownConversion()<CR>
+" nnoremap <leader>eH       :call HTMLConversionModern()<CR>
+" nnoremap <leader>eL       :call LaTeXConversionModern()<CR>
 
 " GVIM menu {{{1
 let s:HL_RootMenu  = 'HyperList.'
@@ -1143,12 +2240,12 @@ menu HyperList.Next\ Template\ Item<Tab>\\SPACE    /=\s*$<CR>A<CR>
 menu HyperList.Highlight\ Toggle<Tab>\\h           :call HighLight()<CR>
 menu HyperList.Presentation\ Move\ Down<Tab>gDOWN  <DOWN><leader>0zv
 menu HyperList.Presentation\ Move\ Up<Tab>gUP      <leader>f<UP><leader>0zv
-menu HyperList.Encryption\ (Requires\ OpenSSL).Encrypt<Tab>\\z :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
-vmenu HyperList.Encryption\ (Requires\ OpenSSL).Encrypt\ Visual\ Selection<Tab>\\z :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
-menu HyperList.Encryption\ (Requires\ OpenSSL).Encrypt\ All<Tab>\\Z :call HLdecrypt()<CR>:%!openssl bf -pbkdf2 -e -a -salt 2>/dev/null<CR><C-L>
-menu HyperList.Encryption\ (Requires\ OpenSSL).Decrypt<Tab>\\x :call HLdecrypt()<CR>V:!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
-vmenu HyperList.Encryption\ (Requires\ OpenSSL).Decrypt\ Visual\ Selection<Tab>\\x :call HLdecrypt()<CR>gv:!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
-menu HyperList.Encryption\ (Requires\ OpenSSL).Decrypt\ All<Tab>\\X :call HLdecrypt()<CR>:%!openssl bf -pbkdf2 -d -a 2>/dev/null<CR><C-L>
+menu HyperList.Encryption\ (Requires\ OpenSSL).Encrypt<Tab>\\z :call HLencryptLine()<CR>
+vmenu HyperList.Encryption\ (Requires\ OpenSSL).Encrypt\ Visual\ Selection<Tab>\\z :call HLencryptVisual()<CR>
+menu HyperList.Encryption\ (Requires\ OpenSSL).Encrypt\ All<Tab>\\Z :call HLencryptAll()<CR>
+menu HyperList.Encryption\ (Requires\ OpenSSL).Decrypt<Tab>\\x :call HLdecryptLine()<CR>
+vmenu HyperList.Encryption\ (Requires\ OpenSSL).Decrypt\ Visual\ Selection<Tab>\\x :call HLdecryptVisual()<CR>
+menu HyperList.Encryption\ (Requires\ OpenSSL).Decrypt\ All<Tab>\\X :call HLdecryptAll()<CR>
 menu HyperList.Conversion.HTML<Tab>\\H             :call HTMLconversion()<CR>
 menu HyperList.Conversion.LaTeX<Tab>\\L            :call LaTeXconversion()<CR>
 menu HyperList.Conversion.TPP<Tab>\\T              :call TPPconversion()<CR>
