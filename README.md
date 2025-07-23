@@ -35,7 +35,8 @@ features:
 * Highlighting of the current item and its children
 * Encrypt and decrypt whole lists or parts of a list
 * Autoencrypt/decrypt files that have a file name starting with a dot
-* Export a HyperList to HTML, LaTeX or TPP formats
+* Export a HyperList to HTML, LaTeX, Markdown, or TPP formats
+* Modern export commands with enhanced features (responsive HTML, modern LaTeX packages)
 * Transfer all items tagged with future dates/times to a Google calendar
 * Show the complexity level of a HyperList
 * Description on how to include HyperLists within other filetypes, taking full advantage of the above features when including a HyperList in e.g. a normal .txt document
