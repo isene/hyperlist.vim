@@ -1,4 +1,4 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.6.1, 2025-01-04)
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.6.2, 2025-07-23)
  
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -156,6 +156,17 @@ preserved.  No HyperList coloring will be done. Bold, italics and underlined
 parts of the HyperList will be preserved.
 
 See https://github.com/cbbrowne/tpp for information on TPP (Text Presentation Program)
+
+Use <leader>M to convert the entire document to Markdown format.
+
+The Markdown conversion creates GitHub-flavored markdown with proper handling
+of HyperList elements, checkboxes, and nested lists.
+
+Modern Export Commands (Enhanced versions):
+<leader>eL - Export to LaTeX with modern packages and enhanced styling
+<leader>eH - Export to HTML with responsive design and modern CSS
+<leader>eM - Export to Markdown (same as <leader>M)
+<leader>eT - Export to TPP presentation (same as <leader>T)
 
 Use <leader>z to encrypt the current line (including all sublevels if folded).
 Use <leader>Z to encrypt the current file (all lines).
@@ -1189,6 +1200,23 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.6.2  		2025-07-23
+	Documentation and export improvements:
+	
+	New Features:
+	- Added <leader>M mapping for Markdown export (fixing issue #16)
+	- Enabled modern export key mappings (<leader>e* commands)
+	
+	Export Commands:
+	- <leader>eL - Enhanced LaTeX export with modern packages
+	- <leader>eH - Enhanced HTML export with responsive design
+	- <leader>eM - Markdown export
+	- <leader>eT - TPP presentation export
+	
+	Documentation:
+	- Updated documentation to include all export commands
+	- Added modern key mappings to documentation
 
 VERSION 2.6.1  		2025-01-04
 	Major performance and feature enhancements:

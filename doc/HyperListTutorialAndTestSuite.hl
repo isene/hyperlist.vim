@@ -1,4 +1,4 @@
-HyperList Test Suite (V1.0); Press '\f' to uncollapse this whole HyperList
+HyperList Test Suite (V1.1); Press '\f' to uncollapse this whole HyperList
 	This HyperList serves two purposes
 		A tutorial for all hyperlist.vim features 
 			Do each item and you will learn all the features of this VIM plugin
@@ -124,12 +124,21 @@ HyperList Test Suite (V1.0); Press '\f' to uncollapse this whole HyperList
 		Export to LaTeX
 			You can convert this whole HyperList to LaTeX and save the output to "test.tex"
 			Pressing 'u' will undo the conversion, but you need to do ':set ft=hyperlist' to set the right filetype again
-			Press '\L' to convert this whole HyperList to HTML format
+			Press '\L' to convert this whole HyperList to LaTeX format
 		Export to TPP
 			tpp: <https://github.com/cbbrowne/tpp>
 			You can convert this whole HyperList to the TPP presentation format and save the output to "test.tpp"
 			Pressing 'u' will undo the conversion, but you need to do ':set ft=hyperlist' to set the right filetype again
-			Press '\T' to convert this whole HyperList to HTML format
+			Press '\T' to convert this whole HyperList to TPP format
+		Export to Markdown
+			You can convert this whole HyperList to GitHub-flavored Markdown and save the output to "test.md"
+			Pressing 'u' will undo the conversion, but you need to do ':set ft=hyperlist' to set the right filetype again
+			Press '\M' to convert this whole HyperList to Markdown format
+		Modern Export Commands (Enhanced versions)
+			The modern export commands provide enhanced versions of the export functions
+			They use the same key with an 'e' prefix: \eH (HTML), \eL (LaTeX), \eM (Markdown), \eT (TPP)
+			Try pressing '\eH' to see the enhanced HTML export with responsive design
+			Try pressing '\eL' to see the enhanced LaTeX export with modern packages
 		Export lines to your Google calendar
 			To use this feature, you need to have the program 'gcalcli' installed and properly set up
 				gcalcli: <https://github.com/insanum/gcalcli>

@@ -14,9 +14,9 @@
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.6.1 - compatible with the HyperList definition v. 2.6
+" Version:    2.6.2 - compatible with the HyperList definition v. 2.6
 " Modified:   2025-01-04
-" Changes:    Major performance and feature enhancements (see doc for details)
+" Changes:    Added missing <leader>M for Markdown conversion. Closes #16
 
 " Instructions {{{1
 "
@@ -2159,6 +2159,7 @@ nnoremap <leader>X        :call HLdecryptAll()<CR>
 nnoremap <leader>L        :call LaTeXconversion()<CR>
 nnoremap <leader>H        :call HTMLconversion()<CR>
 nnoremap <leader>T        :call TPPconversion()<CR>
+nnoremap <leader>M        :call MarkdownConversion()<CR>
 
 nnoremap <leader>h        :call HighLight()<CR>
 nnoremap <leader>an       :call ToggleAutonum()<CR>
@@ -2201,9 +2202,10 @@ vnoremap <leader>s <esc>`<^"iy0gv:s/^<c-r>i\S\@=/<c-v><c-a>/<cr>gv:s/\t/<c-v><c-
 " nnoremap <leader>ih       :call InsertHyperListItem('hash')<CR>
 "
 " Modern export functions:
-" nnoremap <leader>eM       :call MarkdownConversion()<CR>
-" nnoremap <leader>eH       :call HTMLConversionModern()<CR>
-" nnoremap <leader>eL       :call LaTeXConversionModern()<CR>
+nnoremap <leader>eM       :call MarkdownConversion()<CR>
+nnoremap <leader>eH       :call HTMLConversionModern()<CR>
+nnoremap <leader>eL       :call LaTeXConversionModern()<CR>
+nnoremap <leader>eT       :call TPPconversion()<CR>
 
 " GVIM menu {{{1
 let s:HL_RootMenu  = 'HyperList.'
