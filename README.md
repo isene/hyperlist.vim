@@ -1,4 +1,9 @@
 # hyperlist.vim
+
+[![License](https://img.shields.io/badge/License-Public%20Domain-brightgreen.svg)](https://unlicense.org/)
+[![GitHub stars](https://img.shields.io/github/stars/isene/hyperlist.vim.svg)](https://github.com/isene/hyperlist.vim/stargazers)
+[![Stay Amazing](https://img.shields.io/badge/Stay-Amazing-blue.svg)](https://isene.org)
+
 This VIM plugin makes it easy to create and manage HyperLists using VIM
 
 ---------------------------------------------------------------------------
