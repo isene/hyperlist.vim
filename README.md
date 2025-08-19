@@ -1,3 +1,5 @@
+<img src="img/hyperlist_vim_logo.svg" align="left" width="150" height="150" alt="HyperList.vim Logo">
+
 # hyperlist.vim
 
 [![License](https://img.shields.io/badge/License-Public%20Domain-brightgreen.svg)](https://unlicense.org/)
