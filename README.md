@@ -5,6 +5,7 @@
 [![Stay Amazing](https://img.shields.io/badge/Stay-Amazing-blue.svg)](https://isene.org)
 
 <img src="img/hyperlist_vim_logo.svg" align="left" width="150" height="150" alt="HyperList.vim Logo">
+<br clear="left"/>
 
 This VIM plugin makes it easy to create and manage HyperLists using VIM
 
