@@ -19,9 +19,9 @@ syntax/hyperlist.vim	[[[1
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.6.2 - compatible with the HyperList definition v. 2.6
-" Modified:   2025-01-04
-" Changes:    Added missing <leader>M for Markdown conversion. Closes #16
+" Version:    2.6.3 - compatible with the HyperList definition v. 2.6
+" Modified:   2025-10-21
+" Changes:    Added support for HyperList folding in markdown fenced code blocks. Closes #12
 
 " Instructions {{{1
 "
@@ -2262,8 +2262,8 @@ menu HyperList.Show\ Complexity\ of\ List<Tab>:call\ Complexity() :call Complexi
 " vim modeline {{{1
 " vim: set sw=2 sts=2 et fdm=marker fcs=fold\:\ :
 doc/hyperlist.txt	[[[1
-1634
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.6.2, 2025-07-23)
+1638
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.6.3, 2025-10-21)
  
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -3465,6 +3465,10 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.6.3  		2025-10-21
+	Bug fix: HyperList folding now works in markdown fenced code blocks
+	(use ```hl or ```hyperlist language identifiers). Fixes issue #12.
 
 VERSION 2.6.2  		2025-07-23
 	Documentation and export improvements:
@@ -5842,9 +5846,9 @@ ftdetect/hyperlist.vim	[[[1
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.4.4 - compatible with the HyperList definition v. 2.4
-" Modified:   2020-08-06
-" Changes:    Refactoring (thanks to Nick Jensen [nickspoons] for guidance)
+" Version:    2.6.3 - compatible with the HyperList definition v. 2.6
+" Modified:   2025-10-21
+" Changes:    Added support for HyperList folding in markdown fenced code blocks. Closes #12
 
 " File detection {{{1
 " WOIM files are included for backward compatability (HyperList was earlier WOIM)
@@ -5877,8 +5881,16 @@ augroup END
 " vim modeline {{{1
 " vim: set sw=2 sts=2 et fdm=marker fillchars=fold\:\ :
 README.md	[[[1
-284
+308
 # hyperlist.vim
+
+[![License](https://img.shields.io/badge/License-Public%20Domain-brightgreen.svg)](https://unlicense.org/)
+[![GitHub stars](https://img.shields.io/github/stars/isene/hyperlist.vim.svg)](https://github.com/isene/hyperlist.vim/stargazers)
+[![Stay Amazing](https://img.shields.io/badge/Stay-Amazing-blue.svg)](https://isene.org)
+
+<img src="img/hyperlist_vim_logo.svg" align="left" width="150" height="150" alt="HyperList.vim Logo">
+<br clear="left"/>
+
 This VIM plugin makes it easy to create and manage HyperLists using VIM
 
 ---------------------------------------------------------------------------
@@ -5970,6 +5982,22 @@ HyperList file, syntax highlighted correctly and you can use all the neat
 HyperList functionality for VIM.
 
 ### Include Hyperlists in other document types
+
+#### Markdown Support
+
+HyperLists work automatically inside Markdown fenced code blocks! Simply use the
+language identifier `hl` or `hyperlist` in your markdown files:
+
+    ```hl
+    Top level task
+        Subtask
+            Nested subtask
+    ```
+
+All HyperList features including syntax highlighting and folding will work
+inside these code blocks.
+
+#### Other File Types
 
 To use HyperLists within other file types (other than ".hl"), add the
 following to those syntax files:
