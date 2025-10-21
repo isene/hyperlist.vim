@@ -14,9 +14,9 @@
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.4.4 - compatible with the HyperList definition v. 2.4
-" Modified:   2020-08-06
-" Changes:    Refactoring (thanks to Nick Jensen [nickspoons] for guidance)
+" Version:    2.6.3 - compatible with the HyperList definition v. 2.6
+" Modified:   2025-10-21
+" Changes:    Added support for HyperList folding in markdown fenced code blocks. Closes #12
 
 " File detection {{{1
 " WOIM files are included for backward compatability (HyperList was earlier WOIM)

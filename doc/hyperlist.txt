@@ -1,4 +1,4 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.6.2, 2025-07-23)
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.6.3, 2025-10-21)
  
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -1200,6 +1200,10 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.6.3  		2025-10-21
+	Bug fix: HyperList folding now works in markdown fenced code blocks
+	(use ```hl or ```hyperlist language identifiers). Fixes issue #12.
 
 VERSION 2.6.2  		2025-07-23
 	Documentation and export improvements:
