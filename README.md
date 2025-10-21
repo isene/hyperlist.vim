@@ -99,6 +99,22 @@ HyperList functionality for VIM.
 
 ### Include Hyperlists in other document types
 
+#### Markdown Support
+
+HyperLists work automatically inside Markdown fenced code blocks! Simply use the
+language identifier `hl` or `hyperlist` in your markdown files:
+
+    ```hl
+    Top level task
+        Subtask
+            Nested subtask
+    ```
+
+All HyperList features including syntax highlighting and folding will work
+inside these code blocks.
+
+#### Other File Types
+
 To use HyperLists within other file types (other than ".hl"), add the
 following to those syntax files:
 

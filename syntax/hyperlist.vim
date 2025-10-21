@@ -14,9 +14,9 @@
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.6.2 - compatible with the HyperList definition v. 2.6
-" Modified:   2025-01-04
-" Changes:    Added missing <leader>M for Markdown conversion. Closes #16
+" Version:    2.6.3 - compatible with the HyperList definition v. 2.6
+" Modified:   2025-10-21
+" Changes:    Added support for HyperList folding in markdown fenced code blocks. Closes #12
 
 " Instructions {{{1
 "
