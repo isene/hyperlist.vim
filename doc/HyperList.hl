@@ -5,7 +5,7 @@ HyperList
 				[? Multi-line Item] The Identifier acts like the plus sign ("+")
 			Multi-line Indicator = "+"
 				+ If one Item on a certain indent is multi-line, all Items on the same indent
-				 (including single-line Items) must start with a plus sign ("+")} or <Identifier>
+				 (including single-line Items) must start with a plus sign ("+") or <Identifier>
 				 and all lines on the same indent after the first line must start with a space
 		[?] Type
 			OR: 
@@ -34,7 +34,7 @@ HyperList
 							 The encrypted block contains indentation and is left justified
 									This would seem to break the list, but is allowed
 					A block can be included of "literal text" negating any HyperList markup
-						Use a HyperList Item containing only the Operator "\"} to mark start/end
+						Use a HyperList Item containing only the Operator "\" to mark start/end
 							EXAMPLE: 
 								\
 								This is a block of literal text...
@@ -173,15 +173,15 @@ HyperList
 				Newline
 					Used to add another Item on the same level
 					Indent
-						A Tab or an asterisk ("*")}
+						A Tab or an asterisk ("*")
 							Used to add a child
 								A child adds information to its parent
 								A child is another regular <HyperList Item>
 			Definition
 				A Separator and the same or less indent normally reads "then:"
-				[? Parent contains <Description>]} 
+				[? Parent contains <Description>] 
 					The Separator and right indent reads "with:" or "consists of:"
-				[? NOT: parent contains <Description>]} 
+				[? NOT: parent contains <Description>] 
 					The Separator and right indent reads "applies to:"
 					A Separator between the children reads "and:"
 
