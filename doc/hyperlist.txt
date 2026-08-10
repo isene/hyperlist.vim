@@ -1225,6 +1225,8 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 7 Changelog                                              *HyperList-Changelog*
 
 VERSION 2.7.0  		2026-08-10
+	The definition PDF is no longer bundled; it pushed the vimball past
+	vim.org's upload limit and is available at http://isene.org/hyperlist/
 	HyperList definition v2.7: the "[?!]" fallback Qualifier, read as
 	"otherwise". Applies when no preceding sibling Qualifier at the same
 	indent did, binding a fallback to the Items above it so a restated
