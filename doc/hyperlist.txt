@@ -1,4 +1,4 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.6.3, 2025-10-21)
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.7.0, 2026-08-10)
  
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -577,6 +577,25 @@ To indicate that an Item is optional, use "[?]". Example:
          Take the message
          Send the message to the person
 
+When two or more sibling Items form one decision, the last of them may be
+qualified with "[?!]" - read as "otherwise". It applies when no preceding
+sibling Qualifier at the same indent applied. These two are equivalent:
+
+   [? Payment received] Ship the order
+   [? Payment not received] Send a reminder
+
+   [? Payment received] Ship the order
+   [?!] Send a reminder
+
+The first form states the fallback condition again, negated. The second binds
+the fallback to the Items above it, so the two cannot drift apart when the
+condition is later edited. Use "[?!]" only as the final Item of such a group;
+it has no meaning as the first.
+
+Where the alternatives are simply tried in turn until one succeeds, the
+Operator "OR(PRIORITY): " is usually clearer than a chain of Qualifiers, as no
+condition needs stating at all.
+
 The special word "END" and the semicolon in the above example will be explained
 later, under "Reference" and "Separator", respectively.
 
@@ -1063,6 +1082,10 @@ HyperList
 						Do Item 1 or more times while "Bob is polite" = "[1+, Bob is polite]"
 						Do Item up to 4 times only while "zoo=0" = "[<4, zoo=0]"
 					Optional Item = "[?]"
+					Fallback Item = "[?!]"
+						Read as "otherwise"
+						Applies when no preceding sibling Qualifier applied
+						Valid only as the last Item of such a group
 					Timestamp Qualifier = "[YYYY-MM-DD hh.mm.ss]"
 						Shorten the format to the appropriate granularity
 					Time relations
@@ -1200,6 +1223,13 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.7.0  		2026-08-10
+	HyperList definition v2.7: the "[?!]" fallback Qualifier, read as
+	"otherwise". Applies when no preceding sibling Qualifier at the same
+	indent did, binding a fallback to the Items above it so a restated
+	negated condition cannot drift out of sync. Syntax highlighting needed
+	no change: the Qualifier rule already matches any "[...]".
 
 VERSION 2.6.3  		2025-10-21
 	Bug fix: HyperList folding now works in markdown fenced code blocks
