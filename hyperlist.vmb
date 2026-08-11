@@ -19,7 +19,7 @@ syntax/hyperlist.vim	[[[1
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.7.0 - compatible with the HyperList definition v. 2.7
+" Version:    2.8.0 - compatible with the HyperList definition v. 2.8
 " Modified:   2025-10-21
 " Changes:    Added support for HyperList folding in markdown fenced code blocks. Closes #12
 
@@ -2262,8 +2262,8 @@ menu HyperList.Show\ Complexity\ of\ List<Tab>:call\ Complexity() :call Complexi
 " vim modeline {{{1
 " vim: set sw=2 sts=2 et fdm=marker fcs=fold\:\ :
 doc/hyperlist.txt	[[[1
-1670
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.7.0, 2026-08-10)
+1682
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.8.0, 2026-08-11)
  
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -2706,8 +2706,13 @@ this documentation -- even that is a valid HyperList.
 ------------------------------------------------------------------------------
 4.1 Starter                                                *HyperList-Starter*
 
-A HyperList Item may begin with a "Starter". A "Starter" can be either an
-"Identifier" or a "Multi-line Indicator".
+A HyperList Item may begin with a "Starter". A "Starter" can be either a
+"Neutral Starter" or an "Identifier".
+
+The Neutral Starters are the plus sign ("+") and the hyphen ("-"), each
+followed by a space. They mark where an Item begins and carry no further
+meaning. An Identifier does the same and is also unique, so it can be referred
+to.
 
 An Identifier is a unique indicator that can be used in referring to that Item.
 A numbering scheme such as X.Y.Z can be used, e.g. the first Item in a
@@ -2720,24 +2725,21 @@ as 1A1A for the first fourth-level Item. The next fourth-level Item would be
 1A1B. When using this scheme, there is no need for any periods. The Identifier
 "21T2AD" would be equivalent to "21.20.2.30", saving 4 characters.
 
-An Item that spans more than one line must have a Starter. It does not have to
-be an Identifier. You may use a "Multi-line Indicator" instead; just prefix the
-Item with a plus sign ("+"), to show that it spans more than one line.    The
-second line of an Item will be indented to the same level/indent as the first
-with an added space in front.    If you use a Starter on one Item, then all the
-Items in that same group of Items on the same level/indent must also have a
-Starter.
+A Starter is optional. An Item that spans more than one line must have one, so
+that the reader can tell where the Item begins.
 
-In the example below, the first child begins with an Identifier and the second
-a Multi-line Indicator. A Multi-line Indicator can also be used for single-line
-Items when other Items on the same level span more than one line and thus
-require a Multi-line Indicator.
+The second and following lines of an Item are indented two spaces beyond the
+Item's own indent. One level of indentation must be at least three columns
+wide, which is what keeps a continuation line from being read as a child.
 
-	Multi-line Indicator = "+"
-		1. Following lines are of the same indent with a "space" before
-		 the text
-		+ If one Item on a certain level/indent is multi-line, all Items
-		 on the same level/indent must start with a plus sign ("+") or <Identifier> 
+There is no requirement on the other Items at the same level. An Item that
+fits on one line needs no Starter, whatever its siblings do.
+
+	Starters
+		- A Neutral Starter is a plus sign or a hyphen, followed by a space
+		+ An Item that runs past the end of the line takes a Starter, and
+		  its following lines are indented two spaces further than the Item
+		1 An Identifier such as this one also acts as a Starter
 
 The angle brackets near the end will be discussed later in this article.
 
@@ -3237,7 +3239,7 @@ First, here is a simple list showing what HyperList is all about:
 
 	HyperList Item parts (in sequence): 
 		Starter (optional)
-			Identifier or Multi-line Indicator
+			Neutral Starter or Identifier
 		Type (optional)
 			State or transition
 		Content (can be an Element and/or an Additive)
@@ -3254,7 +3256,7 @@ strict by using the system concisely:
 	HyperList Item parts
 		[?] Starter; OR:
 			Identifier
-			Multi-line Indicator
+			Neutral Starter
 		[?] Type; OR:
 			State
 			Transition
@@ -3288,12 +3290,15 @@ HLstart
 HyperList
 	[1+] HyperList Item
 		[?] Starter; OR: 
+			Neutral Starter = "+ " or "- "
+				Marks where an Item begins and carries no further meaning
 			Identifier (Numbers: Format = "1.1.1.1", Mixed: Format = "1A1A")
-				[? Multi-line Item] The Identifier acts like the plus sign ("+")
-			Multi-line Indicator = "+"
-				+ If one Item on a certain indent is multi-line, all Items on the same indent
-				 (including single-line Items) must start with a plus sign ("+")} or <Identifier>
-				 and all lines on the same indent after the first line must start with a space
+				Unique, so the Item can be referred to; also acts as a Starter
+			+ An Item spanning more than one line must have a Starter, and its
+			  following lines are indented two spaces beyond the Item's own indent
+				One level of indentation is at least three columns wide, so a
+				 continuation line can never be read as a child
+				No requirement falls on the other Items at the same indent
 		[?] Type
 			OR: 
 				State = "S:" or "|"
@@ -3488,6 +3493,13 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.8.0  		2026-08-11
+	HyperList definition v2.8. "+" and "-" are Neutral Starters marking
+	where an Item begins. A Starter is required only on an Item that spans
+	more than one line, whose following lines are now indented two spaces
+	beyond the Item's own indent rather than one. The rule that forced every
+	sibling at the same indent to carry a Starter has been dropped.
 
 VERSION 2.7.0  		2026-08-10
 	The definition PDF is no longer bundled; it pushed the vimball past
@@ -3939,8 +3951,8 @@ HyperList
 	[1+] HyperList Item
 		[?] Starter; OR: 
 			Identifier (Numbers: Format = "1.1.1.1", Mixed: Format = "1A1A")
-				[? Multi-line Item] The Identifier acts like the plus sign ("+")
-			Multi-line Indicator = "+"
+			Neutral Starter = "+ " or "- "
+				Marks where an Item begins and carries no further meaning
 				+ If one Item on a certain indent is multi-line, all Items on the same indent
 				 (including single-line Items) must start with a plus sign ("+") or <Identifier>
 				 and all lines on the same indent after the first line must start with a space
@@ -4313,7 +4325,7 @@ ftdetect/hyperlist.vim	[[[1
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.7.0 - compatible with the HyperList definition v. 2.7
+" Version:    2.8.0 - compatible with the HyperList definition v. 2.8
 " Modified:   2025-10-21
 " Changes:    Added support for HyperList folding in markdown fenced code blocks. Closes #12
 

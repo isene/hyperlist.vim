@@ -2,8 +2,8 @@ HyperList
 	[1+] HyperList Item
 		[?] Starter; OR: 
 			Identifier (Numbers: Format = "1.1.1.1", Mixed: Format = "1A1A")
-				[? Multi-line Item] The Identifier acts like the plus sign ("+")
-			Multi-line Indicator = "+"
+			Neutral Starter = "+ " or "- "
+				Marks where an Item begins and carries no further meaning
 				+ If one Item on a certain indent is multi-line, all Items on the same indent
 				 (including single-line Items) must start with a plus sign ("+") or <Identifier>
 				 and all lines on the same indent after the first line must start with a space
