@@ -1956,7 +1956,7 @@ endfunction
 syn match   HLident     '^\(\t\|\*\)*[0-9.]* '
 
 " Multi-line
-syn match   HLmulti     '^\(\t\|\*\)*+ '
+syn match   HLmulti     '^\(\t\|\*\)*[+-] '
 
 " State & Transitions
 syn match   HLstate	'\(\(^\|\s\|\*\)\(S: \|| \)\)\@<=.*' contains=HLtodo,HLop,HLcomment,HLref,HLqual,HLsc,HLmove,HLtag,HLquote
@@ -2084,7 +2084,7 @@ hi	        Folded	  ctermfg=none ctermbg=none cterm=bold term=bold guifg=NONE gu
 hi          HLdim0    ctermfg=241     guifg=Grey
 hi          HLdim1    ctermfg=241     guifg=Grey
 hi          HLident	  ctermfg=Magenta guifg=Magenta
-hi          HLmulti	  ctermfg=Red     guifg=Red
+hi          HLmulti	  ctermfg=Magenta guifg=Magenta
 hi          HLtag	    ctermfg=Red     guifg=Red
 hi          HLop	    ctermfg=Blue    guifg=Blue
 hi          HLqual	  ctermfg=Green   guifg=LimeGreen

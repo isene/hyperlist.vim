@@ -418,19 +418,19 @@ A HyperList Item consists of an optional "Starter", an optional "Type",
 HyperList Item are described below and in the sequence they appear in an Item,
 as outlined here:
 
-	4.1 Starter   
+	4.1 Starter
 	4.2 Type
 	4.3 Content
-		4.3.1 Element 
+		4.3.1 Element
 			4.3.1.1 Operator
 			4.3.1.2 Qualifier
 			4.3.1.3 Substitution
 			4.3.1.4 Property
-			4.3.1.5 Description 
+			4.3.1.5 Description
 		4.3.2 Additive
 			4.3.2.1 Reference
-			4.3.2.2 Tag 
-			4.3.2.3 Comment  
+			4.3.2.2 Tag
+			4.3.2.3 Comment
 			4.3.2.4 Quote
 			4.3.2.5 Change Markup
 	4.4 Separator
@@ -972,7 +972,7 @@ HyperList.
 
 First, here is a simple list showing what HyperList is all about:
 
-	HyperList Item parts (in sequence): 
+	HyperList Item parts (in sequence):
 		Starter (optional)
 			Neutral Starter or Identifier
 		Type (optional)
@@ -980,7 +980,7 @@ First, here is a simple list showing what HyperList is all about:
 		Content (can be an Element and/or an Additive)
 			Element
 				Either an Operator, Qualifier, Property, or Description
-			Additive    
+			Additive
 				Either a Reference, Tag, Comment, Quote, or Change Markup
 		Separator
 			Newline or semicolon
