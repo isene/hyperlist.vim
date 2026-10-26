@@ -19,7 +19,7 @@ syntax/hyperlist.vim	[[[1
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.8.0 - compatible with the HyperList definition v. 2.8
+" Version:    2.9.0 - compatible with the HyperList definition v. 2.9
 " Modified:   2025-10-21
 " Changes:    Added support for HyperList folding in markdown fenced code blocks. Closes #12
 
@@ -1961,7 +1961,7 @@ endfunction
 syn match   HLident     '^\(\t\|\*\)*[0-9.]* '
 
 " Multi-line
-syn match   HLmulti     '^\(\t\|\*\)*+ '
+syn match   HLmulti     '^\(\t\|\*\)*[+-] '
 
 " State & Transitions
 syn match   HLstate	'\(\(^\|\s\|\*\)\(S: \|| \)\)\@<=.*' contains=HLtodo,HLop,HLcomment,HLref,HLqual,HLsc,HLmove,HLtag,HLquote
@@ -2089,7 +2089,7 @@ hi	        Folded	  ctermfg=none ctermbg=none cterm=bold term=bold guifg=NONE gu
 hi          HLdim0    ctermfg=241     guifg=Grey
 hi          HLdim1    ctermfg=241     guifg=Grey
 hi          HLident	  ctermfg=Magenta guifg=Magenta
-hi          HLmulti	  ctermfg=Red     guifg=Red
+hi          HLmulti	  ctermfg=Magenta guifg=Magenta
 hi          HLtag	    ctermfg=Red     guifg=Red
 hi          HLop	    ctermfg=Blue    guifg=Blue
 hi          HLqual	  ctermfg=Green   guifg=LimeGreen
@@ -2262,8 +2262,8 @@ menu HyperList.Show\ Complexity\ of\ List<Tab>:call\ Complexity() :call Complexi
 " vim modeline {{{1
 " vim: set sw=2 sts=2 et fdm=marker fcs=fold\:\ :
 doc/hyperlist.txt	[[[1
-1682
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.8.0, 2026-08-11)
+1692
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.9.0, 2026-10-26)
  
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -2683,19 +2683,19 @@ A HyperList Item consists of an optional "Starter", an optional "Type",
 HyperList Item are described below and in the sequence they appear in an Item,
 as outlined here:
 
-	4.1 Starter   
+	4.1 Starter
 	4.2 Type
 	4.3 Content
-		4.3.1 Element 
+		4.3.1 Element
 			4.3.1.1 Operator
 			4.3.1.2 Qualifier
 			4.3.1.3 Substitution
 			4.3.1.4 Property
-			4.3.1.5 Description 
+			4.3.1.5 Description
 		4.3.2 Additive
 			4.3.2.1 Reference
-			4.3.2.2 Tag 
-			4.3.2.3 Comment  
+			4.3.2.2 Tag
+			4.3.2.3 Comment
 			4.3.2.4 Quote
 			4.3.2.5 Change Markup
 	4.4 Separator
@@ -2732,8 +2732,10 @@ The second and following lines of an Item are indented two spaces beyond the
 Item's own indent. One level of indentation must be at least three columns
 wide, which is what keeps a continuation line from being read as a child.
 
-There is no requirement on the other Items at the same level. An Item that
-fits on one line needs no Starter, whatever its siblings do.
+When one Item in a group spans more than one line, every Item in that group
+takes a Starter, so the group lines up. A group is the Items at the same indent
+under the same parent. In a group where every Item fits on one line, no Item
+needs a Starter.
 
 	Starters
 		- A Neutral Starter is a plus sign or a hyphen, followed by a space
@@ -3237,7 +3239,7 @@ HyperList.
 
 First, here is a simple list showing what HyperList is all about:
 
-	HyperList Item parts (in sequence): 
+	HyperList Item parts (in sequence):
 		Starter (optional)
 			Neutral Starter or Identifier
 		Type (optional)
@@ -3245,7 +3247,7 @@ First, here is a simple list showing what HyperList is all about:
 		Content (can be an Element and/or an Additive)
 			Element
 				Either an Operator, Qualifier, Property, or Description
-			Additive    
+			Additive
 				Either a Reference, Tag, Comment, Quote, or Change Markup
 		Separator
 			Newline or semicolon
@@ -3290,15 +3292,17 @@ HLstart
 HyperList
 	[1+] HyperList Item
 		[?] Starter; OR: 
-			Neutral Starter = "+ " or "- "
+			+ Neutral Starter = "+ " or "- "
 				Marks where an Item begins and carries no further meaning
-			Identifier (Numbers: Format = "1.1.1.1", Mixed: Format = "1A1A")
+			+ Identifier (Numbers: Format = "1.1.1.1", Mixed: Format = "1A1A")
 				Unique, so the Item can be referred to; also acts as a Starter
 			+ An Item spanning more than one line must have a Starter, and its
 			  following lines are indented two spaces beyond the Item's own indent
-				One level of indentation is at least three columns wide, so a
-				 continuation line can never be read as a child
-				No requirement falls on the other Items at the same indent
+				+ One level of indentation is at least three columns wide, so a
+				  continuation line can never be read as a child
+				+ When one Item in a group spans more than one line, every Item
+				  in that group takes a Starter. A group is the Items at the
+				  same indent under the same parent
 		[?] Type
 			OR: 
 				State = "S:" or "|"
@@ -3493,6 +3497,12 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.9.0  		2026-10-26
+	HyperList definition v2.9. The group rule is back: when one Item in a
+	group spans more than one line, every Item in that group takes a
+	Starter. A group is the Items at the same indent under the same parent.
+	Neutral Starters and the two-space continuation from 2.8 stay.
 
 VERSION 2.8.0  		2026-08-11
 	HyperList definition v2.8. "+" and "-" are Neutral Starters marking
@@ -3946,16 +3956,18 @@ purpose and I am not liable for any damages resulting from its use. Further, I
 am under no obligation to maintain or extend this software. It is provided on
 an 'as is' basis without any expressed or implied warranty.
 doc/HyperList.hl	[[[1
-191
+193
 HyperList
 	[1+] HyperList Item
 		[?] Starter; OR: 
 			Identifier (Numbers: Format = "1.1.1.1", Mixed: Format = "1A1A")
 			Neutral Starter = "+ " or "- "
-				Marks where an Item begins and carries no further meaning
-				+ If one Item on a certain indent is multi-line, all Items on the same indent
-				 (including single-line Items) must start with a plus sign ("+") or <Identifier>
-				 and all lines on the same indent after the first line must start with a space
+				+ Marks where an Item begins and carries no further meaning
+				+ An Item that spans more than one line must have a Starter; its
+				  following lines are indented two spaces beyond the Item's own indent
+				+ When one Item in a group spans more than one line, every Item in
+				  that group takes a Starter. A group is the Items at the same
+				  indent under the same parent
 		[?] Type
 			OR: 
 				State = "S:" or "|"
@@ -4139,7 +4151,7 @@ HyperList
 					A Separator between the children reads "and:"
 
 doc/HyperListTutorialAndTestSuite.hl	[[[1
-167
+169
 HyperList Test Suite (V1.1); Press '\f' to uncollapse this whole HyperList
 	This HyperList serves two purposes
 		A tutorial for all hyperlist.vim features 
@@ -4160,8 +4172,10 @@ HyperList Test Suite (V1.1); Press '\f' to uncollapse this whole HyperList
 		[? OK] Qualifier in green
 		A #hashtag should be in yellow; And the preceding semicolon in green
 		1. The numbering is an identifier and should appear in magenta
-		+ The multi-line indicator should appear in red
+		+ The "+" Starter should appear in magenta, like the numbering above
 		 and indicates the item runs across more than one line
+		- The "-" Starter should also appear in magenta
+		 and is the neutral Starter introduced in HyperList 2.8
 		This link should be in magenta <link to nowhere>
 		This comment should be in teal with the link inside in magenta (the <link to nowhere>)
 		Quotes are also in "teal" and with "links inside in magenta, <link to nowhere>"
@@ -4325,7 +4339,7 @@ ftdetect/hyperlist.vim	[[[1
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.8.0 - compatible with the HyperList definition v. 2.8
+" Version:    2.9.0 - compatible with the HyperList definition v. 2.9
 " Modified:   2025-10-21
 " Changes:    Added support for HyperList folding in markdown fenced code blocks. Closes #12
 
