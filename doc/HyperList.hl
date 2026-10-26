@@ -2,7 +2,7 @@ HyperList
 	[1+] HyperList Item
 		[?] Starter; OR: 
 			Identifier (Numbers: Format = "1.1.1.1", Mixed: Format = "1A1A")
-			Neutral Starter = "+ " or "- "
+			Neutral Starter = "+ "
 				+ Marks where an Item begins and carries no further meaning
 				+ An Item that spans more than one line must have a Starter; its
 				  following lines are indented two spaces beyond the Item's own indent
