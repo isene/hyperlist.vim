@@ -472,7 +472,7 @@ under the same parent. In a group where every Item fits on one line, no Item
 needs a Starter.
 
 	Starters
-		- A Neutral Starter is a plus sign or a hyphen, followed by a space
+		+ A Neutral Starter is a plus sign followed by a space
 		+ An Item that runs past the end of the line takes a Starter, and
 		  its following lines are indented two spaces further than the Item
 		1 An Identifier such as this one also acts as a Starter
