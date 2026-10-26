@@ -3,10 +3,12 @@ HyperList
 		[?] Starter; OR: 
 			Identifier (Numbers: Format = "1.1.1.1", Mixed: Format = "1A1A")
 			Neutral Starter = "+ " or "- "
-				Marks where an Item begins and carries no further meaning
-				+ If one Item on a certain indent is multi-line, all Items on the same indent
-				 (including single-line Items) must start with a plus sign ("+") or <Identifier>
-				 and all lines on the same indent after the first line must start with a space
+				+ Marks where an Item begins and carries no further meaning
+				+ An Item that spans more than one line must have a Starter; its
+				  following lines are indented two spaces beyond the Item's own indent
+				+ When one Item in a group spans more than one line, every Item in
+				  that group takes a Starter. A group is the Items at the same
+				  indent under the same parent
 		[?] Type
 			OR: 
 				State = "S:" or "|"
