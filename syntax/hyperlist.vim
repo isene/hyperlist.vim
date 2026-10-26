@@ -14,7 +14,7 @@
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.9.0 - compatible with the HyperList definition v. 2.9
+" Version:    2.9.1 - compatible with the HyperList definition v. 2.9
 " Modified:   2025-10-21
 " Changes:    Added support for HyperList folding in markdown fenced code blocks. Closes #12
 
@@ -1956,7 +1956,7 @@ endfunction
 syn match   HLident     '^\(\t\|\*\)*[0-9.]* '
 
 " Multi-line
-syn match   HLmulti     '^\(\t\|\*\)*[+-] '
+syn match   HLmulti     '^\(\t\|\*\)*+ '
 
 " State & Transitions
 syn match   HLstate	'\(\(^\|\s\|\*\)\(S: \|| \)\)\@<=.*' contains=HLtodo,HLop,HLcomment,HLref,HLqual,HLsc,HLmove,HLtag,HLquote

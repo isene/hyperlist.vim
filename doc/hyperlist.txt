@@ -1,4 +1,4 @@
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.9.0, 2026-10-26)
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.9.1, 2026-10-26)
  
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -444,9 +444,8 @@ this documentation -- even that is a valid HyperList.
 A HyperList Item may begin with a "Starter". A "Starter" can be either a
 "Neutral Starter" or an "Identifier".
 
-The Neutral Starters are the plus sign ("+") and the hyphen ("-"), each
-followed by a space. They mark where an Item begins and carry no further
-meaning. An Identifier does the same and is also unique, so it can be referred
+The Neutral Starter is the plus sign ("+") followed by a space. It marks
+where an Item begins and carries no further meaning. An Identifier does the same and is also unique, so it can be referred
 to.
 
 An Identifier is a unique indicator that can be used in referring to that Item.
@@ -1027,7 +1026,7 @@ HLstart
 HyperList
 	[1+] HyperList Item
 		[?] Starter; OR: 
-			+ Neutral Starter = "+ " or "- "
+			+ Neutral Starter = "+ "
 				Marks where an Item begins and carries no further meaning
 			+ Identifier (Numbers: Format = "1.1.1.1", Mixed: Format = "1A1A")
 				Unique, so the Item can be referred to; also acts as a Starter
@@ -1232,6 +1231,10 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.9.1  		2026-10-26
+	The hyphen ("-") is no longer a Starter, so a Starter is "+ " or an
+	Identifier. A line that begins with "- " is plain text again.
 
 VERSION 2.9.0  		2026-10-26
 	HyperList definition v2.9. The group rule is back: when one Item in a

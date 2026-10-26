@@ -19,7 +19,7 @@ syntax/hyperlist.vim	[[[1
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.9.0 - compatible with the HyperList definition v. 2.9
+" Version:    2.9.1 - compatible with the HyperList definition v. 2.9
 " Modified:   2025-10-21
 " Changes:    Added support for HyperList folding in markdown fenced code blocks. Closes #12
 
@@ -1961,7 +1961,7 @@ endfunction
 syn match   HLident     '^\(\t\|\*\)*[0-9.]* '
 
 " Multi-line
-syn match   HLmulti     '^\(\t\|\*\)*[+-] '
+syn match   HLmulti     '^\(\t\|\*\)*+ '
 
 " State & Transitions
 syn match   HLstate	'\(\(^\|\s\|\*\)\(S: \|| \)\)\@<=.*' contains=HLtodo,HLop,HLcomment,HLref,HLqual,HLsc,HLmove,HLtag,HLquote
@@ -2262,8 +2262,8 @@ menu HyperList.Show\ Complexity\ of\ List<Tab>:call\ Complexity() :call Complexi
 " vim modeline {{{1
 " vim: set sw=2 sts=2 et fdm=marker fcs=fold\:\ :
 doc/hyperlist.txt	[[[1
-1692
-*hyperlist.txt*   The VIM plugin for HyperList (version 2.9.0, 2026-10-26)
+1695
+*hyperlist.txt*   The VIM plugin for HyperList (version 2.9.1, 2026-10-26)
  
 HyperList is a way to describe anything - any state, item(s), pattern, action,
 process, transition, program, instruction set etc. So, you can use it as an
@@ -2709,9 +2709,8 @@ this documentation -- even that is a valid HyperList.
 A HyperList Item may begin with a "Starter". A "Starter" can be either a
 "Neutral Starter" or an "Identifier".
 
-The Neutral Starters are the plus sign ("+") and the hyphen ("-"), each
-followed by a space. They mark where an Item begins and carry no further
-meaning. An Identifier does the same and is also unique, so it can be referred
+The Neutral Starter is the plus sign ("+") followed by a space. It marks
+where an Item begins and carries no further meaning. An Identifier does the same and is also unique, so it can be referred
 to.
 
 An Identifier is a unique indicator that can be used in referring to that Item.
@@ -3292,7 +3291,7 @@ HLstart
 HyperList
 	[1+] HyperList Item
 		[?] Starter; OR: 
-			+ Neutral Starter = "+ " or "- "
+			+ Neutral Starter = "+ "
 				Marks where an Item begins and carries no further meaning
 			+ Identifier (Numbers: Format = "1.1.1.1", Mixed: Format = "1A1A")
 				Unique, so the Item can be referred to; also acts as a Starter
@@ -3497,6 +3496,10 @@ HyperList definition itself; Geir Isene <g@isene.com>. More at http//isene.org
 
 ==============================================================================
 7 Changelog                                              *HyperList-Changelog*
+
+VERSION 2.9.1  		2026-10-26
+	The hyphen ("-") is no longer a Starter, so a Starter is "+ " or an
+	Identifier. A line that begins with "- " is plain text again.
 
 VERSION 2.9.0  		2026-10-26
 	HyperList definition v2.9. The group rule is back: when one Item in a
@@ -3961,7 +3964,7 @@ HyperList
 	[1+] HyperList Item
 		[?] Starter; OR: 
 			Identifier (Numbers: Format = "1.1.1.1", Mixed: Format = "1A1A")
-			Neutral Starter = "+ " or "- "
+			Neutral Starter = "+ "
 				+ Marks where an Item begins and carries no further meaning
 				+ An Item that spans more than one line must have a Starter; its
 				  following lines are indented two spaces beyond the Item's own indent
@@ -4339,7 +4342,7 @@ ftdetect/hyperlist.vim	[[[1
 "             Further, I am under no obligation to maintain or extend
 "             this software. It is provided on an 'as is' basis without
 "             any expressed or implied warranty.
-" Version:    2.9.0 - compatible with the HyperList definition v. 2.9
+" Version:    2.9.1 - compatible with the HyperList definition v. 2.9
 " Modified:   2025-10-21
 " Changes:    Added support for HyperList folding in markdown fenced code blocks. Closes #12
 
